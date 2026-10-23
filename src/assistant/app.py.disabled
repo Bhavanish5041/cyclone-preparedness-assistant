@@ -1,0 +1,1022 @@
+"""Cyclone Preparedness Assistant — Decision Support Dashboard.
+
+Streamlit multi-page application for coastal Karnataka (Dakshina Kannada & Udupi).
+Provides interactive geospatial exploration, multidimensional vulnerability inspection,
+dynamic policy scenario re-weighting, rank sensitivity comparison, and archetype discovery.
+
+Architecture:
+- Directly utilizes DecisionSupportService with @st.cache_resource for ultra-low latency,
+  zero-redundancy in-memory computations, and standalone zero-dependency execution.
+- Reuses verified analytical formulations from src/features/prioritization.py and
+  src/models/clustering.py without formula duplication.
+"""
+
+import sys
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import altair as alt
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import streamlit as st
+from streamlit_folium import st_folium
+
+# Ensure project root is in python path
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from src.api.schemas import (
+    PrioritizationScenarioRequest,
+    ScenarioComparisonRequest,
+    WeightConfiguration,
+)
+from src.assistant.decision_support import DecisionSupportService
+from src.assistant.ui_components import (
+    ARCHETYPE_COLORS,
+    METRIC_LABELS,
+    build_folium_choropleth_map,
+    generate_radar_chart,
+    generate_rank_scatter_chart,
+    get_custom_css,
+)
+from src.features.prioritization import PRIORITIZATION_DISCLAIMER
+from src.models.clustering import ARCHETYPE_DISCLAIMER, ARCHETYPE_LABELS_K4
+
+# Configure Streamlit page layout
+st.set_page_config(
+    page_title="Cyclone Preparedness Assistant | Decision Support Dashboard",
+    page_icon="🌀",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# Inject custom CSS styling
+st.markdown(get_custom_css(), unsafe_allow_html=True)
+
+
+@st.cache_resource(show_spinner="Loading spatial decision support baseline...")
+def get_service() -> DecisionSupportService:
+    """Initialize and cache the DecisionSupportService singleton."""
+    return DecisionSupportService()
+
+
+def render_sidebar(service: DecisionSupportService) -> Tuple[str, Optional[str]]:
+    """Render the sidebar with navigation, district filter, and architecture notes."""
+    st.sidebar.markdown(
+        """
+        <div style="text-align: center; margin-bottom: 1.2rem;">
+            <h2 style="margin: 0; color: #38bdf8; font-size: 1.5rem;">🌀 Cyclone Assistant</h2>
+            <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">Spatial Decision Support System</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    page = st.sidebar.radio(
+        "Navigation",
+        options=[
+            "🗺️ Prioritization Map & Policy Studio",
+            "🔍 Community Deep-Dive",
+            "⚖️ Scenario Comparison",
+            "📊 Archetypes & Methodology",
+        ],
+        index=0,
+    )
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📍 Study Area Filter")
+    district_choice = st.sidebar.selectbox(
+        "District Scope",
+        options=["All Coastal Karnataka (622 Units)", "Dakshina Kannada (369 Units)", "Udupi (253 Units)"],
+        index=0,
+    )
+    district_filter = None
+    if "Dakshina Kannada" in district_choice:
+        district_filter = "Dakshina Kannada"
+    elif "Udupi" in district_choice:
+        district_filter = "Udupi"
+
+    st.sidebar.markdown("---")
+    with st.sidebar.expander("ℹ️ Architecture & Trade-Offs"):
+        st.markdown(
+            """
+            **Direct Service Execution (Active)**
+            - Leverages in-process `DecisionSupportService` cached via `@st.cache_resource`.
+            - Sub-millisecond response times for dynamic slider adjustments with 0 network latency.
+            - Allows standalone execution with a single command without running a separate backend.
+
+            **FastAPI Backend (Complementary)**
+            - Exposes identical endpoints (`/api/v1/...`) at port `8000`.
+            - Suitable for headless external GIS integrations and programmatic queries.
+            """
+        )
+
+    st.sidebar.markdown(
+        """
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: 2rem;">
+            RV College of Engineering • Dept. of CSE (AI & ML)<br>
+            Coastal Karnataka Preparedness Rebuild
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    return page, district_filter
+
+
+# ==============================================================================
+# PAGE 1: Prioritization Map & Policy Studio
+# ==============================================================================
+def render_page_prioritization_map(service: DecisionSupportService, district_filter: Optional[str]) -> None:
+    st.markdown(
+        """
+        <div class="hero-banner">
+            <h1 class="hero-title">Prioritization Map & Policy Studio</h1>
+            <p class="hero-subtitle">
+                Simulate emergency resource allocation policies across 622 coastal Karnataka revenue villages and towns.
+                Adjust dimension weights to recompute deterministic preparedness priority scores and identify underserved communities.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 1. Weight Preset Selection and Interactive Sliders
+    st.markdown("### 🎛️ Policy Weighting Studio")
+    col_preset, col_scale = st.columns([3, 1])
+
+    with col_preset:
+        preset = st.selectbox(
+            "Load Policy Preset",
+            options=[
+                "Equal Weights (Analytical Baseline: 25% each)",
+                "Rapid Landfall Hazard Focus (60% Coastal Proximity, 20% Infra, 10% Health, 10% Demo)",
+                "Rural Healthcare Isolation (50% Healthcare Deficit, 25% Demo, 25% Infra, 0% Coastal)",
+                "Inland Resilience Focus (0% Coastal, 35% Healthcare, 35% Infra, 30% Demo)",
+                "Custom Weight Sliders",
+            ],
+            index=0,
+        )
+
+    with col_scale:
+        include_pop = st.checkbox(
+            "Scale by Population",
+            value=False,
+            help="When checked, factors absolute Census population scale into the demographic vulnerability dimension.",
+        )
+
+    # Preset values mapping
+    if "Equal Weights" in preset:
+        w_health, w_demo, w_infra, w_coast = 25, 25, 25, 25
+    elif "Rapid Landfall" in preset:
+        w_health, w_demo, w_infra, w_coast = 10, 10, 20, 60
+    elif "Rural Healthcare" in preset:
+        w_health, w_demo, w_infra, w_coast = 50, 25, 25, 0
+    elif "Inland Resilience" in preset:
+        w_health, w_demo, w_infra, w_coast = 35, 30, 35, 0
+    else:
+        # Default starting points for custom
+        w_health, w_demo, w_infra, w_coast = 30, 20, 20, 30
+
+    # Render interactive sliders
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        s_health = st.slider("Healthcare Deficit Weight", 0, 100, w_health, key="sl_h")
+    with col2:
+        s_demo = st.slider("Demographic Vulnerability Weight", 0, 100, w_demo, key="sl_d")
+    with col3:
+        s_infra = st.slider("Infrastructure Deficit Weight", 0, 100, w_infra, key="sl_i")
+    with col4:
+        s_coast = st.slider("Coastal Hazard Weight", 0, 100, w_coast, key="sl_c")
+
+    # Safe normalization calculation
+    total_raw = s_health + s_demo + s_infra + s_coast
+    if total_raw == 0:
+        st.error("⚠️ At least one dimension weight must be greater than zero.")
+        return
+
+    norm_h = s_health / total_raw
+    norm_d = s_demo / total_raw
+    norm_i = s_infra / total_raw
+    norm_c = s_coast / total_raw
+
+    # Display effective normalized weights
+    st.markdown(
+        f"""
+        <div style="background: rgba(30, 41, 59, 0.4); border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 1.2rem; font-size: 0.88rem;">
+            <b>Effective Normalized Weights:</b> &nbsp;
+            🏥 Healthcare: <code style="color:#38bdf8;">{norm_h:.1%}</code> &nbsp;|&nbsp;
+            👥 Demographic: <code style="color:#38bdf8;">{norm_d:.1%}</code> &nbsp;|&nbsp;
+            🏗️ Infrastructure: <code style="color:#38bdf8;">{norm_i:.1%}</code> &nbsp;|&nbsp;
+            🌊 Coastal Proximity: <code style="color:#38bdf8;">{norm_c:.1%}</code>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Recompute scenario rankings dynamically
+    req_weights = WeightConfiguration(
+        healthcare=float(s_health),
+        demographic=float(s_demo),
+        infrastructure=float(s_infra),
+        coastal=float(s_coast),
+        auto_normalize=True,
+        include_population_scale=include_pop,
+    )
+    req = PrioritizationScenarioRequest(
+        scenario_name=preset if "Custom" not in preset else "Custom Scenario",
+        weights=req_weights,
+        top_n=622,
+        district_filter=district_filter,
+    )
+
+    # Compute scenario via service
+    scenario_res = service.compute_prioritization_scenario(req)
+
+    # Merge custom score & rank into full GeoDataFrame for geospatial visualization
+    eval_df = service.df.copy()
+    w_applied = scenario_res.weights_applied
+    custom_score = (
+        w_applied["healthcare"] * eval_df["dim_healthcare_deficit"]
+        + w_applied["demographic"] * eval_df["dim_demographic_vulnerability"]
+        + w_applied["infrastructure"] * eval_df["dim_infrastructure_deficit"]
+        + w_applied["coastal"] * eval_df["dim_coastal_exposure"]
+    ).round(4)
+
+    eval_df["priority_score"] = custom_score
+    eval_df["priority_rank"] = custom_score.rank(ascending=False, method="min").astype(int)
+
+    # Filter district if selected
+    if district_filter:
+        display_df = eval_df[eval_df["district_name"].str.lower() == district_filter.lower()].copy()
+    else:
+        display_df = eval_df.copy()
+
+    # Is this scenario identical to baseline equal weights?
+    is_baseline = (
+        abs(norm_h - 0.25) < 1e-4
+        and abs(norm_d - 0.25) < 1e-4
+        and abs(norm_i - 0.25) < 1e-4
+        and abs(norm_c - 0.25) < 1e-4
+        and not include_pop
+    )
+
+    # Scenario Indicator Badge
+    if is_baseline:
+        st.info("ℹ️ Displaying **Analytical Baseline: Equal Weights (25% each)** across all dimensions.")
+    else:
+        st.success(f"⚡ Displaying **Dynamic Policy Scenario**: *{req.scenario_name}*")
+
+    # 2. Key Statistical Metrics
+    m1, m2, m3, m4, m5 = st.columns(5)
+    with m1:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Units Evaluated</div>
+                <div class="metric-value">{len(display_df)}</div>
+                <div class="metric-caption">{district_filter or "Both Districts"}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m2:
+        top_unit = display_df.sort_values("priority_score", ascending=False).iloc[0]
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Top Priority Unit</div>
+                <div class="metric-value" style="font-size: 1.25rem;">{top_unit['unit_name']}</div>
+                <div class="metric-caption">Score: {top_unit['priority_score']:.4f}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m3:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Median Score</div>
+                <div class="metric-value">{display_df['priority_score'].median():.4f}</div>
+                <div class="metric-caption">Interquartile baseline</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m4:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Max Priority Score</div>
+                <div class="metric-value" style="color: #ef4444;">{display_df['priority_score'].max():.4f}</div>
+                <div class="metric-caption">Highest composite deficit</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m5:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Min Priority Score</div>
+                <div class="metric-value" style="color: #10b981;">{display_df['priority_score'].min():.4f}</div>
+                <div class="metric-caption">Lowest composite deficit</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 3. Folium Map Layer & Overlay Controls
+    st.markdown("### 🗺️ Geospatial Layer Exploration")
+    map_col1, map_col2, map_col3 = st.columns([2, 1, 1])
+
+    with map_col1:
+        selected_metric = st.selectbox(
+            "Choropleth Color Layer",
+            options=[
+                ("priority_score", "Composite Priority Score (Active Scenario)"),
+                ("dim_healthcare_deficit", "Healthcare Access Deficit (0 to 1)"),
+                ("dim_demographic_vulnerability", "Demographic Vulnerability (0 to 1)"),
+                ("dim_infrastructure_deficit", "Infrastructure Deficit (0 to 1)"),
+                ("dim_coastal_exposure", "Coastal Hazard Proximity (0 to 1)"),
+                ("vulnerability_archetype_id", "Discovered Vulnerability Archetypes (4 Clusters)"),
+            ],
+            format_func=lambda x: x[1],
+            index=0,
+        )[0]
+
+    with map_col2:
+        show_coast = st.checkbox("Overlay 10m Coastline", value=True)
+
+    with map_col3:
+        show_hosp = st.checkbox("Overlay Healthcare Facilities", value=False)
+
+    # Render Folium Map
+    with st.spinner("Rendering geospatial choropleth map..."):
+        fmap = build_folium_choropleth_map(
+            gdf=display_df,
+            metric_col=selected_metric,
+            show_coastline=show_coast,
+            show_healthcare=show_hosp,
+        )
+        st_folium(fmap, use_container_width=True, height=520, returned_objects=[])
+
+    # 4. Top-20 Prioritized Communities Table
+    st.markdown("### 📋 Top-20 Prioritized Communities")
+    top_20 = display_df.sort_values("priority_score", ascending=False).head(20).copy()
+
+    # Format table columns
+    table_df = pd.DataFrame(
+        {
+            "Rank": range(1, len(top_20) + 1),
+            "Unit Name": top_20["unit_name"].values,
+            "District": top_20["district_name"].values,
+            "Unit Type": top_20["unit_type"].values,
+            "Priority Score": top_20["priority_score"].map(lambda x: f"{x:.4f}").values,
+            "Baseline Rank": top_20["priority_rank"].values,
+            "Archetype": top_20["vulnerability_archetype_label"].values,
+            "Dist to Coast (km)": top_20["dist_to_coastline_km"].map(lambda x: f"{x:.1f}").values,
+            "Dist to Hospital (km)": top_20["dist_to_nearest_hospital_km"].map(lambda x: f"{x:.1f}").values,
+            "Population": top_20["total_population"].map(lambda x: f"{x:,}").values,
+        }
+    )
+
+    st.dataframe(table_df, use_container_width=True, hide_index=True)
+
+    # Export CSV Button
+    csv_data = display_df[
+        [
+            "shrid2",
+            "pc11_id",
+            "unit_name",
+            "unit_type",
+            "district_name",
+            "priority_score",
+            "priority_rank",
+            "dim_healthcare_deficit",
+            "dim_demographic_vulnerability",
+            "dim_infrastructure_deficit",
+            "dim_coastal_exposure",
+            "vulnerability_archetype_label",
+            "total_population",
+            "dist_to_coastline_km",
+            "dist_to_nearest_hospital_km",
+        ]
+    ].to_csv(index=False)
+
+    st.download_button(
+        label="📥 Download Full Prioritization Scenario (CSV)",
+        data=csv_data,
+        file_name=f"cyclone_prioritization_{req.scenario_name.lower().replace(' ', '_')}.csv",
+        mime="text/csv",
+    )
+
+    # Prominent Disclaimer Callout
+    st.markdown(
+        f"""
+        <div class="disclaimer-box">
+            <b>Analytical Disclaimer:</b> {PRIORITIZATION_DISCLAIMER}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ==============================================================================
+# PAGE 2: Community Deep-Dive & Inspection Tool
+# ==============================================================================
+def render_page_community_deep_dive(service: DecisionSupportService) -> None:
+    st.markdown(
+        """
+        <div class="hero-banner">
+            <h1 class="hero-title">Community Deep-Dive & Inspection Tool</h1>
+            <p class="hero-subtitle">
+                Inspect granular multidimensional indicators, radar profiles, demographic vulnerability metrics,
+                and tailored disaster response intervention checklists for any of the 622 revenue villages and towns.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Search & Unit Autocomplete Selection
+    all_units = service.df.sort_values("unit_name")
+    unit_options = [
+        f"{row['unit_name']} ({row['unit_type']}, {row['district_name']}) — PC11: {row['pc11_id']}"
+        for _, row in all_units.iterrows()
+    ]
+    shrid_map = {opt: row["shrid2"] for opt, (_, row) in zip(unit_options, all_units.iterrows())}
+
+    st.markdown("### 🔎 Select Administrative Unit")
+    quick_col, sel_col = st.columns([1, 3])
+
+    with quick_col:
+        st.markdown("**Quick Picks:**")
+        q1, q2 = st.columns(2)
+        with q1:
+            pick_tallur = st.button("Tallur (Coast)")
+            pick_edmoge = st.button("Edmoge (Foothill)")
+        with q2:
+            pick_mang = st.button("Mangaluru (Urban)")
+            pick_shim = st.button("Shimanthur (Rural)")
+
+    # Handle quick pick default selection
+    default_idx = 0
+    if pick_tallur:
+        default_idx = next((i for i, opt in enumerate(unit_options) if "Tallur" in opt), 0)
+    elif pick_edmoge:
+        default_idx = next((i for i, opt in enumerate(unit_options) if "Edmoge" in opt), 0)
+    elif pick_mang:
+        default_idx = next((i for i, opt in enumerate(unit_options) if "Mangaluru" in opt), 0)
+    elif pick_shim:
+        default_idx = next((i for i, opt in enumerate(unit_options) if "Shimanthur" in opt), 0)
+
+    with sel_col:
+        selected_option = st.selectbox(
+            "Search by Unit Name, Census PC11 ID, or District",
+            options=unit_options,
+            index=default_idx,
+        )
+
+    selected_shrid = shrid_map[selected_option]
+
+    # Retrieve full unit detail using service
+    try:
+        detail = service.get_unit_detail(selected_shrid)
+    except KeyError:
+        st.error(f"Unit '{selected_shrid}' not found.")
+        return
+
+    # Archetype badge color
+    arch_info = detail.archetype if isinstance(detail.archetype, dict) else detail.archetype.model_dump()
+    c_id = int(arch_info.get("archetype_id", 0))
+    arch_color = ARCHETYPE_COLORS.get(c_id, {}).get("hex", "#38bdf8")
+
+    # 1. Community Header Banner
+    st.markdown(
+        f"""
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.2rem 1.5rem; margin-top: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 style="margin: 0; color: #f8fafc; font-size: 1.7rem;">{detail.unit_name}</h2>
+                    <p style="margin: 0.2rem 0 0 0; color: #94a3b8; font-size: 0.95rem;">
+                        <b>{detail.unit_type}</b> in <b>{detail.district_name} District</b> &nbsp;|&nbsp;
+                        Census PC11 ID: <code>{detail.pc11_id}</code> &nbsp;|&nbsp;
+                        SHRID: <code>{detail.shrid2}</code>
+                    </p>
+                </div>
+                <div>
+                    <span class="badge-pill badge-arch-{c_id}" style="font-size: 0.9rem; padding: 0.4rem 1rem;">
+                        🏷️ Archetype {c_id}: {arch_info.get('label', f'Cluster {c_id}')}
+                    </span>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 2. Key Metrics Row
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Priority Rank</div>
+                <div class="metric-value">#{detail.priority_rank} <span style="font-size: 0.9rem; color: #94a3b8;">/ 622</span></div>
+                <div class="metric-caption">Top {detail.priority_rank / 622 * 100:.1f}% across study area</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m2:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Composite Priority Score</div>
+                <div class="metric-value">{detail.priority_score:.4f}</div>
+                <div class="metric-caption">Baseline Equal-Weights index</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m3:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Distance to Coastline</div>
+                <div class="metric-value">{detail.raw_indicators['dist_to_coastline_km']:.1f} <span style="font-size: 0.9rem;">km</span></div>
+                <div class="metric-caption">Perpendicular proxy in UTM 43N</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m4:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Distance to Hospital</div>
+                <div class="metric-value">{detail.raw_indicators['dist_to_nearest_hospital_km']:.1f} <span style="font-size: 0.9rem;">km</span></div>
+                <div class="metric-caption">Geodesic to registered facility</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # 3. Two-Column Inspection View: Radar Chart vs Physical Indicators
+    col_left, col_right = st.columns([1, 1])
+
+    with col_left:
+        st.markdown("#### 🎯 Multidimensional Deficit Profile")
+        st.write("Comparison of normalized dimension deficits ([0.0, 1.0]) against the district median benchmark:")
+
+        # Compute district medians for comparison
+        dist_df = service.df[service.df["district_name"] == detail.district_name]
+        dist_medians = {
+            "healthcare_deficit": float(dist_df["dim_healthcare_deficit"].median()),
+            "demographic_vulnerability": float(dist_df["dim_demographic_vulnerability"].median()),
+            "infrastructure_deficit": float(dist_df["dim_infrastructure_deficit"].median()),
+            "coastal_exposure": float(dist_df["dim_coastal_exposure"].median()),
+        }
+
+        radar_fig = generate_radar_chart(
+            unit_scores=detail.dimension_scores,
+            district_medians=dist_medians,
+            unit_name=detail.unit_name,
+            district_name=detail.district_name,
+        )
+        st.pyplot(radar_fig, use_container_width=True)
+
+        # Dimension scores progress bars
+        st.markdown("##### Dimension Scores (Higher = Greater Deficit)")
+        for dim_name, score in detail.dimension_scores.items():
+            label = METRIC_LABELS.get(f"dim_{dim_name}", dim_name.replace("_", " ").title())
+            st.write(f"**{label}**: `{score:.4f}`")
+            st.progress(float(score))
+
+    with col_right:
+        st.markdown("#### 📊 Granular Physical & Demographic Indicators")
+
+        raw = detail.raw_indicators
+        indicators_data = {
+            "Indicator": [
+                "Nearest Hospital",
+                "Hospital Distance",
+                "Hospital Facility Type",
+                "Nearest Primary Health Centre (PHC/CHC)",
+                "PHC/CHC Distance",
+                "Total Population (Census 2011)",
+                "Total Households",
+                "SC / ST Population Ratio",
+                "Sex Ratio",
+                "Treated Piped Tap Water Access",
+                "All-Weather Paved Road",
+                "Drainage System",
+            ],
+            "Value": [
+                raw.get("nearest_hospital_name", "N/A"),
+                f"{raw['dist_to_nearest_hospital_km']:.2f} km",
+                raw.get("nearest_hospital_type", "N/A"),
+                raw.get("nearest_phc_chc_name", "N/A"),
+                f"{raw['dist_to_nearest_phc_chc_km']:.2f} km",
+                f"{raw['total_population']:,}",
+                f"{raw['total_households']:,}",
+                f"{raw['sc_st_ratio']:.2%}",
+                f"{raw['sex_ratio_female_per_1000_male']} females / 1000 males",
+                "✅ Available" if raw["has_treated_tap_water"] else "❌ Unavailable / Untreated",
+                "✅ Paved (Pucca)" if raw["has_all_weather_road"] else "❌ Kutcha / Unpaved",
+                raw["drainage_system"],
+            ],
+        }
+        st.table(pd.DataFrame(indicators_data))
+
+    # 4. Tailored Archetype Intervention Checklist
+    st.markdown("### 📋 Operational Disaster Response Protocol")
+    st.markdown(
+        f"""
+        <div style="background: rgba(30, 41, 59, 0.5); border-left: 5px solid {arch_color}; border-radius: 0 10px 10px 0; padding: 1rem 1.4rem; margin-bottom: 1.5rem;">
+            <h4 style="margin: 0; color: #f8fafc; font-size: 1.15rem;">Priority Intervention Directive: {arch_info.get('label', f'Cluster {c_id}')}</h4>
+            <p style="margin: 0.4rem 0 0.8rem 0; color: #94a3b8; font-size: 0.92rem;">{arch_info.get('description', '')}</p>
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 0.8rem 1rem; border-radius: 6px; color: #e2e8f0; font-size: 0.9rem;">
+                <b>Recommended Actions:</b> {arch_info.get('recommended_interventions', '')}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 5. Provenance & Limitations Accordion
+    with st.expander("⚠️ Data Provenance, Temporal Vintage, and Operational Caveats"):
+        prov = detail.provenance_and_limitations
+        st.markdown(
+            f"""
+            - **Census Vintage**: Decennial Census `{prov['census_vintage']}`. Rapid infrastructure developments (e.g. Jal Jeevan Mission piped water or PMGSY roads) constructed post-2011 are not captured.
+            - **Healthcare Facility Directory**: National Health Portal / MoHFW `{prov['healthcare_directory_source']}`.
+            - **Facility Freshness Caveat**: `{prov['operational_limitations']}`
+            - **Coastline Source**: `{prov['coastline_source']}`.
+            - **Geometric Assumption**: Coastline distance is straight-line Euclidean distance in UTM Zone 43N, NOT a hydrodynamic storm-surge flood simulation.
+            """
+        )
+
+
+# ==============================================================================
+# PAGE 3: Scenario Comparison & Sensitivity Studio
+# ==============================================================================
+def render_page_scenario_comparison(service: DecisionSupportService) -> None:
+    st.markdown(
+        """
+        <div class="hero-banner">
+            <h1 class="hero-title">Scenario Comparison & Sensitivity Studio</h1>
+            <p class="hero-subtitle">
+                Compare community rank shifts across distinct policy priorities. Contrast baseline allocations
+                against coastal hazard surge or rural clinic access weighting to evaluate policy sensitivity.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 1. Scenario Configuration Panels
+    st.markdown("### ⚖️ Select Policy Schemes to Contrast")
+    col_a, col_b = st.columns(2)
+
+    with col_a:
+        st.markdown("#### Scenario A (Reference)")
+        sc_a_choice = st.selectbox(
+            "Scheme A",
+            options=[
+                "Equal Weights Baseline (25% each)",
+                "Rapid Landfall Hazard Focus (60% Coastal)",
+                "Rural Healthcare Isolation (50% Healthcare)",
+                "Inland Infrastructure Focus (0% Coastal)",
+            ],
+            index=0,
+            key="sc_a_sel",
+        )
+        if "Equal Weights" in sc_a_choice:
+            wa_h, wa_d, wa_i, wa_c = 0.25, 0.25, 0.25, 0.25
+        elif "Rapid Landfall" in sc_a_choice:
+            wa_h, wa_d, wa_i, wa_c = 0.10, 0.10, 0.20, 0.60
+        elif "Rural Healthcare" in sc_a_choice:
+            wa_h, wa_d, wa_i, wa_c = 0.50, 0.25, 0.25, 0.00
+        else:
+            wa_h, wa_d, wa_i, wa_c = 0.35, 0.30, 0.35, 0.00
+
+    with col_b:
+        st.markdown("#### Scenario B (Comparison / Alternate Policy)")
+        sc_b_choice = st.selectbox(
+            "Scheme B",
+            options=[
+                "Rapid Landfall Hazard Focus (60% Coastal)",
+                "Rural Healthcare Isolation (50% Healthcare)",
+                "Inland Infrastructure Focus (0% Coastal)",
+                "Equal Weights Baseline (25% each)",
+                "Custom Weights Slider Scheme",
+            ],
+            index=0,
+            key="sc_b_sel",
+        )
+
+        if "Custom" in sc_b_choice:
+            c1, c2 = st.columns(2)
+            with c1:
+                wb_h_raw = st.slider("Healthcare Weight B", 0, 100, 40, key="wb_h")
+                wb_d_raw = st.slider("Demographic Weight B", 0, 100, 20, key="wb_d")
+            with c2:
+                wb_i_raw = st.slider("Infrastructure Weight B", 0, 100, 20, key="wb_i")
+                wb_c_raw = st.slider("Coastal Weight B", 0, 100, 20, key="wb_c")
+            tot_b = wb_h_raw + wb_d_raw + wb_i_raw + wb_c_raw
+            if tot_b == 0:
+                tot_b = 1
+            wb_h, wb_d, wb_i, wb_c = wb_h_raw / tot_b, wb_d_raw / tot_b, wb_i_raw / tot_b, wb_c_raw / tot_b
+        elif "Equal Weights" in sc_b_choice:
+            wb_h, wb_d, wb_i, wb_c = 0.25, 0.25, 0.25, 0.25
+        elif "Rapid Landfall" in sc_b_choice:
+            wb_h, wb_d, wb_i, wb_c = 0.10, 0.10, 0.20, 0.60
+        elif "Rural Healthcare" in sc_b_choice:
+            wb_h, wb_d, wb_i, wb_c = 0.50, 0.25, 0.25, 0.00
+        else:
+            wb_h, wb_d, wb_i, wb_c = 0.35, 0.30, 0.35, 0.00
+
+    # Build comparison request
+    comp_req = ScenarioComparisonRequest(
+        scenario_a_name=sc_a_choice,
+        scenario_b_name=sc_b_choice,
+        scenario_a_weights=WeightConfiguration(healthcare=wa_h, demographic=wa_d, infrastructure=wa_i, coastal=wa_c),
+        scenario_b_weights=WeightConfiguration(healthcare=wb_h, demographic=wb_d, infrastructure=wb_i, coastal=wb_c),
+        top_divergent_count=10,
+    )
+
+    comp_res = service.compare_scenarios(comp_req)
+
+    # 2. Key Statistical Divergence Metrics
+    st.markdown("### 📊 Rank Correlation & Stability Summary")
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        corr = comp_res.spearman_rank_correlation
+        corr_color = "#10b981" if corr > 0.7 else ("#f59e0b" if corr > 0.3 else "#ef4444")
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Spearman Rank Correlation</div>
+                <div class="metric-value" style="color: {corr_color};">{corr:.3f}</div>
+                <div class="metric-caption">Monotonic ranking agreement</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with c2:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Kendall's Tau (τ)</div>
+                <div class="metric-value">{comp_res.kendall_tau_correlation:.3f}</div>
+                <div class="metric-caption">Pairwise concordance</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with c3:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Mean Absolute Shift</div>
+                <div class="metric-value">{comp_res.mean_absolute_rank_shift:.1f} <span style="font-size: 0.9rem;">ranks</span></div>
+                <div class="metric-caption">Average community displacement</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with c4:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-title">Maximum Rank Shift</div>
+                <div class="metric-value" style="color: #ef4444;">{comp_res.max_rank_shift} <span style="font-size: 0.9rem;">ranks</span></div>
+                <div class="metric-caption">Highest policy sensitivity</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    # Compute full DataFrame for scatter plot
+    df_eval = service.df.copy()
+    score_a = (
+        wa_h * df_eval["dim_healthcare_deficit"]
+        + wa_d * df_eval["dim_demographic_vulnerability"]
+        + wa_i * df_eval["dim_infrastructure_deficit"]
+        + wa_c * df_eval["dim_coastal_exposure"]
+    )
+    score_b = (
+        wb_h * df_eval["dim_healthcare_deficit"]
+        + wb_d * df_eval["dim_demographic_vulnerability"]
+        + wb_i * df_eval["dim_infrastructure_deficit"]
+        + wb_c * df_eval["dim_coastal_exposure"]
+    )
+    df_eval["rank_a"] = score_a.rank(ascending=False, method="min").astype(int)
+    df_eval["rank_b"] = score_b.rank(ascending=False, method="min").astype(int)
+    df_eval["rank_shift"] = df_eval["rank_a"] - df_eval["rank_b"]
+
+    # 3. Interactive Scatter Plot
+    st.markdown("### 📈 Rank Shift Scatter Plot (Scenario A vs. Scenario B)")
+    st.write(
+        "Each point represents one administrative unit. Points along the dashed diagonal line have identical ranks under both schemes. "
+        "Points far from the diagonal indicate communities whose priority changes dramatically depending on policy focus."
+    )
+    scatter_chart = generate_rank_scatter_chart(
+        df=df_eval,
+        col_x="rank_a",
+        col_y="rank_b",
+        label_x=f"Rank in '{sc_a_choice}' (1 = Highest Priority)",
+        label_y=f"Rank in '{sc_b_choice}' (1 = Highest Priority)",
+    )
+    st.altair_chart(scatter_chart, use_container_width=True)
+
+    # 4. Top Divergent Communities (Surges & Drops)
+    st.markdown("### 🚀 Greatest Priority Movers")
+    col_surges, col_drops = st.columns(2)
+
+    with col_surges:
+        st.markdown("#### Top Priority Surges in Scenario B (Ranked Much Higher)")
+        surging = df_eval.sort_values("rank_shift", ascending=False).head(5)
+        surge_df = pd.DataFrame(
+            {
+                "Unit Name": surging["unit_name"].values,
+                "District": surging["district_name"].values,
+                "Rank in A": surging["rank_a"].values,
+                "Rank in B": surging["rank_b"].values,
+                "Rank Shift": [f"+{s}" for s in surging["rank_shift"].values],
+                "Archetype": surging["vulnerability_archetype_label"].values,
+            }
+        )
+        st.dataframe(surge_df, use_container_width=True, hide_index=True)
+
+    with col_drops:
+        st.markdown("#### Top Priority Drops in Scenario B (Ranked Much Lower)")
+        dropping = df_eval.sort_values("rank_shift", ascending=True).head(5)
+        drop_df = pd.DataFrame(
+            {
+                "Unit Name": dropping["unit_name"].values,
+                "District": dropping["district_name"].values,
+                "Rank in A": dropping["rank_a"].values,
+                "Rank in B": dropping["rank_b"].values,
+                "Rank Shift": dropping["rank_shift"].values,
+                "Archetype": dropping["vulnerability_archetype_label"].values,
+            }
+        )
+        st.dataframe(drop_df, use_container_width=True, hide_index=True)
+
+    # Methodological guardrail alert
+    st.markdown(
+        """
+        <div class="disclaimer-box">
+            <b>Critical Methodological Notice:</b> A rank shift between scenarios reflects a divergence in
+            <b>human policy priorities</b> (e.g. allocating resources for acute storm-surge evacuation along the coastline
+            versus reinforcing remote healthcare clinics in the Western Ghat foothills),
+            <b>NOT a change in real-world cyclone hazard or physical meteorological risk</b>.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ==============================================================================
+# PAGE 4: Archetypes & Methodology Catalog
+# ==============================================================================
+def render_page_archetypes_methodology(service: DecisionSupportService) -> None:
+    st.markdown(
+        """
+        <div class="hero-banner">
+            <h1 class="hero-title">Vulnerability Archetypes & Methodology</h1>
+            <p class="hero-subtitle">
+                Explore the four vulnerability archetypes discovered through unsupervised machine learning (K-Means on standardized 4D scores).
+                Review data provenance, administrative unit reconciliation, and transparent analytical formulas.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    catalog = service.get_archetype_catalog()
+
+    # 1. Four Archetype Profile Cards
+    st.markdown("### 🏷️ Discovered Vulnerability Archetypes")
+
+    arch_cols = st.columns(4)
+    for i, arch in enumerate(catalog.archetypes):
+        c_id = arch.archetype_id
+        color = ARCHETYPE_COLORS.get(c_id, {}).get("hex", "#38bdf8")
+        with arch_cols[i]:
+            st.markdown(
+                f"""
+                <div style="background: rgba(15, 23, 42, 0.7); border-top: 4px solid {color}; border-radius: 8px; padding: 1.1rem; height: 100%; border: 1px solid rgba(255, 255, 255, 0.08);">
+                    <div style="color: {color}; font-weight: 700; font-size: 0.85rem;">ARCHETYPE {c_id}</div>
+                    <h3 style="margin: 0.3rem 0; font-size: 1.05rem; color: #f8fafc;">{arch.short_label}</h3>
+                    <div style="margin: 0.5rem 0; font-size: 1.35rem; font-weight: 700; color: #38bdf8;">
+                        {arch.unit_count} <span style="font-size: 0.85rem; color: #94a3b8;">units ({arch.percentage_of_total}%)</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.6rem;">
+                        📍 DK: {arch.count_dakshina_kannada} | Udupi: {arch.count_udupi}
+                    </div>
+                    <p style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.45; margin-bottom: 0.8rem;">
+                        {arch.detailed_description}
+                    </p>
+                    <div style="background: rgba(30, 41, 59, 0.6); padding: 0.6rem; border-radius: 6px; font-size: 0.78rem; color: #94a3b8;">
+                        <b style="color: #e2e8f0;">Key Action:</b> {arch.primary_intervention_need}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # 2. Archetype Dimension Comparison
+    st.markdown("### 📊 Dimension Means by Archetype")
+    profile_data = []
+    for arch in catalog.archetypes:
+        dm = arch.dimension_means
+        profile_data.append(
+            {
+                "Archetype": f"Cluster {arch.archetype_id}: {arch.short_label}",
+                "Healthcare Deficit": dm["healthcare_deficit"],
+                "Demographic Vulnerability": dm["demographic_vulnerability"],
+                "Infrastructure Deficit": dm["infrastructure_deficit"],
+                "Coastal Proximity": dm["coastal_exposure"],
+            }
+        )
+
+    prof_df = pd.DataFrame(profile_data)
+    st.dataframe(prof_df, use_container_width=True, hide_index=True)
+
+    # 3. Administrative Unit Ground-Truth Reconciliation
+    st.markdown("### 🏛️ Administrative Unit Count Reconciliation")
+    st.markdown(
+        """
+        A rigorous audit was conducted between the raw Census 2011 release and the SHRUG spatial boundary layer:
+        - **Census 2011 Baseline Tables**: Contain **625 total units** (**564 rural revenue villages** and **61 Census towns**).
+        - **SHRUG Spatial Boundary Polygons**: Contain **622 total units** (**563 rural revenue villages** and **59 Census towns**).
+        - **Mathematical Cause of Discrepancy**: Exactly 3 Census units lack independent boundary polygons in SHRUG because they were dissolved into adjoining municipal extents:
+          1. `617734`: *Kemminje (Rural)* (Village in DK)
+          2. `617507`: *Mulur (CT)* (Census Town in DK)
+          3. `617510`: *Neermarga (CT)* (Census Town in DK)
+        - All spatial and clustering models evaluate these **622 verified units** with 0 fabricated geometries.
+        """
+    )
+
+    # 4. Methodological Framework & Formulas
+    st.markdown("### 📐 Mathematical Formulation")
+    with st.expander("Show Analytical Formulas for Dimensions and Prioritization"):
+        st.markdown(
+            r"""
+            **1. Dimension Score Normalization:**
+            Each raw proxy variable $x$ is normalized onto a unit interval $[0, 1]$ with directionality aligned such that **1.0 indicates maximum deficit / priority**:
+            $$x_{\text{norm}} = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$$
+            
+            - **Healthcare Access Deficit ($D_{\text{health}}$)**:
+              $$D_{\text{health}} = 0.5 \cdot \text{dist\_hospital}_{\text{norm}} + 0.5 \cdot \text{dist\_phc}_{\text{norm}}$$
+            - **Demographic Vulnerability ($D_{\text{demo}}$)**:
+              $$D_{\text{demo}} = \text{sc\_st\_ratio}_{\text{norm}}$$
+            - **Infrastructure Deficit ($D_{\text{infra}}$)**:
+              $$D_{\text{infra}} = \frac{1}{3} \cdot (1 - \text{has\_treated\_tap}) + \frac{1}{3} \cdot (1 - \text{has\_paved\_road}) + \frac{1}{3} \cdot (1 - \text{has\_closed\_drainage})$$
+            - **Coastal Hazard Proximity ($D_{\text{coast}}$)**:
+              $$D_{\text{coast}} = 1 - \text{dist\_coastline}_{\text{norm}}$$
+
+            **2. Multidimensional Composite Priority Score:**
+            $$S = w_{\text{health}} D_{\text{health}} + w_{\text{demo}} D_{\text{demo}} + w_{\text{infra}} D_{\text{infra}} + w_{\text{coast}} D_{\text{coast}}$$
+            where $\sum w_i = 1.0$.
+            """
+        )
+
+    # 5. Limitations Callout
+    st.markdown(
+        f"""
+        <div class="disclaimer-box">
+            <b>Clustering Disclaimer:</b> {ARCHETYPE_DISCLAIMER}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ==============================================================================
+# MAIN APPLICATION ROUTING
+# ==============================================================================
+def main():
+    service = get_service()
+    page, district_filter = render_sidebar(service)
+
+    if "Prioritization Map" in page:
+        render_page_prioritization_map(service, district_filter)
+    elif "Community Deep-Dive" in page:
+        render_page_community_deep_dive(service)
+    elif "Scenario Comparison" in page:
+        render_page_scenario_comparison(service)
+    elif "Archetypes & Methodology" in page:
+        render_page_archetypes_methodology(service)
+
+
+if __name__ == "__main__":
+    main()

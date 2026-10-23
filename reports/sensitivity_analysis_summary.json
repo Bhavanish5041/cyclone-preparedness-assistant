@@ -1,0 +1,201 @@
+{
+  "total_units_evaluated": 622,
+  "scenarios_evaluated": [
+    "equal_weights",
+    "hazard_focused",
+    "access_focused",
+    "no_coastal",
+    "with_population_scale"
+  ],
+  "spearman_rank_correlations": {
+    "equal_weights": {
+      "equal_weights": 1.0,
+      "hazard_focused": 0.704,
+      "access_focused": 0.829,
+      "no_coastal": 0.656,
+      "with_population_scale": 0.98
+    },
+    "hazard_focused": {
+      "equal_weights": 0.704,
+      "hazard_focused": 1.0,
+      "access_focused": 0.313,
+      "no_coastal": -0.025,
+      "with_population_scale": 0.783
+    },
+    "access_focused": {
+      "equal_weights": 0.829,
+      "hazard_focused": 0.313,
+      "access_focused": 1.0,
+      "no_coastal": 0.879,
+      "with_population_scale": 0.794
+    },
+    "no_coastal": {
+      "equal_weights": 0.656,
+      "hazard_focused": -0.025,
+      "access_focused": 0.879,
+      "no_coastal": 1.0,
+      "with_population_scale": 0.557
+    },
+    "with_population_scale": {
+      "equal_weights": 0.98,
+      "hazard_focused": 0.783,
+      "access_focused": 0.794,
+      "no_coastal": 0.557,
+      "with_population_scale": 1.0
+    }
+  },
+  "kendall_tau_correlations": {
+    "equal_weights": {
+      "equal_weights": 1.0,
+      "hazard_focused": 0.501,
+      "access_focused": 0.659,
+      "no_coastal": 0.491,
+      "with_population_scale": 0.881
+    },
+    "hazard_focused": {
+      "equal_weights": 0.501,
+      "hazard_focused": 1.0,
+      "access_focused": 0.209,
+      "no_coastal": -0.008,
+      "with_population_scale": 0.578
+    },
+    "access_focused": {
+      "equal_weights": 0.659,
+      "hazard_focused": 0.209,
+      "access_focused": 1.0,
+      "no_coastal": 0.709,
+      "with_population_scale": 0.615
+    },
+    "no_coastal": {
+      "equal_weights": 0.491,
+      "hazard_focused": -0.008,
+      "access_focused": 0.709,
+      "no_coastal": 1.0,
+      "with_population_scale": 0.401
+    },
+    "with_population_scale": {
+      "equal_weights": 0.881,
+      "hazard_focused": 0.578,
+      "access_focused": 0.615,
+      "no_coastal": 0.401,
+      "with_population_scale": 1.0
+    }
+  },
+  "robust_high_priority_units_count": 14,
+  "robust_units_summary": [
+    {
+      "shrid2": "11-29-575-05561-617431",
+      "unit_name": "Shimanthur",
+      "district_name": "Dakshina Kannada",
+      "rank_mean": 9.8,
+      "rank_std": 12.6,
+      "rank_shift_span": 30
+    },
+    {
+      "shrid2": "11-29-569-05522-608679",
+      "unit_name": "Byndoor",
+      "district_name": "Udupi",
+      "rank_mean": 10.2,
+      "rank_std": 9.4,
+      "rank_shift_span": 22
+    },
+    {
+      "shrid2": "11-29-575-05561-617432",
+      "unit_name": "Kilpady",
+      "district_name": "Dakshina Kannada",
+      "rank_mean": 10.2,
+      "rank_std": 14.3,
+      "rank_shift_span": 34
+    },
+    {
+      "shrid2": "11-29-569-05522-608720",
+      "unit_name": "Edmoge",
+      "district_name": "Udupi",
+      "rank_mean": 13.0,
+      "rank_std": 23.5,
+      "rank_shift_span": 54
+    },
+    {
+      "shrid2": "11-29-569-05522-608712",
+      "unit_name": "Kodladi",
+      "district_name": "Udupi",
+      "rank_mean": 16.4,
+      "rank_std": 13.7,
+      "rank_shift_span": 32
+    },
+    {
+      "shrid2": "11-29-569-05523-608776",
+      "unit_name": "Herady",
+      "district_name": "Udupi",
+      "rank_mean": 20.0,
+      "rank_std": 21.1,
+      "rank_shift_span": 49
+    },
+    {
+      "shrid2": "11-29-575-05561-617460",
+      "unit_name": "Puthige",
+      "district_name": "Dakshina Kannada",
+      "rank_mean": 21.6,
+      "rank_std": 16.9,
+      "rank_shift_span": 44
+    },
+    {
+      "shrid2": "11-29-569-05522-608683",
+      "unit_name": "Jadkal",
+      "district_name": "Udupi",
+      "rank_mean": 28.4,
+      "rank_std": 32.9,
+      "rank_shift_span": 77
+    },
+    {
+      "shrid2": "11-29-569-05522-608685",
+      "unit_name": "Hallihole",
+      "district_name": "Udupi",
+      "rank_mean": 30.0,
+      "rank_std": 37.1,
+      "rank_shift_span": 89
+    },
+    {
+      "shrid2": "11-29-569-05522-608710",
+      "unit_name": "Keradi",
+      "district_name": "Udupi",
+      "rank_mean": 37.6,
+      "rank_std": 27.9,
+      "rank_shift_span": 69
+    },
+    {
+      "shrid2": "11-29-569-05522-608680",
+      "unit_name": "Yeljith",
+      "district_name": "Udupi",
+      "rank_mean": 42.0,
+      "rank_std": 22.9,
+      "rank_shift_span": 51
+    },
+    {
+      "shrid2": "11-29-569-05522-608709",
+      "unit_name": "Hosoor",
+      "district_name": "Udupi",
+      "rank_mean": 47.6,
+      "rank_std": 32.6,
+      "rank_shift_span": 67
+    },
+    {
+      "shrid2": "11-29-569-05522-608724",
+      "unit_name": "Kulanje",
+      "district_name": "Udupi",
+      "rank_mean": 47.8,
+      "rank_std": 29.1,
+      "rank_shift_span": 74
+    },
+    {
+      "shrid2": "11-29-569-05523-608795",
+      "unit_name": "Aroor",
+      "district_name": "Udupi",
+      "rank_mean": 49.2,
+      "rank_std": 38.2,
+      "rank_shift_span": 81
+    }
+  ],
+  "max_rank_shift_observed": 580,
+  "mean_rank_shift_observed": 231.0
+}

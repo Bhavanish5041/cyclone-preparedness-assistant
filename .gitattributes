@@ -1,6 +1,7 @@
-*.csv filter=lfs diff=lfs merge=lfs -text
-*.xlsx filter=lfs diff=lfs merge=lfs -text
-*.xls filter=lfs diff=lfs merge=lfs -text
-*.pdf filter=lfs diff=lfs merge=lfs -text
-*.zip filter=lfs diff=lfs merge=lfs -text
-*.parquet filter=lfs diff=lfs merge=lfs -text
+# Git LFS for selected dataset formats
+data/interim/*.parquet filter=lfs diff=lfs merge=lfs -text
+data/processed/*.parquet filter=lfs diff=lfs merge=lfs -text
+
+# Reports and manifests stay in ordinary Git
+reports/*.csv !filter !diff !merge text
+reports/*.json !filter !diff !merge text

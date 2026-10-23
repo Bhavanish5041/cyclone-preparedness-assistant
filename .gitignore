@@ -1,9 +1,23 @@
+# Python environments
 .venv/
 venv/
+
+# Python caches and tests
 __pycache__/
 *.py[cod]
-.env
-wandb/
 .pytest_cache/
 .ipynb_checkpoints/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Experiment tracking
+wandb/
+
+# Raw source datasets: keep locally
+data/raw/
+
+# OS files
 .DS_Store

@@ -1,0 +1,21 @@
+# ==============================================================================
+# Prometheus Scrape and Monitoring Configuration
+# Cyclone Preparedness Decision Support System
+# ==============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  - job_name: "cyclone-assistant-api"
+    metrics_path: "/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ["api:8000"]
+        labels:
+          environment: "production"
+          service: "cyclone-api"
+          system: "cyclone-decision-support"

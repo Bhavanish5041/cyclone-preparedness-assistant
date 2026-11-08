@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "Defensible, evidence-based cyclone preparedness assessment and decision support assistant"
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+    "evidently==0.7.23",
+]
 
 [tool.pytest.ini_options]
 minversion = "7.0"

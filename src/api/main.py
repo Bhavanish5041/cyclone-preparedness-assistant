@@ -14,7 +14,9 @@ while analytical formulations are encapsulated in DecisionSupportService.
 
 from contextlib import asynccontextmanager
 import logging
+import os
 import sys
+import time
 from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Path, Query, Request, status
@@ -26,6 +28,9 @@ from src.api.schemas import (
     DecisionEvaluationListResponse,
     DecisionSupportEvaluation,
     HealthCheckResponse,
+    ModelHealthResponse,
+    ModelPredictionRequest,
+    ModelPredictionResponse,
     PrioritizationScenarioRequest,
     PrioritizationScenarioResponse,
     RankDivergenceItem,
@@ -36,6 +41,16 @@ from src.api.schemas import (
     UnitSummary,
 )
 from src.assistant.decision_support import DecisionSupportService
+from src.features.inference_features import engineer_inference_features
+from src.models.load_registered_model import RegisteredModelContainer, load_registered_model
+from src.monitoring.prometheus_metrics import (
+    get_metrics_response,
+    get_normalized_endpoint,
+    record_http_request,
+    record_inference_error,
+    record_inference_success,
+    set_model_status,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +59,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("api_main")
 
+MODEL_PREDICTION_DISCLAIMER = (
+    "OPERATIONAL NOTICE: Model predictions and class probabilities represent an empirical surrogate "
+    "approximating AHP-derived village preparedness tiers (High, Medium, Low). They are NOT calibrated "
+    "physical cyclone-risk probabilities, storm-surge inundation forecasts, or casualty predictions. "
+    "Deterministic AHP assessments maintain absolute operational precedence for emergency resource allocation."
+)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,6 +73,30 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing DecisionSupportService during application startup...")
     app.state.service = DecisionSupportService()
     logger.info("DecisionSupportService successfully initialized and cached in app.state.")
+
+    # Phase 2.4: Load W&B registered model artifact once during startup
+    artifact_address = os.environ.get("WANDB_MODEL_ARTIFACT", "village-preparedness-classifier:v0")
+    logger.info(f"Loading W&B registered model artifact: '{artifact_address}'...")
+    try:
+        model_container = load_registered_model(artifact_address=artifact_address)
+        app.state.model_container = model_container
+        set_model_status(
+            loaded=True,
+            artifact_name="village-preparedness-classifier",
+            artifact_version=model_container.artifact_version,
+        )
+        logger.info(
+            f"Successfully loaded and verified W&B model artifact: {model_container.artifact_source} "
+            f"({model_container.artifact_version})"
+        )
+    except Exception as e:
+        logger.error(f"Failed to load configured W&B model artifact '{artifact_address}': {e}")
+        app.state.model_container = None
+        set_model_status(loaded=False)
+        raise RuntimeError(
+            f"FastAPI startup aborted: failed to load required W&B model artifact '{artifact_address}': {e}"
+        )
+
     yield
     logger.info("FastAPI application shutdown complete.")
 
@@ -79,12 +125,69 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def prometheus_metrics_middleware(request: Request, call_next):
+    """Track HTTP request count and duration across all endpoints with bounded cardinality."""
+    start_time = time.perf_counter()
+    status_code = 500
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    except Exception:
+        status_code = 500
+        raise
+    finally:
+        duration = time.perf_counter() - start_time
+        endpoint = get_normalized_endpoint(request)
+        record_http_request(
+            method=request.method,
+            endpoint=endpoint,
+            status_code=status_code,
+            duration_seconds=duration,
+        )
+
+
 def get_service(request: Request) -> DecisionSupportService:
     """Dependency injection provider for DecisionSupportService."""
     if not hasattr(request.app.state, "service") or request.app.state.service is None:
         logger.info("Creating on-demand DecisionSupportService instance...")
         request.app.state.service = DecisionSupportService()
     return request.app.state.service
+
+
+def get_model(request: Request) -> RegisteredModelContainer:
+    """Dependency injection provider for registered model container."""
+    container = getattr(request.app.state, "model_container", None)
+    if container is None:
+        # Fallback to on-demand load if lifespan was bypassed in testing fixtures
+        artifact_address = os.environ.get("WANDB_MODEL_ARTIFACT", "village-preparedness-classifier:v0")
+        try:
+            container = load_registered_model(artifact_address=artifact_address)
+            request.app.state.model_container = container
+            set_model_status(
+                loaded=True,
+                artifact_name="village-preparedness-classifier",
+                artifact_version=container.artifact_version,
+            )
+        except Exception as e:
+            record_inference_error("model_unavailable")
+            set_model_status(loaded=False)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Registered model artifact is unavailable: {e}",
+            )
+    return container
+
+
+@app.get(
+    "/metrics",
+    include_in_schema=False,
+    summary="Prometheus exposition metrics endpoint",
+)
+def prometheus_metrics():
+    """Expose Prometheus operational metrics in standard exposition format."""
+    return get_metrics_response()
 
 
 @app.get(
@@ -101,13 +204,36 @@ def root_redirect():
     "/health",
     response_model=HealthCheckResponse,
     tags=["System Status"],
-    summary="Check system health, dataset readiness, and record counts",
+    summary="Check system health, dataset readiness, and model status",
 )
 def health_check(
+    request: Request,
     service: DecisionSupportService = Depends(get_service),
 ) -> HealthCheckResponse:
-    """Return system readiness, dataset loading state, and administrative unit counts."""
-    return service.get_health_status()
+    """Return system readiness, dataset loading state, and model artifact status."""
+    base_health = service.get_health_status()
+    model_container = getattr(request.app.state, "model_container", None)
+    if model_container is None:
+        try:
+            model_container = get_model(request)
+        except Exception:
+            model_container = None
+
+    return HealthCheckResponse(
+        status=base_health.status,
+        dataset_loaded=base_health.dataset_loaded,
+        total_units=base_health.total_units,
+        total_villages=base_health.total_villages,
+        total_census_towns=base_health.total_census_towns,
+        districts=base_health.districts,
+        archetypes_count=base_health.archetypes_count,
+        version=base_health.version,
+        model_loaded=(model_container is not None),
+        model_artifact_name="village-preparedness-classifier" if model_container else None,
+        model_artifact_version=model_container.artifact_version if model_container else None,
+        model_feature_schema_status=f"VALID_{len(model_container.features)}_FEATURES" if model_container else None,
+        model_provenance=model_container.metadata.get("model_nature") if model_container else None,
+    )
 
 
 @app.get(
@@ -323,5 +449,196 @@ def get_decision_units(
         priority_band=priority_band,
         limit=limit,
         offset=offset,
+    )
+
+
+# =============================================================================
+# Phase 2.4: Registered Model Inference & Diagnostics Endpoints
+# =============================================================================
+
+
+@app.get(
+    "/api/v1/model/health",
+    response_model=ModelHealthResponse,
+    tags=["Model Inference"],
+    summary="Check registered model health, active artifact version, and schema integrity",
+)
+def get_model_health(
+    model: RegisteredModelContainer = Depends(get_model),
+) -> ModelHealthResponse:
+    """Return active artifact version, canonical feature schema status, and model provenance."""
+    return ModelHealthResponse(
+        status="healthy",
+        model_loaded=True,
+        artifact_name="village-preparedness-classifier",
+        artifact_version=model.artifact_version,
+        artifact_source=model.artifact_source,
+        features_count=len(model.features),
+        feature_schema_status=f"VALID_{len(model.features)}_FEATURES",
+        target_classes=model.classes_,
+        model_provenance=model.metadata.get("model_nature", "REPRODUCIBLE RECONSTRUCTION"),
+        target_nature="AHP_CAPACITY_TIER_SURROGATE",
+    )
+
+
+@app.post(
+    "/api/v1/model/predict",
+    response_model=ModelPredictionResponse,
+    tags=["Model Inference"],
+    summary="Generate calibrated village preparedness tier prediction using W&B registered model",
+)
+def predict_model_tier(
+    request: ModelPredictionRequest,
+    service: DecisionSupportService = Depends(get_service),
+    model: RegisteredModelContainer = Depends(get_model),
+) -> ModelPredictionResponse:
+    """Generate calibrated village preparedness tier prediction and boundary case analysis.
+
+    Accepts either an area identifier (PC11 ID, SHRID, or village name) or a feature dictionary.
+    Deterministic AHP baseline maintains absolute operational precedence for emergency allocations.
+    """
+    area_id = None
+    village_name = None
+    district_name = None
+    ahp_tier = None
+    ahp_score = None
+    ahp_agreement = None
+    ahp_precedence_note = None
+
+    # Scenario 1: Direct feature dictionary provided
+    if request.features is not None:
+        try:
+            X_aligned = engineer_inference_features(request.features)
+        except ValueError as e:
+            record_inference_error("validation_error")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=str(e),
+            )
+
+        if request.area_id:
+            clean_id = request.area_id.strip()
+            df = service.unified_df
+            match = df[
+                (df["area_id"] == clean_id)
+                | (df["pc11_id"] == clean_id)
+                | (df["shrid2"] == clean_id)
+                | (df["village_name"].str.lower() == clean_id.lower())
+            ]
+            if not match.empty:
+                row = match.iloc[0]
+                area_id = str(row["area_id"])
+                village_name = str(row["village_name"])
+                district_name = str(row["district_name"])
+                ahp_tier = str(row["preparedness_tier"])
+                ahp_score = float(row["preparedness_score"])
+            else:
+                area_id = clean_id
+
+    # Scenario 2: Only area_id provided (lookup in unified dataset)
+    else:
+        clean_id = request.area_id.strip()  # type: ignore[union-attr]
+        df = service.unified_df
+        match = df[
+            (df["area_id"] == clean_id)
+            | (df["pc11_id"] == clean_id)
+            | (df["shrid2"] == clean_id)
+            | (df["village_name"].str.lower() == clean_id.lower())
+        ]
+        if match.empty:
+            record_inference_error("not_found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Administrative unit '{request.area_id}' not found in unified preparedness dataset.",
+            )
+
+        row = match.iloc[0]
+        area_id = str(row["area_id"])
+        village_name = str(row["village_name"])
+        district_name = str(row["district_name"])
+        ahp_tier = str(row["preparedness_tier"])
+        ahp_score = float(row["preparedness_score"])
+
+        try:
+            X_aligned = engineer_inference_features(row.to_dict())
+        except ValueError as e:
+            record_inference_error("validation_error")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Feature extraction failed for administrative unit '{clean_id}': {e}",
+            )
+
+    # Perform inference using registered model container
+    inf_start = time.perf_counter()
+    try:
+        preds_df = model.predict_detailed(X_aligned)
+    except Exception as e:
+        record_inference_error("runtime_error")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Inference execution failed: {e}",
+        )
+    inf_duration = time.perf_counter() - inf_start
+
+    res_row = preds_df.iloc[0]
+    pred_tier = str(res_row["predicted_preparedness_tier"])
+    prob_high = round(float(res_row["prob_high"]), 6)
+    prob_low = round(float(res_row["prob_low"]), 6)
+    prob_medium = round(float(res_row["prob_medium"]), 6)
+    prob_margin = round(float(res_row["probability_margin"]), 6)
+    max_prob = round(float(res_row["max_probability"]), 6)
+    is_boundary = bool(res_row["is_boundary_case"])
+
+    # Determine agreement status and precedence if AHP tier is available
+    if ahp_tier is not None:
+        if pred_tier.lower() == ahp_tier.lower():
+            ahp_agreement = "FULL_AGREEMENT"
+        else:
+            ahp_agreement = "BORDERLINE_DISAGREEMENT"
+
+        # Explicit safeguard: Never allow ML model to downgrade an AHP Low classification
+        if ahp_tier.lower() == "low" and pred_tier.lower() != "low":
+            ahp_precedence_note = (
+                "AHP PRECEDENCE MANDATE: Authoritative AHP capacity tier is 'Low'. "
+                "Per operational safety rules, ML model prediction cannot downgrade emergency priority."
+            )
+        elif ahp_agreement == "BORDERLINE_DISAGREEMENT":
+            ahp_precedence_note = (
+                f"DISCORDANCE NOTICE: Model predicts '{pred_tier}', differing from baseline AHP '{ahp_tier}'. "
+                "Deterministic AHP assessment holds operational precedence; flagged for administrative review."
+            )
+
+    # Record Prometheus metrics for successful inference execution
+    record_inference_success(
+        duration_seconds=inf_duration,
+        predicted_tier=pred_tier,
+        is_boundary=is_boundary,
+        model_version=model.artifact_version,
+        ahp_tier=ahp_tier,
+        agreement_status=ahp_agreement,
+    )
+
+    return ModelPredictionResponse(
+        area_id=area_id,
+        village_name=village_name,
+        district_name=district_name,
+        predicted_preparedness_tier=pred_tier,
+        class_probabilities={
+            "prob_high": prob_high,
+            "prob_low": prob_low,
+            "prob_medium": prob_medium,
+        },
+        probability_margin=prob_margin,
+        max_probability=max_prob,
+        is_boundary_case=is_boundary,
+        deterministic_ahp_tier=ahp_tier,
+        deterministic_ahp_score=ahp_score,
+        ahp_agreement_status=ahp_agreement,
+        ahp_precedence_note=ahp_precedence_note,
+        model_artifact_name="village-preparedness-classifier",
+        model_artifact_version=model.artifact_version,
+        model_provenance=model.metadata.get("model_nature", "REPRODUCIBLE RECONSTRUCTION"),
+        target_nature="AHP_CAPACITY_TIER_SURROGATE",
+        disclaimer=MODEL_PREDICTION_DISCLAIMER,
     )
 

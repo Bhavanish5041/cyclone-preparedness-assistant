@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class HealthCheckResponse(BaseModel):
-    """System health check and dataset inventory status."""
+    """System health check, dataset inventory status, and model readiness."""
 
     status: str = Field("healthy", description="Service health state")
     dataset_loaded: bool = Field(..., description="Whether archetype dataset is loaded in memory")
@@ -23,6 +23,13 @@ class HealthCheckResponse(BaseModel):
     districts: List[str] = Field(..., description="Covered coastal districts")
     archetypes_count: int = Field(4, description="Number of discovered vulnerability archetypes")
     version: str = Field("1.0.0", description="API contract version")
+
+    # Phase 2.4 Model Readiness Fields
+    model_loaded: bool = Field(False, description="Whether the W&B registered model is loaded and ready for inference")
+    model_artifact_name: Optional[str] = Field(None, description="Registered W&B artifact name")
+    model_artifact_version: Optional[str] = Field(None, description="Exact active artifact version or alias")
+    model_feature_schema_status: Optional[str] = Field(None, description="Feature schema validation status")
+    model_provenance: Optional[str] = Field(None, description="Model lineage and provenance statement")
 
 
 class WeightConfiguration(BaseModel):
@@ -317,4 +324,80 @@ class DecisionEvaluationListResponse(BaseModel):
     limit: int = Field(..., description="Page size limit")
     offset: int = Field(..., description="Offset index")
     units: List[DecisionSupportEvaluation] = Field(..., description="Matching evaluated units")
+
+
+# =============================================================================
+# Phase 2.4: Registered Model Inference Schemas
+# =============================================================================
+
+class ModelPredictionRequest(BaseModel):
+    """Request payload for model inference."""
+
+    area_id: Optional[str] = Field(
+        None,
+        description="Area identifier (SHRID, PC11 ID, or village name) to load from unified dataset",
+        examples=["11-29-575-05562-617533", "617533", "Panjikal"],
+    )
+    features: Optional[Dict[str, float]] = Field(
+        None,
+        description="Direct dictionary of feature values (either 26 canonical features or raw indicators for engineering)",
+    )
+
+    @model_validator(mode="after")
+    def validate_request_payload(self) -> "ModelPredictionRequest":
+        if not self.area_id and not self.features:
+            raise ValueError("Either 'area_id' or 'features' dictionary must be provided.")
+        return self
+
+
+class ModelPredictionResponse(BaseModel):
+    """Calibrated model prediction and diagnostic response payload."""
+
+    area_id: Optional[str] = Field(None, description="Queried or resolved area identifier")
+    village_name: Optional[str] = Field(None, description="Village name if resolved")
+    district_name: Optional[str] = Field(None, description="District name if resolved")
+
+    # Model Predictions & Calibrated Probabilities
+    predicted_preparedness_tier: str = Field(..., description="Model-predicted tier: High, Low, or Medium")
+    class_probabilities: Dict[str, float] = Field(
+        ...,
+        description="Calibrated tier probabilities strictly summing to 1.0 (prob_high, prob_low, prob_medium)",
+    )
+    probability_margin: float = Field(..., description="Margin: highest minus second-highest class probability")
+    max_probability: float = Field(..., description="Maximum class probability")
+    is_boundary_case: bool = Field(..., description="True if margin < 0.10 or max_probability < 0.60")
+
+    # Authoritative Baseline AHP Context
+    deterministic_ahp_tier: Optional[str] = Field(None, description="Authoritative baseline AHP tier if known")
+    deterministic_ahp_score: Optional[float] = Field(None, description="Authoritative baseline AHP score if known")
+    ahp_agreement_status: Optional[str] = Field(
+        None,
+        description="FULL_AGREEMENT (model tier == AHP tier) or BORDERLINE_DISAGREEMENT (model tier != AHP tier)",
+    )
+    ahp_precedence_note: Optional[str] = Field(
+        None,
+        description="Operational precedence note reinforcing that deterministic AHP classification cannot be downgraded",
+    )
+
+    # Model Artifact & Lineage
+    model_artifact_name: str = Field(..., description="Registered W&B model artifact name")
+    model_artifact_version: str = Field(..., description="Active W&B artifact version or alias")
+    model_provenance: str = Field(..., description="Model lineage and provenance statement")
+    target_nature: str = Field("AHP_CAPACITY_TIER_SURROGATE", description="Operational nature of prediction target")
+    disclaimer: str = Field(..., description="Mandatory operational disclaimer clarifying surrogate capacity nature")
+
+
+class ModelHealthResponse(BaseModel):
+    """Status and metadata of the active registered W&B model artifact."""
+
+    status: str = Field("healthy", description="Model service health state")
+    model_loaded: bool = Field(..., description="Whether the registered model container is active")
+    artifact_name: str = Field(..., description="Registered W&B artifact name")
+    artifact_version: str = Field(..., description="Exact active artifact version or alias")
+    artifact_source: str = Field(..., description="Qualified artifact source identifier")
+    features_count: int = Field(26, description="Expected feature vector dimension")
+    feature_schema_status: str = Field(..., description="Validation status of the 26 canonical features")
+    target_classes: List[str] = Field(..., description="Target preparedness classes: High, Low, Medium")
+    model_provenance: str = Field(..., description="Lineage and reconstruction provenance")
+    target_nature: str = Field("AHP_CAPACITY_TIER_SURROGATE", description="Operational nature of target")
 

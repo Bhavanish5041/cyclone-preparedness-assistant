@@ -15,6 +15,10 @@ __pycache__/
 
 # Experiment tracking
 wandb/
+.wandb_artifacts_cache/
+
+# Generated monitoring reports
+reports/model_monitoring/
 
 # Raw source datasets: keep locally
 data/raw/

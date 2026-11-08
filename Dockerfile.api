@@ -1,0 +1,59 @@
+# ==============================================================================
+# FastAPI Backend Production Container
+# Cyclone Preparedness Decision Support System
+# ==============================================================================
+
+FROM python:3.14-slim
+
+LABEL maintainer="Cyclone Preparedness Team"
+LABEL description="FastAPI decision-support and model inference backend"
+
+# Environment configuration
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PORT=8000 \
+    WANDB_MODEL_ARTIFACT="village-preparedness-classifier:v0" \
+    WANDB_CACHE_DIR="/app/.wandb_artifacts_cache" \
+    MONITORING_REPORTS_DIR="/app/reports/model_monitoring"
+
+# Install system dependencies (curl for container healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root system user and group
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/bash -m appuser
+
+WORKDIR /app
+
+# Install pinned Python dependencies
+COPY docker/requirements-api.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code, processed data, local baseline models, and seed cache
+COPY src/ /app/src/
+COPY data/processed/ /app/data/processed/
+COPY models/ /app/models/
+COPY .wandb_artifacts_cache/ /app/.wandb_artifacts_cache/
+
+# Create persistent storage mountpoints with correct non-root ownership
+RUN mkdir -p /app/.wandb_artifacts_cache /app/reports/model_monitoring && \
+    chown -R appuser:appgroup /app
+
+# Switch to unprivileged user
+USER appuser
+
+# Expose API service port
+EXPOSE 8000
+
+# Container healthcheck using existing FastAPI health endpoint
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Graceful shutdown signal
+STOPSIGNAL SIGTERM
+
+# Start Uvicorn production server
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-graceful-shutdown", "15"]

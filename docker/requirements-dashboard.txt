@@ -1,0 +1,15 @@
+# Streamlit Dashboard Dependencies (Production Container)
+streamlit==1.66.1
+streamlit-folium==0.27.4
+folium==0.20.0
+altair==6.3.0
+matplotlib==3.11.2
+fastapi==0.159.1
+pydantic==2.14.1
+numpy==2.5.4
+pandas==3.0.6
+scipy==1.18.1
+geopandas==1.2.0
+pyarrow==26.0.0
+shapely==2.2.0
+httpx==0.28.1

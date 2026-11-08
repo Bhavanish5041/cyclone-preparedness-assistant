@@ -26,6 +26,60 @@ ARCHETYPE_COLORS = {
     3: {"name": "High-Exposure Coastal Belt", "hex": "#ef4444", "badge": "danger"},         # Rose Red
 }
 
+# Authoritative palette for decision support priority bands
+BAND_COLORS: Dict[str, Dict[str, str]] = {
+    "BAND_1_CRITICAL": {
+        "name": "Band 1 — Critical Priority",
+        "short_label": "Band 1",
+        "hex": "#ef4444",  # Rose Red
+        "badge_class": "badge-band-1",
+        "description": "Immediate intervention; low preparedness baseline (<40) or compound vulnerability.",
+    },
+    "BAND_2_SPECIALIZED": {
+        "name": "Band 2 — Specialized Readiness",
+        "short_label": "Band 2",
+        "hex": "#f59e0b",  # Amber
+        "badge_class": "badge-band-2",
+        "description": "Medium preparedness (40–60) with targeted coastal proximity (<5km), shelter deficit, or medical deficit.",
+    },
+    "BAND_3_MODERATE": {
+        "name": "Band 3 — Moderate Priority",
+        "short_label": "Band 3",
+        "hex": "#38bdf8",  # Sky Blue
+        "badge_class": "badge-band-3",
+        "description": "Secondary readiness; standard medium preparedness baseline.",
+    },
+    "BAND_4_ADEQUATE": {
+        "name": "Band 4 — Adequate Baseline",
+        "short_label": "Band 4",
+        "hex": "#10b981",  # Emerald
+        "badge_class": "badge-band-4",
+        "description": "Adequate preparedness (>60); standard vigilance and maintenance.",
+    },
+}
+
+# AHP Preparedness Tier metadata and colors
+TIER_COLORS: Dict[str, Dict[str, str]] = {
+    "Low": {
+        "name": "Low Preparedness (<40)",
+        "hex": "#ef4444",
+        "badge_class": "badge-tier-low",
+        "description": "AHP Score < 40.0; critical infrastructure or resource deficits.",
+    },
+    "Medium": {
+        "name": "Medium Preparedness (40–60)",
+        "hex": "#f59e0b",
+        "badge_class": "badge-tier-medium",
+        "description": "AHP Score 40.0–60.0; moderate baseline readiness.",
+    },
+    "High": {
+        "name": "High Preparedness (>60)",
+        "hex": "#10b981",
+        "badge_class": "badge-tier-high",
+        "description": "AHP Score > 60.0; robust local amenities and connectivity.",
+    },
+}
+
 METRIC_LABELS = {
     "priority_score": "Composite Priority Score",
     "dim_healthcare_deficit": "Healthcare Access Deficit",
@@ -125,6 +179,43 @@ def get_custom_css() -> str:
     .badge-arch-1 { background-color: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid #f59e0b; }
     .badge-arch-2 { background-color: rgba(139, 92, 246, 0.18); color: #8b5cf6; border: 1px solid #8b5cf6; }
     .badge-arch-3 { background-color: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid #ef4444; }
+
+    /* Priority Band Badges */
+    .badge-band-1 { background-color: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-band-2 { background-color: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-band-3 { background-color: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid #38bdf8; }
+    .badge-band-4 { background-color: rgba(16, 185, 129, 0.18); color: #10b981; border: 1px solid #10b981; }
+
+    /* AHP Tier Badges */
+    .badge-tier-low { background-color: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-tier-medium { background-color: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid #f59e0b; }
+    .badge-tier-high { background-color: rgba(16, 185, 129, 0.18); color: #10b981; border: 1px solid #10b981; }
+
+    /* Data Integrity Warning Banner */
+    .data-integrity-warning {
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-left: 4px solid #ef4444;
+        border-radius: 8px;
+        padding: 0.85rem 1.1rem;
+        margin-top: 0.8rem;
+        margin-bottom: 1.2rem;
+        color: #fca5a5;
+        font-size: 0.88rem;
+        line-height: 1.45;
+    }
+
+    /* Filter Information Callout */
+    .filter-banner {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-left: 4px solid #38bdf8;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.2rem;
+        font-size: 0.88rem;
+        color: #e2e8f0;
+    }
 
     /* Operational Checklist Item */
     .checklist-item {
@@ -487,5 +578,295 @@ def generate_rank_scatter_chart(
             labelColor="#cbd5e1",
             titleColor="#f8fafc",
             orient="bottom",
+        )
+    )
+
+
+def render_kpi_card(
+    title: str,
+    value: Any,
+    caption: Optional[str] = None,
+    percentage: Optional[float] = None,
+    color: Optional[str] = None,
+    badge_label: Optional[str] = None,
+) -> str:
+    """Generate HTML snippet for a glassmorphic KPI metric card.
+
+    Args:
+        title: Metric name or card header.
+        value: Primary numerical or text value to display.
+        caption: Optional subtitle or contextual footnote.
+        percentage: Optional percentage to format beside value.
+        color: Optional CSS hex color for value.
+        badge_label: Optional small pill badge in top-right of card.
+
+    Returns:
+        HTML string suitable for st.markdown(..., unsafe_allow_html=True).
+    """
+    pct_html = ""
+    if percentage is not None:
+        pct_html = f" <span style='font-size: 0.92rem; font-weight: 500; color: #94a3b8;'>({percentage:.1f}%)</span>"
+
+    val_color = f"color: {color};" if color else "color: #38bdf8;"
+
+    badge_html = ""
+    if badge_label:
+        badge_html = f"<span style='float: right; font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 9999px; background: rgba(255,255,255,0.08); color: #cbd5e1;'>{badge_label}</span>"
+
+    cap_html = f"<div class='metric-caption'>{caption}</div>" if caption else ""
+
+    return f"""
+    <div class="metric-card">
+        <div class="metric-title">{title} {badge_html}</div>
+        <div class="metric-value" style="{val_color}">{value}{pct_html}</div>
+        {cap_html}
+    </div>
+    """
+
+
+def generate_district_band_chart(
+    df: pd.DataFrame,
+    normalized: bool = False,
+    height: int = 340,
+) -> alt.Chart:
+    """Generate Altair stacked bar chart comparing priority band distribution across districts.
+
+    Args:
+        df: DataFrame containing 'district_name' and 'provisional_priority_band'.
+        normalized: If True, normalizes bars to 100% distribution per district.
+        height: Chart height in pixels.
+
+    Returns:
+        Altair Chart object.
+    """
+    col_band = "provisional_priority_band" if "provisional_priority_band" in df.columns else "priority_band"
+    if df.empty or col_band not in df.columns or "district_name" not in df.columns:
+        return alt.Chart(pd.DataFrame({"x": ["No Data"], "y": [0]})).mark_bar().encode(x="x:N", y="y:Q")
+
+    agg_df = df.groupby(["district_name", col_band]).size().reset_index(name="count")
+    totals = agg_df.groupby("district_name")["count"].transform("sum")
+    agg_df["percentage"] = (agg_df["count"] / totals * 100).round(1)
+
+    domain = [
+        "BAND_1_CRITICAL",
+        "BAND_2_SPECIALIZED",
+        "BAND_3_MODERATE",
+        "BAND_4_ADEQUATE",
+    ]
+    colors = ["#ef4444", "#f59e0b", "#38bdf8", "#10b981"]
+
+    y_scale = alt.Scale(domain=[0, 1]) if normalized else alt.Scale()
+    y_axis = (
+        alt.Axis(format=".0%", title="Proportion of District Units")
+        if normalized
+        else alt.Axis(title="Number of Administrative Units")
+    )
+    y_encoding = alt.Y("count:Q", stack="normalize" if normalized else "zero", axis=y_axis, scale=y_scale)
+
+    return (
+        alt.Chart(agg_df)
+        .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+        .encode(
+            x=alt.X("district_name:N", title="District", axis=alt.Axis(labelAngle=0)),
+            y=y_encoding,
+            color=alt.Color(
+                f"{col_band}:N",
+                scale=alt.Scale(domain=domain, range=colors),
+                legend=alt.Legend(
+                    title="Priority Band",
+                    orient="top",
+                    direction="horizontal",
+                    labelLimit=250,
+                ),
+            ),
+            tooltip=[
+                alt.Tooltip("district_name:N", title="District"),
+                alt.Tooltip(f"{col_band}:N", title="Priority Band"),
+                alt.Tooltip("count:Q", title="Units"),
+                alt.Tooltip("percentage:Q", title="District Share (%)", format=".1f"),
+            ],
+        )
+        .properties(height=height)
+        .configure_view(strokeWidth=0)
+        .configure_axis(
+            gridColor="#334155",
+            domainColor="#475569",
+            tickColor="#475569",
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
+        )
+        .configure_legend(
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
+        )
+    )
+
+
+def generate_tier_distribution_chart(
+    df: pd.DataFrame,
+    by_district: bool = False,
+    height: int = 300,
+) -> alt.Chart:
+    """Generate Altair bar chart displaying AHP preparedness tier distribution.
+
+    Args:
+        df: DataFrame containing 'preparedness_tier' (and 'district_name' if by_district=True).
+        by_district: If True, clusters bars by district.
+        height: Chart height in pixels.
+
+    Returns:
+        Altair Chart object.
+    """
+    if df.empty or "preparedness_tier" not in df.columns:
+        return alt.Chart(pd.DataFrame({"x": ["No Data"], "y": [0]})).mark_bar().encode(x="x:N", y="y:Q")
+
+    domain = ["Low", "Medium", "High"]
+    colors = ["#ef4444", "#f59e0b", "#10b981"]
+
+    if by_district and "district_name" in df.columns:
+        agg_df = (
+            df.groupby(["district_name", "preparedness_tier"])
+            .size()
+            .reset_index(name="count")
+        )
+        totals = agg_df.groupby("district_name")["count"].transform("sum")
+        agg_df["percentage"] = (agg_df["count"] / totals * 100).round(1)
+
+        chart = (
+            alt.Chart(agg_df)
+            .mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3)
+            .encode(
+                x=alt.X("district_name:N", title="District", axis=alt.Axis(labelAngle=0)),
+                xOffset=alt.XOffset("preparedness_tier:N", sort=domain),
+                y=alt.Y("count:Q", title="Administrative Units", axis=alt.Axis(grid=True)),
+                color=alt.Color(
+                    "preparedness_tier:N",
+                    scale=alt.Scale(domain=domain, range=colors),
+                    sort=domain,
+                    legend=alt.Legend(title="AHP Preparedness Tier", orient="top", direction="horizontal"),
+                ),
+                tooltip=[
+                    alt.Tooltip("district_name:N", title="District"),
+                    alt.Tooltip("preparedness_tier:N", title="Tier"),
+                    alt.Tooltip("count:Q", title="Units"),
+                    alt.Tooltip("percentage:Q", title="District Share (%)", format=".1f"),
+                ],
+            )
+            .properties(height=height)
+        )
+    else:
+        agg_df = df["preparedness_tier"].value_counts().reset_index()
+        agg_df.columns = ["preparedness_tier", "count"]
+        total = agg_df["count"].sum()
+        agg_df["percentage"] = (agg_df["count"] / total * 100).round(1)
+
+        chart = (
+            alt.Chart(agg_df)
+            .mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+            .encode(
+                x=alt.X("preparedness_tier:N", title="AHP Preparedness Tier", sort=domain, axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("count:Q", title="Administrative Units", axis=alt.Axis(grid=True)),
+                color=alt.Color(
+                    "preparedness_tier:N",
+                    scale=alt.Scale(domain=domain, range=colors),
+                    legend=None,
+                ),
+                tooltip=[
+                    alt.Tooltip("preparedness_tier:N", title="Tier"),
+                    alt.Tooltip("count:Q", title="Units"),
+                    alt.Tooltip("percentage:Q", title="Regional Share (%)", format=".1f"),
+                ],
+            )
+            .properties(height=height)
+        )
+
+    return (
+        chart.configure_view(strokeWidth=0)
+        .configure_axis(
+            gridColor="#334155",
+            domainColor="#475569",
+            tickColor="#475569",
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
+        )
+        .configure_legend(
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
+        )
+    )
+
+
+def generate_archetype_distribution_chart(
+    df: pd.DataFrame,
+    height: int = 300,
+) -> alt.Chart:
+    """Generate Altair horizontal bar chart showing K-Means vulnerability archetypes.
+
+    Distinguishes the 4 assigned archetypes (DK/Udupi) from unassigned units (Uttara Kannada).
+
+    Args:
+        df: DataFrame containing 'vulnerability_archetype_label' and 'district_name'.
+        height: Chart height in pixels.
+
+    Returns:
+        Altair Chart object.
+    """
+    if df.empty:
+        return alt.Chart(pd.DataFrame({"x": ["No Data"], "y": [0]})).mark_bar().encode(x="x:N", y="y:Q")
+
+    labels = []
+    statuses = []
+    for _, row in df.iterrows():
+        lbl = row.get("vulnerability_archetype_label")
+        dist = str(row.get("district_name", ""))
+        if pd.isna(lbl) or not str(lbl).strip() or dist.lower() == "uttara kannada":
+            labels.append("Unassigned (Uttara Kannada Sector Fallback)")
+            statuses.append("Sector Rule Fallback")
+        else:
+            labels.append(str(lbl).strip())
+            statuses.append("Assigned Cluster")
+
+    temp_df = pd.DataFrame({"archetype_display": labels, "assignment_status": statuses})
+    agg_df = temp_df.groupby(["archetype_display", "assignment_status"]).size().reset_index(name="count")
+    total = agg_df["count"].sum()
+    agg_df["percentage"] = (agg_df["count"] / total * 100).round(1)
+
+    agg_df = agg_df.sort_values("count", ascending=False)
+
+    color_scale = alt.Scale(
+        domain=["Assigned Cluster", "Sector Rule Fallback"],
+        range=["#38bdf8", "#64748b"],
+    )
+
+    return (
+        alt.Chart(agg_df)
+        .mark_bar(cornerRadiusTopRight=4, cornerRadiusBottomRight=4)
+        .encode(
+            y=alt.Y("archetype_display:N", title="Vulnerability Archetype", sort="-x", axis=alt.Axis(labelLimit=320)),
+            x=alt.X("count:Q", title="Administrative Units", axis=alt.Axis(grid=True)),
+            color=alt.Color(
+                "assignment_status:N",
+                scale=color_scale,
+                legend=alt.Legend(title="Clustering Status", orient="top", direction="horizontal"),
+            ),
+            tooltip=[
+                alt.Tooltip("archetype_display:N", title="Archetype"),
+                alt.Tooltip("assignment_status:N", title="Status"),
+                alt.Tooltip("count:Q", title="Units"),
+                alt.Tooltip("percentage:Q", title="Share (%)", format=".1f"),
+            ],
+        )
+        .properties(height=height)
+        .configure_view(strokeWidth=0)
+        .configure_axis(
+            gridColor="#334155",
+            domainColor="#475569",
+            tickColor="#475569",
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
+        )
+        .configure_legend(
+            labelColor="#94a3b8",
+            titleColor="#cbd5e1",
         )
     )

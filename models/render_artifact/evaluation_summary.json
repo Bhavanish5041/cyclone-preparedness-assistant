@@ -1,0 +1,57 @@
+{
+  "evaluation_timestamp_utc": "2026-11-07T13:09:44.972849+00:00",
+  "model_artifact": "logistic_regression_tier.joblib",
+  "sample_size_test": 282,
+  "overall_performance": {
+    "accuracy": 0.9432624113475178,
+    "macro_f1": 0.9060227871307046,
+    "weighted_f1": 0.9422469456827796
+  },
+  "per_class_performance": {
+    "High": {
+      "precision": 0.9659090909090909,
+      "recall": 0.9444444444444444,
+      "f1_score": 0.9550561797752809,
+      "support": 90.0
+    },
+    "Low": {
+      "precision": 0.8947368421052632,
+      "recall": 0.7391304347826086,
+      "f1_score": 0.8095238095238095,
+      "support": 23.0
+    },
+    "Medium": {
+      "precision": 0.9371428571428572,
+      "recall": 0.9704142011834319,
+      "f1_score": 0.9534883720930233,
+      "support": 169.0
+    }
+  },
+  "confusion_matrix": {
+    "classes": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "matrix": [
+      [
+        85,
+        0,
+        5
+      ],
+      [
+        0,
+        17,
+        6
+      ],
+      [
+        3,
+        2,
+        164
+      ]
+    ]
+  },
+  "operational_alerts": [
+    "Low Preparedness Tier recall is 73.91% (below provisional 80% engineering threshold). 6 of 23 Low-tier villages misclassified as Medium. Vulnerable villages warrant manual field verification."
+  ]
+}

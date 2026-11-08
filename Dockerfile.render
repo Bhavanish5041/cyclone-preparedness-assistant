@@ -44,9 +44,9 @@ COPY src/ /app/src/
 COPY data/processed/coastal_vulnerability_archetypes.parquet /app/data/processed/
 COPY data/processed/unified_village_preparedness_v2.parquet /app/data/processed/
 
-# Copy baseline model components and immutable W&B cached artifact
+# Copy baseline model components and immutable deployment model artifact
 COPY models/ /app/models/
-COPY .wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/ \
+COPY models/render_artifact/ \
      /app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/
 
 # Setup home and config directory for non-root user

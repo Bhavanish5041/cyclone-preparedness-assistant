@@ -1,0 +1,172 @@
+{
+  "model_artifact": "logistic_regression_tier.joblib",
+  "model_nature": "REPRODUCIBLE RECONSTRUCTION: This model is a faithful, verified reconstruction of the teammate's documented 70/15/15 experiment from notebooks/02_Baseline_Models.ipynb. It is NOT the original unpersisted in-memory estimator.",
+  "model_type": "sklearn.pipeline.Pipeline (RobustScaler + LogisticRegression)",
+  "framework": "scikit-learn",
+  "scikit_learn_version": "1.9.1",
+  "python_version": "3.14.4",
+  "creation_timestamp_utc": "2026-11-07T13:09:44.972849+00:00",
+  "training_dataset_source": "/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet",
+  "total_dataset_rows": 1879,
+  "n_features": 26,
+  "features": [
+    "dist_coast_km",
+    "elevation_mean",
+    "avg_household_size",
+    "sc_share",
+    "st_share",
+    "vulnerable_pop_share",
+    "road_connectivity_score",
+    "drinking_water_score",
+    "n_hc_10km",
+    "n_phc_chc_10km",
+    "n_gauges_20km",
+    "n_shelters_10km",
+    "cvi_physical",
+    "cvi_social",
+    "has_pucca_road",
+    "has_major_district_road",
+    "bus_connectivity",
+    "log1p_population",
+    "log1p_pop_density_sqkm",
+    "log1p_dist_nearest_shelter_km",
+    "log1p_dist_nearest_hospital_km",
+    "coastal_risk_score",
+    "evacuation_sufficiency",
+    "vulnerability_exposure",
+    "infra_composite",
+    "monitoring_coverage"
+  ],
+  "feature_order_is_strict": true,
+  "preprocessing": {
+    "scaler": "sklearn.preprocessing.RobustScaler",
+    "with_centering": true,
+    "with_scaling": true,
+    "quantile_range": [
+      25.0,
+      75.0
+    ]
+  },
+  "hyperparameters": {
+    "penalty": "l2",
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 500,
+    "random_state": 42,
+    "multi_class": "multinomial (automatic in scikit-learn >= 1.8)"
+  },
+  "split_configuration": {
+    "split_name": "split_70_15_15",
+    "strategy": "Stratified train_test_split",
+    "random_state": 42,
+    "train_size": 1315,
+    "val_size": 282,
+    "test_size": 282,
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15
+  },
+  "target": {
+    "target_variable": "preparedness_tier",
+    "target_nature": "Empirical AHP/MCDA capacity tier (NOT calibrated physical hazard/casualty risk)",
+    "classes": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "class_encoding": {
+      "High": 0,
+      "Low": 1,
+      "Medium": 2
+    },
+    "probability_column_mapping": {
+      "probs[:, 0]": "prob_high",
+      "probs[:, 1]": "prob_low",
+      "probs[:, 2]": "prob_medium"
+    }
+  },
+  "validation_results": {
+    "train_metrics": {
+      "accuracy": 0.9589353612167301,
+      "macro_f1": 0.9351806340597754,
+      "weighted_f1": 0.9586858611142135
+    },
+    "val_metrics": {
+      "accuracy": 0.9397163120567376,
+      "macro_f1": 0.9340060635101777,
+      "weighted_f1": 0.9395056874374306
+    },
+    "test_metrics": {
+      "accuracy": 0.9432624113475178,
+      "macro_f1": 0.9060227871307046,
+      "weighted_f1": 0.9422469456827796
+    },
+    "recorded_benchmark_metrics": {
+      "test_accuracy": 0.943262,
+      "test_macro_f1": 0.906023,
+      "test_weighted_f1": 0.942247
+    },
+    "metric_discrepancy": {
+      "accuracy_delta": 4.113475177147663e-07,
+      "macro_f1_delta": 2.1286929541286526e-07,
+      "weighted_f1_delta": 5.43172203881781e-08
+    },
+    "test_confusion_matrix": {
+      "classes": [
+        "High",
+        "Low",
+        "Medium"
+      ],
+      "matrix": [
+        [
+          85,
+          0,
+          5
+        ],
+        [
+          0,
+          17,
+          6
+        ],
+        [
+          3,
+          2,
+          164
+        ]
+      ]
+    },
+    "test_classification_report": {
+      "High": {
+        "precision": 0.9659090909090909,
+        "recall": 0.9444444444444444,
+        "f1-score": 0.9550561797752809,
+        "support": 90.0
+      },
+      "Low": {
+        "precision": 0.8947368421052632,
+        "recall": 0.7391304347826086,
+        "f1-score": 0.8095238095238095,
+        "support": 23.0
+      },
+      "Medium": {
+        "precision": 0.9371428571428572,
+        "recall": 0.9704142011834319,
+        "f1-score": 0.9534883720930233,
+        "support": 169.0
+      },
+      "accuracy": 0.9432624113475178,
+      "macro avg": {
+        "precision": 0.9325962633857371,
+        "recall": 0.8846630268034951,
+        "f1-score": 0.9060227871307046,
+        "support": 282.0
+      },
+      "weighted avg": {
+        "precision": 0.9428649234304329,
+        "recall": 0.9432624113475178,
+        "f1-score": 0.9422469456827796,
+        "support": 282.0
+      }
+    }
+  }
+}

@@ -89,6 +89,9 @@ def test_render_dockerfile_specification():
     # Streamlit healthcheck
     assert "/_stcore/health" in content
 
+    # Deployment artifact packaging
+    assert "models/render_artifact" in content
+
 
 def test_direct_mode_initialization():
     """Verify DecisionSupportApiClient operates purely in-memory in Direct Mode."""
@@ -121,6 +124,42 @@ def test_offline_wandb_model_loading_v0():
         container = load_registered_model(
             artifact_address="village-preparedness-classifier:v0",
             cache_dir=cache_dir,
+        )
+        assert isinstance(container, RegisteredModelContainer)
+        assert container.artifact_version == "v0"
+        assert len(container.features) == 26
+        assert set(container.classes_) == {"High", "Low", "Medium"}
+
+
+def test_render_packaged_artifact_loading_v0(tmp_path):
+    """Verify immutable model artifact v0 in models/render_artifact matches specifications and loads cleanly."""
+    packaged_dir = PROJECT_ROOT / "models" / "render_artifact"
+    assert packaged_dir.exists(), "models/render_artifact must exist"
+
+    required_files = [
+        "logistic_regression_tier.joblib",
+        "label_encoder.joblib",
+        "logistic_regression_metadata.json",
+        "evaluation_summary.json",
+        "feature_schema.json",
+        "intended_use_and_limitations.md",
+        "model_card.md",
+    ]
+    for fname in required_files:
+        assert (packaged_dir / fname).exists(), f"Missing required artifact file: {fname}"
+
+    # Replicate Docker container artifact layout into tmp_path
+    target_cache_dir = tmp_path / "bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
+    target_cache_dir.mkdir(parents=True, exist_ok=True)
+    import shutil
+    for fname in required_files:
+        shutil.copy2(packaged_dir / fname, target_cache_dir / fname)
+
+    # Load from replicated cache without W&B credentials
+    with patch.dict(os.environ, {"WANDB_API_KEY": ""}, clear=False):
+        container = load_registered_model(
+            artifact_address="village-preparedness-classifier:v0",
+            cache_dir=tmp_path,
         )
         assert isinstance(container, RegisteredModelContainer)
         assert container.artifact_version == "v0"

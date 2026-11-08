@@ -1,0 +1,76 @@
+{
+  "features_count": 26,
+  "feature_order_is_strict": true,
+  "categorical_features": [
+    "has_pucca_road",
+    "has_major_district_road",
+    "bus_connectivity"
+  ],
+  "numerical_features": [
+    "dist_coast_km",
+    "elevation_mean",
+    "avg_household_size",
+    "sc_share",
+    "st_share",
+    "vulnerable_pop_share",
+    "road_connectivity_score",
+    "drinking_water_score",
+    "n_hc_10km",
+    "n_phc_chc_10km",
+    "n_gauges_20km",
+    "n_shelters_10km",
+    "cvi_physical",
+    "cvi_social",
+    "log1p_population",
+    "log1p_pop_density_sqkm",
+    "log1p_dist_nearest_shelter_km",
+    "log1p_dist_nearest_hospital_km",
+    "coastal_risk_score",
+    "evacuation_sufficiency",
+    "vulnerability_exposure",
+    "infra_composite",
+    "monitoring_coverage"
+  ],
+  "feature_names_canonical_order": [
+    "dist_coast_km",
+    "elevation_mean",
+    "avg_household_size",
+    "sc_share",
+    "st_share",
+    "vulnerable_pop_share",
+    "road_connectivity_score",
+    "drinking_water_score",
+    "n_hc_10km",
+    "n_phc_chc_10km",
+    "n_gauges_20km",
+    "n_shelters_10km",
+    "cvi_physical",
+    "cvi_social",
+    "has_pucca_road",
+    "has_major_district_road",
+    "bus_connectivity",
+    "log1p_population",
+    "log1p_pop_density_sqkm",
+    "log1p_dist_nearest_shelter_km",
+    "log1p_dist_nearest_hospital_km",
+    "coastal_risk_score",
+    "evacuation_sufficiency",
+    "vulnerability_exposure",
+    "infra_composite",
+    "monitoring_coverage"
+  ],
+  "target": {
+    "name": "preparedness_tier",
+    "classes": [
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "class_encoding": {
+      "High": 0,
+      "Low": 1,
+      "Medium": 2
+    },
+    "description": "AHP-derived village preparedness tiers (High, Medium, Low) reflecting composite physical, social, and infrastructural readiness. Deterministic AHP assessments serve as the baseline ground truth. Logistic Regression outputs provide calibrated tier probabilities for granular boundary case detection, NOT physical cyclone-risk or hazard prediction."
+  }
+}

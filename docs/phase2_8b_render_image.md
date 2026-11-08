@@ -79,11 +79,11 @@ wandb==0.31.0
 - Writable cache directories (`/app/.cache`, `/app/.streamlit`, `/app/.wandb`) are pre-created and assigned to `appuser` to prevent permission errors on ephemeral container restarts.
 
 ### 3.3 Offline Artifact & Dataset Packaging
-The build copies only immutable production assets:
+The build copies only immutable production assets tracked in the repository:
 1. `data/processed/coastal_vulnerability_archetypes.parquet` (622 coastal administrative units, geometries, PCA cluster labels).
 2. `data/processed/unified_village_preparedness_v2.parquet` (1,879 complete revenue units with AHP indices and demographic features).
 3. `data/raw/district_karnataka/` (administrative boundary context).
-4. `.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/` (pre-cached model artifact, metadata, lineage, and serialized pipeline).
+4. `models/render_artifact/` (sanitized immutable W&B model artifact `village-preparedness-classifier:v0`, containing `logistic_regression_tier.joblib`, `label_encoder.joblib`, and metadata schemas, copied to `/app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/` at container build time). This ensures the artifact is available in clean remote Git clones where `.wandb_artifacts_cache/` is gitignored.
 
 ### 3.4 Runtime Environment Variables
 ```dockerfile

@@ -1,0 +1,29 @@
+# ==============================================================================
+# Cyclone Preparedness Assistant — Render Cloud Runtime Dependencies
+# Streamlit Direct-Mode Deployment (Minimal Memory Footprint for 512MB RAM)
+# ==============================================================================
+
+# Frontend UI & Visualizations
+streamlit==1.66.1
+streamlit-folium==0.27.4
+folium==0.20.0
+altair==6.3.0
+matplotlib==3.11.2
+
+# Core Analytical, Scientific & Geospatial Engine
+numpy==2.5.4
+pandas==3.0.6
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+geopandas==1.2.0
+pyproj==3.8.0
+pyarrow==26.0.0
+shapely==2.2.0
+pydantic==2.14.1
+
+# HTTP Client (Required by DecisionSupportApiClient module import)
+httpx==0.28.1
+
+# W&B Model Artifact Packaging & Offline Inference Support
+wandb==0.31.0

@@ -1,0 +1,70 @@
+# ==============================================================================
+# Streamlit Dashboard Standalone Production Container (Render Free-Tier)
+# Cyclone Preparedness Decision Support System
+# ==============================================================================
+
+FROM python:3.14-slim
+
+LABEL maintainer="Cyclone Preparedness Team"
+LABEL description="Streamlit decision-support dashboard (Render Free-Tier Direct Mode)"
+
+# Environment configuration
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PORT=10000 \
+    CYCLONE_ADAPTER_MODE="direct" \
+    WANDB_MODEL_ARTIFACT="village-preparedness-classifier:v0" \
+    WANDB_PROJECT="cyclone-preparedness-assistant" \
+    WANDB_ENTITY="bhavanishreddy69-na" \
+    WANDB_CACHE_DIR="/app/.wandb_artifacts_cache" \
+    STREAMLIT_SERVER_ADDRESS="0.0.0.0" \
+    STREAMLIT_SERVER_HEADLESS="true" \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS="false"
+
+# Install system dependencies (curl for container healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root system user and group
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/bash -m appuser
+
+WORKDIR /app
+
+# Install pinned Python runtime dependencies
+COPY docker/requirements-render.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application source code
+COPY src/ /app/src/
+
+# Copy processed datasets (coastal archetypes and unified preparedness)
+COPY data/processed/coastal_vulnerability_archetypes.parquet /app/data/processed/
+COPY data/processed/unified_village_preparedness_v2.parquet /app/data/processed/
+
+# Copy baseline model components and immutable W&B cached artifact
+COPY models/ /app/models/
+COPY .wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/ \
+     /app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/
+
+# Setup home and config directory for non-root user
+RUN mkdir -p /home/appuser/.streamlit /app/.wandb_artifacts_cache && \
+    chown -R appuser:appgroup /app /home/appuser
+
+# Switch to unprivileged user
+USER appuser
+
+# Expose default port
+EXPOSE 10000
+
+# Container healthcheck using Streamlit native health route on dynamic PORT
+HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-10000}/_stcore/health || exit 1
+
+# Graceful shutdown signal
+STOPSIGNAL SIGTERM
+
+# Start Streamlit application in Direct Mode binding to Render dynamic PORT
+CMD ["sh", "-c", "exec streamlit run src/assistant/app.py --server.port=${PORT:-10000} --server.address=0.0.0.0 --server.headless=true --browser.gatherUsageStats=false"]

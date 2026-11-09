@@ -146,8 +146,15 @@ def test_session_history_bounded_size(mock_streamlit_session, direct_client):
 
 def test_direct_mode_chat_execution_fallback(direct_client):
     """Verify direct client executes orchestrator in-process without network overhead."""
-    # Ensure unconfigured key triggers deterministic fallback
-    with patch.dict(os.environ, {"GEMINI_API_KEY": ""}, clear=False):
+    # Ensure unconfigured keys trigger deterministic fallback
+    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "", "GEMINI_API_KEY": ""}, clear=False):
+        from src.assistant.llm.client import OpenRouterClient
+        from src.assistant.llm.orchestrator import ToolCallingOrchestrator
+
+        direct_client._orchestrator = ToolCallingOrchestrator(
+            client=OpenRouterClient(api_key=""),
+            service=direct_client.service,
+        )
         # 1. Unambiguous query without explicit community_identifier
         req_tallur = ChatRequest(message="Explain why Tallur has its current priority classification.")
         res_tallur = direct_client.chat(req_tallur)

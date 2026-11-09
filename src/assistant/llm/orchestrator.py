@@ -1,21 +1,28 @@
 """Tool-calling conversational orchestrator for the Cyclone Preparedness Assistant.
 
 Manages:
-- The full multi-turn conversation turn cycle.
-- Gemini API request formatting with closed-domain scientific guardrails.
+- The full multi-turn conversation turn cycle across OpenRouter and Gemini providers.
+- OpenAI-compatible and Gemini v1beta REST payload formatting with closed-domain scientific guardrails.
 - Tool invocation detection, server-side argument validation, and controlled execution.
 - Prevention of infinite tool loops (strictly capped at 4 rounds and 8 executions per turn).
-- Automatic deterministic fallback when Gemini API is unconfigured, unreachable, or rate-limited.
+- Automatic deterministic fallback when LLM API is unconfigured, unreachable, or rate-limited.
 """
 
+import json
 import logging
 import re
 import time
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 
 if TYPE_CHECKING:
     from src.assistant.decision_support import DecisionSupportService
-from src.assistant.llm.client import GeminiClient, GeminiClientError
+from src.assistant.llm.client import (
+    GeminiClient,
+    GeminiClientError,
+    OpenRouterClient,
+    OpenRouterClientError,
+    get_default_llm_client,
+)
 from src.assistant.llm.prompts import (
     SCIENTIFIC_PRECEDENCE_DISCLAIMER,
     SYSTEM_INSTRUCTION,
@@ -43,12 +50,55 @@ MAX_TOOL_ROUNDS = 4
 MAX_TOTAL_TOOL_CALLS = 8
 
 
+def audit_and_guard_answer(answer: str, structured_evidence: Optional[Dict[str, Any]]) -> str:
+    """Audit LLM-generated prose against deterministic ground truth.
+
+    If an authoritative preparedness assessment was executed during this turn,
+    verifies that the model does not omit or contradict the authoritative AHP score
+    or priority band. If omission or contradiction is detected, appends an explicit
+    deterministic reconciliation block to prevent operational misrepresentation.
+    """
+    if not structured_evidence or not isinstance(structured_evidence, dict):
+        return answer
+
+    assessment = structured_evidence.get("explain_preparedness_assessment")
+    if not isinstance(assessment, dict):
+        return answer
+
+    ahp_data = assessment.get("deterministic_ahp")
+    prio_data = assessment.get("operational_prioritization")
+    score = ahp_data.get("preparedness_score") if isinstance(ahp_data, dict) else None
+    band = prio_data.get("priority_band") if isinstance(prio_data, dict) else None
+    c_name = assessment.get("community_name") or assessment.get("name", "Community")
+
+    if score is not None and band is not None:
+        score_2dec = f"{score:.2f}"
+        score_1dec = f"{score:.1f}"
+        band_raw = str(band).strip()
+        band_clean = band_raw.replace("BAND_", "Band ").replace("_", " ")
+
+        score_in_answer = score_2dec in answer or score_1dec in answer
+        band_in_answer = band_raw.lower() in answer.lower() or band_clean.lower() in answer.lower()
+
+        if not (score_in_answer and band_in_answer):
+            reconciliation = (
+                f"\n\n---\n**Authoritative Metric Verification (Deterministic Ground Truth):**\n"
+                f"- **Community:** {c_name}\n"
+                f"- **Authoritative AHP Score:** `{score_2dec} / 100.0`\n"
+                f"- **Priority Classification:** `{band_raw}`\n"
+                f"*Governance Note: Deterministic AHP scores and priority bands maintain absolute operational precedence.*"
+            )
+            return answer + reconciliation
+
+    return answer
+
+
 class ToolCallingOrchestrator:
-    """Orchestrates multi-turn conversation and deterministic tool-calling with Gemini."""
+    """Orchestrates multi-turn conversation and deterministic tool-calling with LLMs."""
 
     def __init__(
         self,
-        client: Optional[GeminiClient] = None,
+        client: Optional[Union[OpenRouterClient, GeminiClient]] = None,
         registry: Optional[ToolRegistry] = None,
         service: Optional[DecisionSupportService] = None,
         max_rounds: int = MAX_TOOL_ROUNDS,
@@ -61,20 +111,18 @@ class ToolCallingOrchestrator:
         else:
             self.service = service
         self.registry = registry or get_default_registry(service=self.service)
-        self.client = client or GeminiClient()
+        self.client = client or get_default_llm_client()
         self.max_rounds = max_rounds
         self.max_tool_calls = max_tool_calls
 
-    def _build_initial_contents(self, request: ChatRequest) -> List[Dict[str, Any]]:
+    def _build_initial_gemini_contents(self, request: ChatRequest) -> List[Dict[str, Any]]:
         """Construct the Gemini contents array from conversation history and user prompt."""
         contents: List[Dict[str, Any]] = []
 
-        # 1. Process validated prior turns
         for msg in request.conversation_history or []:
             role_str = "user" if msg.role == MessageRole.USER else "model"
             contents.append({"role": role_str, "parts": [{"text": msg.content}]})
 
-        # 2. Prepare user prompt with optional community context injection
         user_text = request.message.strip()
         if request.community_identifier and request.community_identifier.lower() not in user_text.lower():
             user_text = (
@@ -84,6 +132,26 @@ class ToolCallingOrchestrator:
 
         contents.append({"role": "user", "parts": [{"text": user_text}]})
         return contents
+
+    def _build_initial_openrouter_messages(self, request: ChatRequest) -> List[Dict[str, Any]]:
+        """Construct the OpenAI-compatible messages array from conversation history and user prompt."""
+        messages: List[Dict[str, Any]] = [
+            {"role": "system", "content": SYSTEM_INSTRUCTION}
+        ]
+
+        for msg in request.conversation_history or []:
+            role_str = "user" if msg.role == MessageRole.USER else "assistant"
+            messages.append({"role": role_str, "content": msg.content})
+
+        user_text = request.message.strip()
+        if request.community_identifier and request.community_identifier.lower() not in user_text.lower():
+            user_text = (
+                f"[Selected Community Context: identifier = '{request.community_identifier}']\n"
+                f"{user_text}"
+            )
+
+        messages.append({"role": "user", "content": user_text})
+        return messages
 
     async def _execute_deterministic_fallback(
         self,
@@ -170,7 +238,6 @@ class ToolCallingOrchestrator:
                             prior_community = raw_cname
 
         # INTENT DETECTION 1: District Comparison
-        # Detect if two districts are mentioned
         districts_found = []
         if "dakshina kannada" in query_lower or re.search(r"\bdk\b", query_lower):
             districts_found.append("Dakshina Kannada")
@@ -179,7 +246,6 @@ class ToolCallingOrchestrator:
         if "uttara kannada" in query_lower or re.search(r"\buk\b", query_lower):
             districts_found.append("Uttara Kannada")
 
-        # Multi-turn district inheritance: if current turn doesn't specify two districts, inherit from prior turn
         if len(districts_found) < 2 and len(prior_districts) == 2:
             is_comp_followup = any(
                 w in query_lower
@@ -251,7 +317,6 @@ class ToolCallingOrchestrator:
         else:
             target_community = request.community_identifier
             if not target_community:
-                # 1. Check for 6-digit PC11 ID or SHRID
                 pc11_match = re.search(r"\b\d{6}\b", query_text)
                 shrid_match = re.search(r"\b\d{2}-\d{2}-\d{3}-\d{5}-\d{6}\b", query_text)
                 if pc11_match:
@@ -259,13 +324,11 @@ class ToolCallingOrchestrator:
                 elif shrid_match:
                     target_community = shrid_match.group(0)
                 else:
-                    # 2. Extract potential village name from query by matching against known dataset villages
                     for v_name in sorted(all_village_names, key=len, reverse=True):
                         if len(v_name) >= 3 and re.search(r"\b" + re.escape(v_name) + r"\b", query_lower):
                             target_community = v_name
                             break
 
-            # Multi-turn community context inheritance
             if not target_community and prior_community:
                 is_comm_followup = any(
                     w in query_lower
@@ -280,7 +343,6 @@ class ToolCallingOrchestrator:
                     target_community = prior_community
 
             if target_community:
-                # Call lookup_community to verify existence and check for ambiguities
                 res_lookup = _call_tool("lookup_community", {"query": target_community, "limit": 10})
                 if res_lookup.success and res_lookup.data:
                     matches = res_lookup.data.get("matches", [])
@@ -292,10 +354,8 @@ class ToolCallingOrchestrator:
                             "(1,879 surveyed units). Please verify the spelling or provide a Census PC11 ID (e.g. `608691`)."
                         )
                     elif total_matches > 1:
-                        # Ambiguous village name matching multiple units across taluks/districts
                         answer_text = format_ambiguous_community_response(target_community, matches)
                     else:
-                        # Exactly one matching community resolved
                         match_row = matches[0]
                         resolved_id = str(match_row.get("pc11_id") or match_row.get("shrid2") or target_community)
 
@@ -322,7 +382,6 @@ class ToolCallingOrchestrator:
                     else:
                         answer_text = f"Community resolution error: {res_lookup.error}"
             else:
-                # No supported intent, district, band, or community identifier could be resolved
                 answer_text = format_unsupported_query_response(query_text)
 
         total_duration = round((time.perf_counter() - start_time) * 1000, 2)
@@ -340,47 +399,24 @@ class ToolCallingOrchestrator:
             scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
         )
 
-    async def process_chat(self, request: ChatRequest) -> ChatResponse:
-        """Execute a complete conversational turn with Gemini and deterministic tools.
-
-        Lifecycle:
-        1. Validates Gemini API configuration; if unconfigured, triggers immediate fallback.
-        2. Packages conversation history and user query into Gemini v1beta schema.
-        3. Exposes registered deterministic tools as function declarations.
-        4. Manages multi-turn tool calling loop up to 4 rounds / 8 total calls.
-        5. Validates and executes tool calls via ToolRegistry.
-        6. Obtains final grounded natural language briefing from Gemini.
-        7. Returns complete ChatResponse with tool audit trails and precedence notices.
-        """
-        start_time = time.perf_counter()
-        tool_records: List[ToolExecutionRecord] = []
-        tools_executed: List[str] = []
+    async def _process_chat_gemini(
+        self,
+        request: ChatRequest,
+        start_time: float,
+        tool_records: List[ToolExecutionRecord],
+        tools_executed: List[str],
+    ) -> ChatResponse:
+        """Execute conversational turn using Google Gemini generateContent REST API."""
         structured_evidence: Dict[str, Any] = {}
-
-        # 1. Check client configuration
-        if not self.client.is_configured():
-            return await self._execute_deterministic_fallback(
-                request=request,
-                reason="GEMINI_API_KEY is not configured",
-                tool_records=tool_records,
-                tools_executed=tools_executed,
-                start_time=start_time,
-            )
-
-        # 2. Build initial contents
-        contents = self._build_initial_contents(request)
-
-        # 3. Prepare Gemini tool declarations
+        contents = self._build_initial_gemini_contents(request)
         gemini_tools = [{"functionDeclarations": self.registry.export_gemini_tool_declarations()}]
 
         current_round = 0
         total_calls = 0
 
-        # 4. Multi-round tool loop
         while current_round < self.max_rounds and total_calls < self.max_tool_calls:
             current_round += 1
 
-            # Dispatch request to Gemini API
             try:
                 response_json = await self.client.generate_content(
                     contents=contents,
@@ -407,18 +443,17 @@ class ToolCallingOrchestrator:
                     start_time=start_time,
                 )
 
-            # Check if Gemini returned function calls
-            function_calls = self.client.extract_function_calls(response_json)
+            function_calls = GeminiClient.extract_function_calls(response_json)
 
             if not function_calls:
-                # No further tools requested; model formulated final answer
-                final_answer = self.client.extract_text_response(response_json) or (
+                final_answer = GeminiClient.extract_text_response(response_json) or (
                     "Assessment complete. Deterministic evidence retrieved."
                 )
                 total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+                guarded_answer = audit_and_guard_answer(final_answer, structured_evidence)
 
                 return ChatResponse(
-                    answer=final_answer,
+                    answer=guarded_answer,
                     tools_executed=tools_executed,
                     tool_records=tool_records,
                     structured_evidence=structured_evidence if structured_evidence else None,
@@ -430,12 +465,10 @@ class ToolCallingOrchestrator:
                     scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
                 )
 
-            # Function calls present: append model turn to contents
             candidates = response_json.get("candidates", [])
             if candidates:
                 contents.append(candidates[0].get("content", {}))
 
-            # Execute requested tools server-side
             function_response_parts: List[Dict[str, Any]] = []
 
             for fc in function_calls:
@@ -449,10 +482,10 @@ class ToolCallingOrchestrator:
                 total_calls += 1
                 tools_executed.append(fn_name)
 
-                # Controlled deterministic execution
                 t_tool_start = time.perf_counter()
                 tool_res = self.registry.execute(fn_name, fn_args)
                 tool_dur = round((time.perf_counter() - t_tool_start) * 1000, 2)
+                summary = tool_res.metadata.get("summary") or f"Status: {'ok' if tool_res.success else 'error'}"
 
                 tool_records.append(
                     ToolExecutionRecord(
@@ -460,6 +493,7 @@ class ToolCallingOrchestrator:
                         arguments=fn_args,
                         success=tool_res.success,
                         execution_time_ms=tool_dur,
+                        result_summary=summary,
                         error=tool_res.error,
                         error_type=tool_res.error_type,
                     )
@@ -483,19 +517,17 @@ class ToolCallingOrchestrator:
                     }
                 )
 
-            # Append tool responses under role "user" per Gemini v1beta schema
             contents.append({"role": "user", "parts": function_response_parts})
 
-        # 5. If loop exited due to round or call limits, make final request to synthesize answer
         logger.info(f"Tool calling budget reached (rounds: {current_round}, calls: {total_calls}). Requesting final answer.")
         try:
             final_resp = await self.client.generate_content(
                 contents=contents,
-                tools=None,  # Disable tools to force text generation
+                tools=None,
                 system_instruction=SYSTEM_INSTRUCTION,
                 generation_config={"temperature": request.temperature or 0.0},
             )
-            final_answer = self.client.extract_text_response(final_resp) or (
+            final_answer = GeminiClient.extract_text_response(final_resp) or (
                 "Assessment formulated based on executed tool findings."
             )
         except Exception as err:
@@ -509,9 +541,10 @@ class ToolCallingOrchestrator:
             )
 
         total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+        guarded_answer = audit_and_guard_answer(final_answer, structured_evidence)
 
         return ChatResponse(
-            answer=final_answer,
+            answer=guarded_answer,
             tools_executed=tools_executed,
             tool_records=tool_records,
             structured_evidence=structured_evidence if structured_evidence else None,
@@ -522,3 +555,202 @@ class ToolCallingOrchestrator:
             total_duration_ms=total_duration,
             scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
         )
+
+    async def _process_chat_openrouter(
+        self,
+        request: ChatRequest,
+        start_time: float,
+        tool_records: List[ToolExecutionRecord],
+        tools_executed: List[str],
+    ) -> ChatResponse:
+        """Execute conversational turn using OpenRouter OpenAI-compatible REST API."""
+        structured_evidence: Dict[str, Any] = {}
+        messages = self._build_initial_openrouter_messages(request)
+        openai_tools = self.registry.export_openai_tool_definitions()
+
+        current_round = 0
+        total_calls = 0
+
+        while current_round < self.max_rounds and total_calls < self.max_tool_calls:
+            current_round += 1
+
+            try:
+                response_json = await self.client.create_chat_completion(
+                    messages=messages,
+                    tools=openai_tools,
+                    temperature=request.temperature or 0.0,
+                )
+            except OpenRouterClientError as client_err:
+                logger.warning(f"OpenRouter API invocation failed during round {current_round}: {client_err}")
+                return await self._execute_deterministic_fallback(
+                    request=request,
+                    reason=f"OpenRouter API failure: {str(client_err)}",
+                    tool_records=tool_records,
+                    tools_executed=tools_executed,
+                    start_time=start_time,
+                )
+            except Exception as unhandled_err:
+                logger.error(f"Unexpected error querying OpenRouter API: {unhandled_err}")
+                return await self._execute_deterministic_fallback(
+                    request=request,
+                    reason=f"Unexpected engine error: {type(unhandled_err).__name__}",
+                    tool_records=tool_records,
+                    tools_executed=tools_executed,
+                    start_time=start_time,
+                )
+
+            tool_calls = OpenRouterClient.extract_tool_calls(response_json)
+
+            if not tool_calls:
+                final_answer = OpenRouterClient.extract_text_response(response_json) or (
+                    "Assessment complete. Deterministic evidence retrieved."
+                )
+                total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+                guarded_answer = audit_and_guard_answer(final_answer, structured_evidence)
+
+                return ChatResponse(
+                    answer=guarded_answer,
+                    tools_executed=tools_executed,
+                    tool_records=tool_records,
+                    structured_evidence=structured_evidence if structured_evidence else None,
+                    is_fallback=False,
+                    fallback_reason=None,
+                    conversation_status=ConversationStatus.COMPLETED,
+                    model_name=self.client.model,
+                    total_duration_ms=total_duration,
+                    scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+                )
+
+            choices = response_json.get("choices", [])
+            asst_msg = choices[0].get("message", {}) if choices else {}
+            assistant_entry: Dict[str, Any] = {
+                "role": "assistant",
+                "content": asst_msg.get("content") or None,
+                "tool_calls": asst_msg.get("tool_calls", []),
+            }
+            messages.append(assistant_entry)
+
+            for tc in tool_calls:
+                fn_name = tc.get("name", "")
+                fn_args = tc.get("args") or {}
+                tc_id = tc.get("id") or f"call_{total_calls}"
+
+                if total_calls >= self.max_tool_calls:
+                    logger.warning(f"Total tool execution limit ({self.max_tool_calls}) reached.")
+                    break
+
+                total_calls += 1
+                tools_executed.append(fn_name)
+
+                t_tool_start = time.perf_counter()
+                tool_res = self.registry.execute(fn_name, fn_args)
+                tool_dur = round((time.perf_counter() - t_tool_start) * 1000, 2)
+                summary = tool_res.metadata.get("summary") or f"Status: {'ok' if tool_res.success else 'error'}"
+
+                tool_records.append(
+                    ToolExecutionRecord(
+                        tool_name=fn_name,
+                        arguments=fn_args,
+                        success=tool_res.success,
+                        execution_time_ms=tool_dur,
+                        result_summary=summary,
+                        error=tool_res.error,
+                        error_type=tool_res.error_type,
+                    )
+                )
+
+                if tool_res.success and tool_res.data:
+                    structured_evidence[fn_name] = tool_res.data
+                    result_body = tool_res.data
+                else:
+                    result_body = {
+                        "error": tool_res.error or "Tool execution failed",
+                        "error_type": tool_res.error_type or "TOOL_ERROR",
+                    }
+
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc_id,
+                        "name": fn_name,
+                        "content": json.dumps(result_body, default=str),
+                    }
+                )
+
+        logger.info(f"OpenRouter tool calling budget reached (rounds: {current_round}, calls: {total_calls}). Requesting final answer.")
+        try:
+            final_resp = await self.client.create_chat_completion(
+                messages=messages,
+                tools=None,
+                temperature=request.temperature or 0.0,
+            )
+            final_answer = OpenRouterClient.extract_text_response(final_resp) or (
+                "Assessment formulated based on executed tool findings."
+            )
+        except Exception as err:
+            logger.warning(f"Final synthesis request failed: {err}. Falling back to deterministic summary.")
+            return await self._execute_deterministic_fallback(
+                request=request,
+                reason=f"Synthesis timeout/error: {err}",
+                tool_records=tool_records,
+                tools_executed=tools_executed,
+                start_time=start_time,
+            )
+
+        total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+        guarded_answer = audit_and_guard_answer(final_answer, structured_evidence)
+
+        return ChatResponse(
+            answer=guarded_answer,
+            tools_executed=tools_executed,
+            tool_records=tool_records,
+            structured_evidence=structured_evidence if structured_evidence else None,
+            is_fallback=False,
+            fallback_reason=None,
+            conversation_status=ConversationStatus.COMPLETED,
+            model_name=self.client.model,
+            total_duration_ms=total_duration,
+            scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+        )
+
+    async def process_chat(self, request: ChatRequest) -> ChatResponse:
+        """Execute a complete conversational turn with LLM and deterministic tools.
+
+        Lifecycle:
+        1. Validates LLM API configuration; if unconfigured, triggers immediate fallback.
+        2. Packages conversation history and user query into provider-specific schema.
+        3. Exposes registered deterministic tools as function declarations.
+        4. Manages multi-turn tool calling loop up to 4 rounds / 8 total calls.
+        5. Validates and executes tool calls via ToolRegistry.
+        6. Obtains final grounded natural language briefing from the LLM.
+        7. Returns complete ChatResponse with tool audit trails and precedence notices.
+        """
+        start_time = time.perf_counter()
+        tool_records: List[ToolExecutionRecord] = []
+        tools_executed: List[str] = []
+
+        if not self.client.is_configured():
+            provider_label = getattr(self.client, "provider_name", "LLM").upper()
+            return await self._execute_deterministic_fallback(
+                request=request,
+                reason=f"{provider_label}_API_KEY is not configured",
+                tool_records=tool_records,
+                tools_executed=tools_executed,
+                start_time=start_time,
+            )
+
+        provider = getattr(self.client, "provider_name", "gemini")
+        if provider == "openrouter":
+            return await self._process_chat_openrouter(
+                request=request,
+                start_time=start_time,
+                tool_records=tool_records,
+                tools_executed=tools_executed,
+            )
+        else:
+            return await self._process_chat_gemini(
+                request=request,
+                start_time=start_time,
+                tool_records=tool_records,
+                tools_executed=tools_executed,
+            )

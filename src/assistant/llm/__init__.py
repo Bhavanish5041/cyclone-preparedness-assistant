@@ -1,7 +1,8 @@
 """LLM integration package for Cyclone Preparedness Intelligence Platform.
 
 Exposes:
-- `GeminiClient` and client exceptions.
+- `OpenRouterClient`, `GeminiClient`, and client exceptions.
+- Client factory `get_default_llm_client`.
 - `ToolCallingOrchestrator` managing the multi-turn loop.
 - Request, response, and message schemas (`ChatRequest`, `ChatResponse`, `ChatMessage`, `ToolExecutionRecord`).
 - System prompts and scientific guardrail templates.
@@ -15,6 +16,14 @@ from src.assistant.llm.client import (
     GeminiRateLimitError,
     GeminiResponseError,
     GeminiTimeoutError,
+    OpenRouterAuthError,
+    OpenRouterClient,
+    OpenRouterClientError,
+    OpenRouterNetworkError,
+    OpenRouterRateLimitError,
+    OpenRouterResponseError,
+    OpenRouterTimeoutError,
+    get_default_llm_client,
 )
 from src.assistant.llm.prompts import (
     SCIENTIFIC_PRECEDENCE_DISCLAIMER,
@@ -38,8 +47,9 @@ def __getattr__(name: str):
         return ToolCallingOrchestrator
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
+
 __all__ = [
-    # Client & Exceptions
+    # Gemini Client & Exceptions
     "GeminiClient",
     "GeminiClientError",
     "GeminiAuthError",
@@ -47,6 +57,16 @@ __all__ = [
     "GeminiTimeoutError",
     "GeminiNetworkError",
     "GeminiResponseError",
+    # OpenRouter Client & Exceptions
+    "OpenRouterClient",
+    "OpenRouterClientError",
+    "OpenRouterAuthError",
+    "OpenRouterRateLimitError",
+    "OpenRouterTimeoutError",
+    "OpenRouterNetworkError",
+    "OpenRouterResponseError",
+    # Factory
+    "get_default_llm_client",
     # Orchestrator
     "ToolCallingOrchestrator",
     # Schemas

@@ -666,13 +666,13 @@ def predict_model_tier(
     "/api/v1/assistant/chat",
     response_model=ChatResponse,
     tags=["AI Decision Support Assistant"],
-    summary="Conversational decision support assistant powered by Gemini with deterministic tool grounding",
+    summary="Conversational decision support assistant with deterministic tool grounding",
 )
 async def chat_with_assistant(
     request: ChatRequest,
     orchestrator: ToolCallingOrchestrator = Depends(get_orchestrator),
 ) -> ChatResponse:
-    """Execute a conversational interaction turn with the Gemini tool-calling assistant.
+    """Execute a conversational interaction turn with the tool-calling assistant.
 
     Processes the user query against registered deterministic tools (community lookup,
     AHP assessment, district comparisons, infrastructure analysis, vulnerability archetypes,

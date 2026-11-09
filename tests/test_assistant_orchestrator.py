@@ -14,6 +14,7 @@ Verifies:
 import asyncio
 from datetime import datetime, timezone
 import json
+import os
 from typing import Any, Dict, List, Optional
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -797,21 +798,26 @@ def test_chat_request_validation():
 
 def test_fastapi_assistant_chat_endpoint_fallback():
     """Verify POST /api/v1/assistant/chat executes deterministic fallback when unconfigured."""
-    with TestClient(app) as test_client:
-        payload = {
-            "message": "Why is Tallur in Band 4 Adequate?",
-            "community_identifier": "Tallur",
-        }
-        response = test_client.post("/api/v1/assistant/chat", json=payload)
-        assert response.status_code == 200
+    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "", "GEMINI_API_KEY": ""}):
+        with TestClient(app) as test_client:
+            test_client.app.state.orchestrator = ToolCallingOrchestrator(
+                client=GeminiClient(api_key=""),
+                service=test_client.app.state.service,
+            )
+            payload = {
+                "message": "Why is Tallur in Band 4 Adequate?",
+                "community_identifier": "Tallur",
+            }
+            response = test_client.post("/api/v1/assistant/chat", json=payload)
+            assert response.status_code == 200
 
-        data = response.json()
-        assert "answer" in data
-        assert "Tallur" in data["answer"]
-        assert data["conversation_status"] == "FALLBACK"
-        assert data["is_fallback"] is True
-        assert "explain_preparedness_assessment" in data["tools_executed"]
-        assert "AHP PRECEDENCE MANDATE" in data["scientific_precedence_note"]
+            data = response.json()
+            assert "answer" in data
+            assert "Tallur" in data["answer"]
+            assert data["conversation_status"] == "FALLBACK"
+            assert data["is_fallback"] is True
+            assert "explain_preparedness_assessment" in data["tools_executed"]
+            assert "AHP PRECEDENCE MANDATE" in data["scientific_precedence_note"]
 
 
 def test_api_key_non_leakage():

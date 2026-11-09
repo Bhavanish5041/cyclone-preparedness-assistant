@@ -124,6 +124,24 @@ jobs:
         with:
           lfs: true
 
+      - name: Seed and verify offline W&B artifact cache
+        run: |
+          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
+          mkdir -p "$CACHE_DEST"
+          cp -r models/render_artifact/. "$CACHE_DEST"/
+          python3 -c "
+          import hashlib
+          from pathlib import Path
+          src_dir = Path('models/render_artifact')
+          dst_dir = Path('$CACHE_DEST')
+          for src in src_dir.iterdir():
+              if src.is_file():
+                  dst = dst_dir / src.name
+                  assert dst.exists(), f'Missing cached file: {src.name}'
+                  assert hashlib.sha256(src.read_bytes()).digest() == hashlib.sha256(dst.read_bytes()).digest(), f'Checksum mismatch: {src.name}'
+          print('W&B offline artifact cache seeded and verified successfully.')
+          "
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 

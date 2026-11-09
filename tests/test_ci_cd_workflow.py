@@ -123,6 +123,15 @@ def test_build_and_publish_matrix_configuration(workflow_data):
     assert services["dashboard"]["dockerfile"] == "Dockerfile.dashboard"
     assert (PROJECT_ROOT / services["dashboard"]["dockerfile"]).is_file()
 
+    # Verify checkout with Git LFS and cache seeding in build job
+    steps = build_job.get("steps", [])
+    checkout_steps = [s for s in steps if "actions/checkout" in s.get("uses", "")]
+    assert len(checkout_steps) > 0, "actions/checkout step required in build job"
+    assert checkout_steps[0].get("with", {}).get("lfs") is True, "build checkout must have lfs: true"
+
+    step_runs = "\n".join(s.get("run", "") for s in steps)
+    assert ".wandb_artifacts_cache" in step_runs, "build job must seed offline W&B artifact cache"
+
 
 def test_security_and_pull_request_guardrails(workflow_data):
     """Verify that images are NEVER pushed from untrusted pull requests."""

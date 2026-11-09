@@ -37,11 +37,12 @@ from src.models.load_registered_model import (
 from scripts.register_model_wandb import register_model_artifact
 
 # File paths
-LOCAL_MODEL_DIR = Path("models")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LOCAL_MODEL_DIR = PROJECT_ROOT / "models"
 PIPELINE_PATH = LOCAL_MODEL_DIR / "logistic_regression_tier.joblib"
 ENCODER_PATH = LOCAL_MODEL_DIR / "label_encoder.joblib"
 METADATA_PATH = LOCAL_MODEL_DIR / "logistic_regression_metadata.json"
-MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
+MODELLING_PATH = PROJECT_ROOT / "data" / "processed" / "modelling_dataset.parquet"
 
 
 @pytest.fixture(scope="module")

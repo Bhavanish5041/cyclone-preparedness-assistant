@@ -21,9 +21,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-UNIFIED_PATH = Path("data/processed/unified_village_preparedness.parquet")
-PREPAREDNESS_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/master_village_preparedness.parquet")
-CLUSTERING_PATH = Path("data/processed/coastal_vulnerability_archetypes.parquet")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+UNIFIED_PATH = PROJECT_ROOT / "data" / "processed" / "unified_village_preparedness.parquet"
+PREPAREDNESS_PATH = PROJECT_ROOT / "data" / "processed" / "master_village_preparedness.parquet"
+CLUSTERING_PATH = PROJECT_ROOT / "data" / "processed" / "coastal_vulnerability_archetypes.parquet"
 
 
 @pytest.fixture(scope="module")
@@ -165,3 +166,47 @@ def test_12_no_duplicate_primary_keys(df_unified):
     assert df_unified["shrid2"].duplicated().sum() == 0, "Duplicate shrid2 keys found in unified dataset"
     assert df_unified["area_id"].duplicated().sum() == 0, "Duplicate area_id keys found in unified dataset"
     assert (df_unified["shrid2"] == df_unified["area_id"]).all(), "shrid2 does not equal area_id"
+
+
+def test_13_canonical_administrative_names_and_known_60_legacy_differences(df_unified, df_prep):
+    """Test 13: Canonical administrative names are preserved, documenting the 60 known legacy differences.
+
+    In the legacy master preparedness dataset, 59 census towns used synthetic 'Village_<census_code>'
+    placeholders and 1 rural village used 'Village_00None'. The unified dataset resolves all 60 to
+    canonical Census administrative names (e.g. 'Kundapura (TMC)', 'Kodimbala'), while the remaining
+    1,819 regular villages maintain exact string equality when trimmed.
+    """
+    merged = df_unified.merge(
+        df_prep[["area_id", "village_name"]],
+        left_on="shrid2",
+        right_on="area_id",
+        suffixes=("_uni", "_prep"),
+    )
+    assert len(merged) == 1879
+
+    name_diff = merged["village_name_uni"].str.strip() != merged["village_name_prep"].str.strip()
+    assert name_diff.sum() == 60, f"Expected exactly 60 known legacy name differences, got {name_diff.sum()}"
+
+    # 1. Exactly 59 differences are matched census towns where synthetic names were replaced
+    diff_records = merged[name_diff]
+    town_diffs = diff_records[diff_records["unit_type"] == "TOWN"]
+    assert len(town_diffs) == 59
+    assert town_diffs["village_name_prep"].str.startswith("Village_").all(), (
+        "Expected all 59 legacy town placeholders to start with 'Village_'"
+    )
+    assert not town_diffs["village_name_uni"].str.startswith("Village_").any(), (
+        "Unified dataset towns must not contain synthetic 'Village_' prefixes"
+    )
+
+    # 2. Exactly 1 difference is a rural village (Kodimbala) where legacy placeholder was Village_00None
+    village_diffs = diff_records[diff_records["unit_type"] == "VILLAGE"]
+    assert len(village_diffs) == 1
+    kodimbala = village_diffs.iloc[0]
+    assert kodimbala["shrid2"] == "11-29-575-05564-617728"
+    assert kodimbala["village_name_prep"] == "Village_00None"
+    assert kodimbala["village_name_uni"] == "Kodimbala"
+
+    # 3. All other 1,819 records have exact 1-to-1 matching village names
+    same_records = merged[~name_diff]
+    assert len(same_records) == 1819
+    assert (same_records["village_name_uni"].str.strip() == same_records["village_name_prep"].str.strip()).all()

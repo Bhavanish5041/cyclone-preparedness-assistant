@@ -31,9 +31,10 @@ from src.monitoring.model_quality import (
     validate_input_schema,
 )
 
-METADATA_PATH = Path("models/logistic_regression_metadata.json")
-MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
-PROBABILITIES_PATH = Path("data/processed/village_preparedness_probabilities.parquet")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+METADATA_PATH = PROJECT_ROOT / "models" / "logistic_regression_metadata.json"
+MODELLING_PATH = PROJECT_ROOT / "data" / "processed" / "modelling_dataset.parquet"
+PROBABILITIES_PATH = PROJECT_ROOT / "data" / "processed" / "village_preparedness_probabilities.parquet"
 
 
 @pytest.fixture(scope="module")

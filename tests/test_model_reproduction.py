@@ -7,12 +7,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-MODEL_DIR = Path("models")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODEL_DIR = PROJECT_ROOT / "models"
 PIPELINE_PATH = MODEL_DIR / "logistic_regression_tier.joblib"
 ENCODER_PATH = MODEL_DIR / "label_encoder.joblib"
 METADATA_PATH = MODEL_DIR / "logistic_regression_metadata.json"
-PROBABILITIES_PATH = Path("data/processed/village_preparedness_probabilities.parquet")
-MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
+PROBABILITIES_PATH = PROJECT_ROOT / "data" / "processed" / "village_preparedness_probabilities.parquet"
+MODELLING_PATH = PROJECT_ROOT / "data" / "processed" / "modelling_dataset.parquet"
 
 
 @pytest.fixture(scope="module")

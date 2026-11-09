@@ -29,21 +29,22 @@ from src.features.inference_features import (
 )
 from src.models.load_registered_model import WandbRetrievalError, load_registered_model
 
-MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
-UNIFIED_V2_PATH = Path("data/processed/unified_village_preparedness_v2.parquet")
-METADATA_PATH = Path("models/logistic_regression_metadata.json")
-
-
-@pytest.fixture(scope="module")
-def df_modelling():
-    assert MODELLING_PATH.exists(), f"Missing modelling dataset at {MODELLING_PATH}"
-    return pd.read_parquet(MODELLING_PATH)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODELLING_PATH = PROJECT_ROOT / "data" / "processed" / "modelling_dataset.parquet"
+UNIFIED_V2_PATH = PROJECT_ROOT / "data" / "processed" / "unified_village_preparedness_v2.parquet"
+METADATA_PATH = PROJECT_ROOT / "models" / "logistic_regression_metadata.json"
 
 
 @pytest.fixture(scope="module")
 def df_unified():
     assert UNIFIED_V2_PATH.exists(), f"Missing unified dataset at {UNIFIED_V2_PATH}"
     return pd.read_parquet(UNIFIED_V2_PATH)
+
+
+@pytest.fixture(scope="module")
+def df_modelling():
+    assert MODELLING_PATH.exists(), f"Missing modelling dataset at {MODELLING_PATH}"
+    return pd.read_parquet(MODELLING_PATH)
 
 
 @pytest.fixture(scope="module")

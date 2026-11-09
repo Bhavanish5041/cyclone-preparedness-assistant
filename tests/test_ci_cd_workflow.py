@@ -83,9 +83,11 @@ def test_test_job_configuration(workflow_data):
     step_names = [s.get("name", "") for s in steps]
     step_runs = [s.get("run", "") for s in steps]
 
-    # Verify checkout and setup-python
+    # Verify checkout with Git LFS and setup-python
     uses = [s.get("uses", "") for s in steps]
-    assert any("actions/checkout" in u for u in uses)
+    checkout_steps = [s for s in steps if "actions/checkout" in s.get("uses", "")]
+    assert len(checkout_steps) > 0, "actions/checkout step required"
+    assert checkout_steps[0].get("with", {}).get("lfs") is True, "actions/checkout must have lfs: true"
     assert any("actions/setup-python" in u for u in uses)
 
     # Verify requirements.txt installation and pytest invocation
@@ -93,6 +95,10 @@ def test_test_job_configuration(workflow_data):
     assert "requirements.txt" in all_runs
     assert "pytest" in all_runs
     assert "docker compose config" in all_runs
+    assert ".wandb_artifacts_cache" in all_runs
+    assert "data/processed/coastal_vulnerability_archetypes.parquet" in all_runs
+    assert "data/processed/modelling_dataset.parquet" in all_runs
+    assert "data/processed/master_village_preparedness.parquet" in all_runs
 
 
 def test_build_and_publish_matrix_configuration(workflow_data):

@@ -12,6 +12,7 @@ Supports:
 """
 
 from datetime import datetime, timezone
+import logging
 import os
 from typing import Any, Dict, List, Optional
 
@@ -22,6 +23,7 @@ from src.api.schemas import (
     ChatRequest,
     ChatResponse,
     MessageRole,
+    ToolExecutionRecord,
 )
 from src.assistant.api_client import DecisionSupportApiClient
 from src.assistant.theme import (
@@ -62,22 +64,61 @@ def clear_chat_history() -> None:
     st.session_state["is_processing"] = False
 
 
+logger = logging.getLogger(__name__)
+
+
+def _is_valid_telemetry_record(rec: Any) -> bool:
+    """Validate whether an item is a supported ToolExecutionRecord or dictionary record."""
+    if rec is None or isinstance(rec, (bool, int, float, str, bytes, list, set, tuple)):
+        return False
+    if isinstance(rec, ToolExecutionRecord):
+        return True
+    if isinstance(rec, dict):
+        return True
+    # Support duck-typed records only if they have the mandatory tool_name attribute
+    return hasattr(rec, "tool_name")
+
+
+def _extract_telemetry_field(rec: Any, field_name: str, default: Any = None) -> Any:
+    """Safely extract a telemetry attribute or dict key without invoking non-existent methods."""
+    if isinstance(rec, dict):
+        return rec.get(field_name, default)
+    val = getattr(rec, field_name, None)
+    return val if val is not None else default
+
+
 def render_tool_execution_details(tool_records: List[Any], duration_ms: Optional[float] = None) -> None:
     """Render collapsible tool execution telemetry panel."""
     if not tool_records:
         return
 
-    count = len(tool_records)
+    valid_records = [r for r in tool_records if _is_valid_telemetry_record(r)]
+    if not valid_records:
+        return
+
+    count = len(valid_records)
     dur_str = f" in {duration_ms:.1f} ms" if duration_ms is not None else ""
     summary_label = f"Tool Execution Telemetry: {count} tool(s) invoked{dur_str}"
 
     with st.expander(summary_label, expanded=False):
-        for idx, rec in enumerate(tool_records, 1):
-            name = rec.tool_name if hasattr(rec, "tool_name") else rec.get("tool_name", "unknown_tool")
-            success = rec.success if hasattr(rec, "success") else rec.get("success", True)
-            args = rec.arguments if hasattr(rec, "arguments") else rec.get("arguments", {})
-            summary = rec.result_summary if hasattr(rec, "result_summary") else rec.get("result_summary", "")
-            rec_dur = rec.execution_time_ms if hasattr(rec, "execution_time_ms") else rec.get("execution_time_ms", 0.0)
+        for idx, rec in enumerate(valid_records, 1):
+            name = _extract_telemetry_field(rec, "tool_name", "unknown_tool")
+            success = _extract_telemetry_field(rec, "success", True)
+            if success is None:
+                success = True
+            args = _extract_telemetry_field(rec, "arguments", {})
+            summary = _extract_telemetry_field(rec, "result_summary", "")
+            rec_dur = _extract_telemetry_field(rec, "execution_time_ms", 0.0)
+            if rec_dur is None:
+                rec_dur = 0.0
+            error_msg = _extract_telemetry_field(rec, "error", None)
+
+            # Fallback for summary if missing
+            if not summary:
+                if error_msg:
+                    summary = f"Error: {error_msg}"
+                else:
+                    summary = f"Status: {'ok' if success else 'failed'}"
 
             status_badge = (
                 "<span style='color:#7A8B63; font-weight:600;'>SUCCESS</span>"
@@ -85,12 +126,14 @@ def render_tool_execution_details(tool_records: List[Any], duration_ms: Optional
                 else "<span style='color:#C95D4A; font-weight:600;'>FAILED</span>"
             )
 
+            dur_display = f"{rec_dur:.1f} ms" if isinstance(rec_dur, (int, float)) else str(rec_dur)
+
             st.markdown(
                 f"""
                 <div style="background:#2B211B; border:1px solid #514033; border-radius:3px; padding:0.6rem 0.8rem; margin-bottom:0.5rem; font-size:0.82rem;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
                         <span style="color:#D6B28C; font-weight:600;">{idx}. {name}</span>
-                        <span>{status_badge} <span style="color:#918170;">({rec_dur:.1f} ms)</span></span>
+                        <span>{status_badge} <span style="color:#918170;">({dur_display})</span></span>
                     </div>
                     <div style="color:#BDAE9C; margin-bottom:0.2rem;"><b>Arguments:</b> <code>{args}</code></div>
                     <div style="color:#918170; font-style:italic;">{summary}</div>
@@ -235,11 +278,17 @@ def render_message_bubble(msg: Dict[str, Any]) -> None:
 
         # Structured evidence cards (if present)
         if structured_evidence:
-            render_evidence_cards(structured_evidence)
+            try:
+                render_evidence_cards(structured_evidence)
+            except Exception as ev_err:
+                logger.warning("Failed to render structured evidence: %s", ev_err)
 
         # Tool execution details (if tools were executed)
         if tool_records:
-            render_tool_execution_details(tool_records, duration_ms)
+            try:
+                render_tool_execution_details(tool_records, duration_ms)
+            except Exception as tel_err:
+                logger.warning("Failed to render tool execution telemetry: %s", tel_err)
 
         # Scientific precedence disclaimer
         if precedence_note:

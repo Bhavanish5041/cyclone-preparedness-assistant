@@ -281,9 +281,10 @@ def test_render_tool_execution_details_no_crash():
     # Calling with records should not raise
     with patch.object(st, "markdown") as mock_md, patch.object(st, "expander") as mock_exp:
         mock_exp.return_value.__enter__ = MagicMock()
-        mock_exp.return_value.__exit__ = MagicMock()
+        mock_exp.return_value.__exit__ = MagicMock(return_value=False)
         render_tool_execution_details(records, duration_ms=7.6)
         assert mock_exp.called
+        assert mock_md.call_count == 2
 
 
 def test_render_evidence_cards_surrogate_ml_disclaimer():

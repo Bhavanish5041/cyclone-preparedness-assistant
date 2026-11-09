@@ -124,6 +124,9 @@ class ToolExecutionRecord(BaseModel):
     arguments: Dict[str, Any] = Field(..., description="Arguments passed to the tool.")
     success: bool = Field(..., description="Whether the tool execution succeeded.")
     execution_time_ms: float = Field(..., description="Tool execution duration in milliseconds.")
+    result_summary: Optional[str] = Field(
+        None, description="Human-readable summary of the tool execution result."
+    )
     error: Optional[str] = Field(None, description="Error message if tool execution failed.")
     error_type: Optional[str] = Field(None, description="Categorized error type if applicable.")
 

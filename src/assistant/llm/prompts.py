@@ -124,12 +124,20 @@ def format_community_assessment_response(
         # Domain breakdown if present
         domain_scores = ahp.get("domain_scores", {})
         if domain_scores:
+            def _fmt_score(*keys: str) -> str:
+                for k in keys:
+                    val = domain_scores.get(k)
+                    if val is not None and isinstance(val, (int, float)):
+                        return f"{val:.1f} / 100.0"
+                return "N/A"
+
             sections.extend([
                 "**AHP Domain Sub-Scores:**",
-                f"- Primary Emergency Shelters: {domain_scores.get('shelters', 'N/A')} / 100.0",
-                f"- Primary Healthcare Access: {domain_scores.get('medical', 'N/A')} / 100.0",
-                f"- Coastal Hazard Buffer: {domain_scores.get('coastal', 'N/A')} / 100.0",
-                f"- Demographic Baseline: {domain_scores.get('demographic', 'N/A')} / 100.0",
+                f"- Primary Emergency Shelters: {_fmt_score('score_shelters', 'shelters')}",
+                f"- Primary Healthcare Access: {_fmt_score('score_medical', 'medical')}",
+                f"- Infrastructure & Physical Connectivity: {_fmt_score('score_infrastructure', 'infrastructure')}",
+                f"- Early Warning & Communication: {_fmt_score('score_early_warning', 'early_warning')}",
+                f"- Socioeconomic Vulnerability Baseline: {_fmt_score('score_socioeconomic', 'socioeconomic', 'demographic')}",
                 "",
             ])
 

@@ -414,4 +414,8 @@ from src.assistant.llm.schemas import (  # noqa: E402
     MessageRole,
     ToolExecutionRecord,
 )
+from src.assistant.llm.history import (  # noqa: E402
+    compact_message_content,
+    prepare_conversation_history,
+)
 

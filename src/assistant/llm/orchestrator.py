@@ -120,8 +120,15 @@ class ToolCallingOrchestrator:
         contents: List[Dict[str, Any]] = []
 
         for msg in request.conversation_history or []:
-            role_str = "user" if msg.role == MessageRole.USER else "model"
-            contents.append({"role": role_str, "parts": [{"text": msg.content}]})
+            if msg.role == MessageRole.USER:
+                contents.append({"role": "user", "parts": [{"text": msg.content}]})
+            elif msg.role == MessageRole.TOOL:
+                contents.append({
+                    "role": "user",
+                    "parts": [{"functionResponse": {"name": msg.name or "tool", "response": {"result": msg.content}}}],
+                })
+            else:
+                contents.append({"role": "model", "parts": [{"text": msg.content}]})
 
         user_text = request.message.strip()
         if request.community_identifier and request.community_identifier.lower() not in user_text.lower():
@@ -140,8 +147,19 @@ class ToolCallingOrchestrator:
         ]
 
         for msg in request.conversation_history or []:
-            role_str = "user" if msg.role == MessageRole.USER else "assistant"
-            messages.append({"role": role_str, "content": msg.content})
+            if msg.role == MessageRole.USER:
+                messages.append({"role": "user", "content": msg.content})
+            elif msg.role == MessageRole.TOOL:
+                tool_msg: Dict[str, Any] = {"role": "tool", "content": msg.content}
+                if msg.tool_call_id:
+                    tool_msg["tool_call_id"] = msg.tool_call_id
+                if msg.name:
+                    tool_msg["name"] = msg.name
+                messages.append(tool_msg)
+            elif msg.role == MessageRole.SYSTEM:
+                messages.append({"role": "system", "content": msg.content})
+            else:
+                messages.append({"role": "assistant", "content": msg.content})
 
         user_text = request.message.strip()
         if request.community_identifier and request.community_identifier.lower() not in user_text.lower():
@@ -508,11 +526,19 @@ class ToolCallingOrchestrator:
                         "error_type": tool_res.error_type or "TOOL_ERROR",
                     }
 
+                # Safe compaction of large structured tool results
+                raw_json_str = json.dumps(result_body, default=str)
+                if len(raw_json_str) > 4000:
+                    from src.assistant.llm.history import compact_json_structure
+                    safe_gemini_result = compact_json_structure(result_body)
+                else:
+                    safe_gemini_result = result_body
+
                 function_response_parts.append(
                     {
                         "functionResponse": {
                             "name": fn_name,
-                            "response": {"result": result_body},
+                            "response": {"result": safe_gemini_result},
                         }
                     }
                 )
@@ -668,12 +694,20 @@ class ToolCallingOrchestrator:
                         "error_type": tool_res.error_type or "TOOL_ERROR",
                     }
 
+                # Safe compaction of large structured tool results preserving valid JSON
+                raw_json_str = json.dumps(result_body, default=str)
+                if len(raw_json_str) > 4000:
+                    from src.assistant.llm.history import compact_message_content
+                    safe_tool_content = compact_message_content(raw_json_str, max_chars=4000)
+                else:
+                    safe_tool_content = raw_json_str
+
                 messages.append(
                     {
                         "role": "tool",
                         "tool_call_id": tc_id,
                         "name": fn_name,
-                        "content": json.dumps(result_body, default=str),
+                        "content": safe_tool_content,
                     }
                 )
 

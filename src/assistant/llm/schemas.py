@@ -18,6 +18,7 @@ class MessageRole(str, Enum):
     ASSISTANT = "assistant"
     MODEL = "model"
     SYSTEM = "system"
+    TOOL = "tool"
 
 
 class ConversationStatus(str, Enum):
@@ -33,8 +34,8 @@ class ChatMessage(BaseModel):
 
     role: MessageRole = Field(
         ...,
-        description="Role of the message sender ('user' or 'assistant'/'model').",
-        examples=["user", "assistant"],
+        description="Role of the message sender ('user', 'assistant', 'model', 'system', or 'tool').",
+        examples=["user", "assistant", "tool"],
     )
     content: str = Field(
         ...,
@@ -42,13 +43,30 @@ class ChatMessage(BaseModel):
         max_length=5000,
         description="Text content of the message.",
     )
+    name: Optional[str] = Field(
+        None,
+        description="Optional tool function name when role is 'tool'.",
+    )
+    tool_call_id: Optional[str] = Field(
+        None,
+        description="Optional tool call identifier when role is 'tool'.",
+    )
 
-    @field_validator("content")
+    @field_validator("content", mode="before")
     @classmethod
-    def validate_content(cls, v: str) -> str:
-        clean = v.strip()
+    def validate_content(cls, v: Any) -> str:
+        """Sanitize content and strictly enforce 5,000-character ceiling to prevent validation crashes.
+
+        Safely compacts structured JSON payloads and text without destroying JSON syntax.
+        """
+        if v is None:
+            raise ValueError("Message content cannot be None.")
+        clean = str(v).strip()
         if not clean:
             raise ValueError("Message content cannot be empty or solely whitespace.")
+        if len(clean) > 5000:
+            from src.assistant.llm.history import compact_message_content
+            return compact_message_content(clean, max_chars=5000)
         return clean
 
 

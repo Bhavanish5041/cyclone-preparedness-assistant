@@ -24,6 +24,7 @@ from src.api.schemas import (
     ChatResponse,
     MessageRole,
     ToolExecutionRecord,
+    prepare_conversation_history,
 )
 from src.assistant.api_client import DecisionSupportApiClient
 from src.assistant.theme import (
@@ -314,6 +315,13 @@ def execute_assistant_turn(
     if not clean_prompt:
         return
 
+    if len(clean_prompt) > 2000:
+        st.warning(
+            f"Operational prompt exceeds maximum allowed length of 2,000 characters "
+            f"(current: {len(clean_prompt):,} characters). Please shorten your inquiry to avoid context truncation."
+        )
+        return
+
     now_iso = datetime.now(timezone.utc).strftime("%H:%M:%S UTC")
 
     # 1. Append user prompt to session state
@@ -325,18 +333,36 @@ def execute_assistant_turn(
         }
     )
 
-    # 2. Build bounded conversation history for request payload
-    prior_messages: List[ChatMessage] = []
-    for msg in st.session_state["assistant_messages"][-MAX_REQUEST_HISTORY_TURNS - 1 : -1]:
-        if msg.get("role") in ("user", "assistant"):
-            role_enum = MessageRole.USER if msg["role"] == "user" else MessageRole.ASSISTANT
-            prior_messages.append(ChatMessage(role=role_enum, content=msg["content"]))
-
-    request_payload = ChatRequest(
-        message=clean_prompt,
-        conversation_history=prior_messages,
-        community_identifier=selected_community,
+    # 2. Build safe, bounded conversation history for request payload
+    prior_messages = prepare_conversation_history(
+        st.session_state["assistant_messages"][-MAX_REQUEST_HISTORY_TURNS - 1 : -1],
+        max_turns=MAX_REQUEST_HISTORY_TURNS,
+        max_content_chars=4000,
     )
+
+    try:
+        request_payload = ChatRequest(
+            message=clean_prompt,
+            conversation_history=prior_messages,
+            community_identifier=selected_community,
+        )
+    except Exception as req_err:
+        logger.error("Failed to construct ChatRequest payload: %s", req_err)
+        err_turn = {
+            "role": "assistant",
+            "content": f"Decision support assistant could not prepare request payload: {str(req_err)}",
+            "is_fallback": True,
+            "fallback_reason": type(req_err).__name__,
+            "tools_executed": [],
+            "tool_records": [],
+            "structured_evidence": None,
+            "scientific_precedence_note": "AHP deterministic metrics remain authoritative.",
+            "model_name": "error-handler",
+            "total_duration_ms": 0.0,
+            "timestamp": datetime.now(timezone.utc).strftime("%H:%M:%S UTC"),
+        }
+        st.session_state["assistant_messages"].append(err_turn)
+        return
 
     # 3. Invoke client adapter (Direct Mode in-process or REST mode)
     with st.spinner("Analyzing preparedness metrics with tool grounding..."):

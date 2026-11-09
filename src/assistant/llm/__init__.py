@@ -25,6 +25,10 @@ from src.assistant.llm.client import (
     OpenRouterTimeoutError,
     get_default_llm_client,
 )
+from src.assistant.llm.history import (
+    compact_message_content,
+    prepare_conversation_history,
+)
 from src.assistant.llm.prompts import (
     SCIENTIFIC_PRECEDENCE_DISCLAIMER,
     SYSTEM_INSTRUCTION,
@@ -65,8 +69,10 @@ __all__ = [
     "OpenRouterTimeoutError",
     "OpenRouterNetworkError",
     "OpenRouterResponseError",
-    # Factory
+    # Factory & History Helpers
     "get_default_llm_client",
+    "compact_message_content",
+    "prepare_conversation_history",
     # Orchestrator
     "ToolCallingOrchestrator",
     # Schemas

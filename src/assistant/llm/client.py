@@ -9,6 +9,7 @@ Provides:
 - Robust exception classification (Auth, RateLimit, Timeout, Network, Response).
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -171,6 +172,7 @@ class GeminiClient:
 
         self._http_client = http_client
         self._owns_http_client = http_client is None
+        self._loop = None
 
     @property
     def provider_name(self) -> str:
@@ -198,15 +200,38 @@ class GeminiClient:
 
     def _get_http_client(self) -> httpx.AsyncClient:
         """Obtain or lazily create the asynchronous HTTP client."""
-        if self._http_client is None:
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+
+        if self._owns_http_client:
+            if self._http_client is None or self._http_client.is_closed or self._loop != current_loop:
+                old_client = self._http_client
+                old_loop = self._loop
+                if old_client is not None and not old_client.is_closed:
+                    if old_loop is not None and not old_loop.is_closed() and old_loop.is_running():
+                        try:
+                            asyncio.run_coroutine_threadsafe(old_client.aclose(), old_loop)
+                        except Exception:
+                            pass
+                self._http_client = httpx.AsyncClient(timeout=self._timeout)
+                self._loop = current_loop
+        elif self._http_client is None:
             self._http_client = httpx.AsyncClient(timeout=self._timeout)
+
         return self._http_client
 
     async def close(self) -> None:
         """Close the underlying HTTP client if owned by this instance."""
         if self._owns_http_client and self._http_client is not None:
-            await self._http_client.aclose()
+            if not self._http_client.is_closed:
+                try:
+                    await self._http_client.aclose()
+                except Exception:
+                    pass
             self._http_client = None
+            self._loop = None
 
     def _mask_api_key_in_string(self, text: str) -> str:
         """Scrub any occurrence of the active API key from error strings or logs."""
@@ -424,6 +449,7 @@ class OpenRouterClient:
 
         self._http_client = http_client
         self._owns_http_client = http_client is None
+        self._loop = None
 
     @property
     def provider_name(self) -> str:
@@ -451,15 +477,38 @@ class OpenRouterClient:
 
     def _get_http_client(self) -> httpx.AsyncClient:
         """Obtain or lazily create the asynchronous HTTP client."""
-        if self._http_client is None:
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            current_loop = None
+
+        if self._owns_http_client:
+            if self._http_client is None or self._http_client.is_closed or self._loop != current_loop:
+                old_client = self._http_client
+                old_loop = self._loop
+                if old_client is not None and not old_client.is_closed:
+                    if old_loop is not None and not old_loop.is_closed() and old_loop.is_running():
+                        try:
+                            asyncio.run_coroutine_threadsafe(old_client.aclose(), old_loop)
+                        except Exception:
+                            pass
+                self._http_client = httpx.AsyncClient(timeout=self._timeout)
+                self._loop = current_loop
+        elif self._http_client is None:
             self._http_client = httpx.AsyncClient(timeout=self._timeout)
+
         return self._http_client
 
     async def close(self) -> None:
         """Close the underlying HTTP client if owned by this instance."""
         if self._owns_http_client and self._http_client is not None:
-            await self._http_client.aclose()
+            if not self._http_client.is_closed:
+                try:
+                    await self._http_client.aclose()
+                except Exception:
+                    pass
             self._http_client = None
+            self._loop = None
 
     def _mask_api_key_in_string(self, text: str) -> str:
         """Scrub any occurrence of the active API key from error strings or logs."""

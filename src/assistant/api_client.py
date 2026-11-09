@@ -229,7 +229,21 @@ class DecisionSupportApiClient:
             )
 
         if self._mode == AdapterMode.DIRECT:
-            return self._run_async(self.orchestrator.process_chat(req_obj))
+            async def _execute_direct_turn():
+                try:
+                    return await self.orchestrator.process_chat(req_obj)
+                finally:
+                    if hasattr(self.orchestrator, "client") and hasattr(self.orchestrator.client, "close"):
+                        close_fn = getattr(self.orchestrator.client, "close")
+                        if callable(close_fn):
+                            try:
+                                res = close_fn()
+                                if asyncio.iscoroutine(res):
+                                    await res
+                            except Exception:
+                                pass
+
+            return self._run_async(_execute_direct_turn())
         else:
             url = "/api/v1/assistant/chat"
             client = self._get_http_client()

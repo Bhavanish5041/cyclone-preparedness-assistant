@@ -534,7 +534,8 @@ def test_register_model_artifact_online_mocked(tmp_path):
     mock_run.link_artifact = MagicMock()
     mock_run.finish = MagicMock()
 
-    with patch("scripts.register_model_wandb.is_wandb_authenticated", return_value=True):
+    with patch("src.tracking.wandb_logger.is_wandb_authenticated", return_value=True), \
+         patch("scripts.register_model_wandb.is_wandb_authenticated", return_value=True):
         with patch("wandb.init", return_value=mock_run):
             result = register_model_artifact(
                 project="test-project",

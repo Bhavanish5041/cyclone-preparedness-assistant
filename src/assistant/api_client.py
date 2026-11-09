@@ -16,6 +16,8 @@ and preserving all scientific metadata, surrogate ML probabilities, provenance f
 and explicit null values.
 """
 
+import asyncio
+import concurrent.futures
 from enum import Enum
 import logging
 import os
@@ -24,6 +26,8 @@ import httpx
 import pandas as pd
 
 from src.api.schemas import (
+    ChatRequest,
+    ChatResponse,
     DecisionEvaluationListResponse,
     DecisionSupportEvaluation,
     RegionalDecisionSummaryResponse,
@@ -95,6 +99,7 @@ class DecisionSupportApiClient:
         timeout: Optional[float] = None,
         service: Optional[DecisionSupportService] = None,
         http_client: Optional[Any] = None,
+        orchestrator: Optional[Any] = None,
     ) -> None:
         """Initialize client adapter.
 
@@ -104,6 +109,7 @@ class DecisionSupportApiClient:
             timeout: HTTP request timeout in seconds for REST mode. Defaults to CYCLONE_API_TIMEOUT or 10.0.
             service: Optional pre-initialized DecisionSupportService instance for direct mode.
             http_client: Optional custom HTTP client (e.g. httpx.Client or TestClient) for REST mode.
+            orchestrator: Optional pre-initialized ToolCallingOrchestrator for direct mode.
         """
         # 1. Mode determination
         raw_mode = mode or os.getenv("CYCLONE_ADAPTER_MODE", DEFAULT_ADAPTER_MODE)
@@ -119,6 +125,7 @@ class DecisionSupportApiClient:
 
         # 2. In-memory service configuration
         self._service: Optional[DecisionSupportService] = service
+        self._orchestrator: Optional[Any] = orchestrator
 
         # 3. REST configuration
         raw_base_url = (
@@ -169,6 +176,94 @@ class DecisionSupportApiClient:
         if self._service is None:
             self._service = DecisionSupportService()
         return self._service
+
+    @property
+    def orchestrator(self) -> Any:
+        """Lazy-loaded ToolCallingOrchestrator instance for direct mode."""
+        if self._orchestrator is None:
+            from src.assistant.llm.orchestrator import ToolCallingOrchestrator
+            self._orchestrator = ToolCallingOrchestrator(service=self.service)
+        return self._orchestrator
+
+    @staticmethod
+    def _run_async(coro: Any) -> Any:
+        """Run an asynchronous coroutine synchronously, handling existing event loops safely."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                return pool.submit(asyncio.run, coro).result()
+        else:
+            return asyncio.run(coro)
+
+    def chat(
+        self,
+        request: Union[ChatRequest, Dict[str, Any]],
+    ) -> ChatResponse:
+        """Execute a conversational interaction turn with the Cyclone Decision Assistant.
+
+        Args:
+            request: ChatRequest instance or equivalent dictionary.
+
+        Returns:
+            ChatResponse containing assistant answer, tool records, and evidence.
+
+        Raises:
+            ApiClientValidationError: If request format is invalid.
+            ApiClientConnectionError: If REST mode connection fails.
+            ApiClientResponseError: If backend returns unexpected error.
+        """
+        if isinstance(request, dict):
+            try:
+                req_obj = ChatRequest.model_validate(request)
+            except Exception as err:
+                raise ApiClientValidationError(f"Invalid ChatRequest payload: {err}") from err
+        elif isinstance(request, ChatRequest):
+            req_obj = request
+        else:
+            raise ApiClientValidationError(
+                f"Expected ChatRequest or dict, got {type(request).__name__}"
+            )
+
+        if self._mode == AdapterMode.DIRECT:
+            return self._run_async(self.orchestrator.process_chat(req_obj))
+        else:
+            url = "/api/v1/assistant/chat"
+            client = self._get_http_client()
+            try:
+                resp = client.post(url, json=req_obj.model_dump())
+            except (
+                httpx.ConnectError,
+                httpx.ConnectTimeout,
+                httpx.TimeoutException,
+                httpx.NetworkError,
+            ) as err:
+                raise ApiClientConnectionError(
+                    f"Failed to connect to assistant API at {self._base_url}: {err}"
+                ) from err
+            except Exception as err:
+                raise ApiClientConnectionError(
+                    f"Network error querying {url}: {err}"
+                ) from err
+
+            if resp.status_code == 422:
+                raise ApiClientValidationError(
+                    f"Chat validation failed: {resp.text}"
+                )
+            elif resp.status_code != 200:
+                raise ApiClientResponseError(
+                    f"Assistant API returned HTTP {resp.status_code}: {resp.text}"
+                )
+
+            try:
+                return ChatResponse.model_validate(resp.json())
+            except Exception as err:
+                raise ApiClientResponseError(
+                    f"Failed to parse ChatResponse from {url}: {err}"
+                ) from err
 
     def _get_http_client(self) -> Any:
         """Obtain or lazily create an HTTP client instance."""
@@ -536,6 +631,7 @@ def get_api_client(
     mode: Optional[str] = None,
     base_url: Optional[str] = None,
     timeout: Optional[float] = None,
+    orchestrator: Optional[Any] = None,
     force_new: bool = False,
 ) -> DecisionSupportApiClient:
     """Factory function returning a singleton or newly initialized DecisionSupportApiClient.
@@ -546,6 +642,7 @@ def get_api_client(
         mode: Optional mode override ('direct' or 'rest').
         base_url: Optional base URL override for REST mode.
         timeout: Optional timeout override in seconds for REST mode.
+        orchestrator: Optional pre-initialized ToolCallingOrchestrator instance.
         force_new: If True, creates and caches a new instance.
 
     Returns:
@@ -557,5 +654,6 @@ def get_api_client(
             mode=mode,
             base_url=base_url,
             timeout=timeout,
+            orchestrator=orchestrator,
         )
     return _CLIENT_SINGLETON

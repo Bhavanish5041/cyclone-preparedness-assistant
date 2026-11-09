@@ -1,0 +1,170 @@
+"""Pydantic request, response, and message schemas for the Gemini LLM assistant.
+
+Provides:
+- Strict validation for user input, conversation history, and community context.
+- Structured tool execution recording for auditing and transparency.
+- Response envelope with explicit fallback indicators and scientific precedence mandates.
+"""
+
+from enum import Enum
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+
+class MessageRole(str, Enum):
+    """Permitted conversation roles."""
+
+    USER = "user"
+    ASSISTANT = "assistant"
+    MODEL = "model"
+    SYSTEM = "system"
+
+
+class ConversationStatus(str, Enum):
+    """Status of the conversation turn."""
+
+    COMPLETED = "COMPLETED"
+    FALLBACK = "FALLBACK"
+    ERROR = "ERROR"
+
+
+class ChatMessage(BaseModel):
+    """Single turn in client-supplied conversation history."""
+
+    role: MessageRole = Field(
+        ...,
+        description="Role of the message sender ('user' or 'assistant'/'model').",
+        examples=["user", "assistant"],
+    )
+    content: str = Field(
+        ...,
+        min_length=1,
+        max_length=5000,
+        description="Text content of the message.",
+    )
+
+    @field_validator("content")
+    @classmethod
+    def validate_content(cls, v: str) -> str:
+        clean = v.strip()
+        if not clean:
+            raise ValueError("Message content cannot be empty or solely whitespace.")
+        return clean
+
+
+class ChatRequest(BaseModel):
+    """Request payload for /api/v1/assistant/chat."""
+
+    message: str = Field(
+        ...,
+        min_length=1,
+        max_length=2000,
+        description="User question or incident command prompt for the assistant.",
+        examples=[
+            "Why is Tallur classified as Band 4 Adequate despite coastal proximity?",
+            "Compare preparedness between Dakshina Kannada and Udupi.",
+            "What are the recommended interventions for Edmoge?",
+        ],
+    )
+    conversation_history: Optional[List[ChatMessage]] = Field(
+        default_factory=list,
+        description="Recent conversation history for multi-turn context (maximum 10 turns).",
+    )
+    community_identifier: Optional[str] = Field(
+        None,
+        max_length=100,
+        description="Optional Census PC11 ID, SHRID, or village name for contextual focus.",
+        examples=["608691", "Tallur", "Edmoge"],
+    )
+    temperature: Optional[float] = Field(
+        None,
+        ge=0.0,
+        le=1.0,
+        description="Optional sampling temperature override (default 0.0 for deterministic grounding).",
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def populate_history_alias(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "history" in data and ("conversation_history" not in data or not data.get("conversation_history")):
+                data["conversation_history"] = data.pop("history")
+        return data
+
+    @field_validator("message")
+    @classmethod
+    def validate_message(cls, v: str) -> str:
+        clean = v.strip()
+        if not clean:
+            raise ValueError("Message cannot be empty or solely whitespace.")
+        return clean
+
+    @field_validator("conversation_history")
+    @classmethod
+    def validate_history_length(cls, v: Optional[List[ChatMessage]]) -> List[ChatMessage]:
+        if v is None:
+            return []
+        if len(v) > 10:
+            raise ValueError("Conversation history cannot exceed 10 messages to prevent context exhaustion.")
+        return v
+
+    @field_validator("community_identifier")
+    @classmethod
+    def validate_community_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        clean = v.strip()
+        return clean if clean else None
+
+
+class ToolExecutionRecord(BaseModel):
+    """Audit record of a single deterministic tool execution."""
+
+    tool_name: str = Field(..., description="Name of the deterministic tool executed.")
+    arguments: Dict[str, Any] = Field(..., description="Arguments passed to the tool.")
+    success: bool = Field(..., description="Whether the tool execution succeeded.")
+    execution_time_ms: float = Field(..., description="Tool execution duration in milliseconds.")
+    error: Optional[str] = Field(None, description="Error message if tool execution failed.")
+    error_type: Optional[str] = Field(None, description="Categorized error type if applicable.")
+
+
+class ChatResponse(BaseModel):
+    """Response payload returned by the conversational decision support engine."""
+
+    answer: str = Field(..., description="Grounded natural language assessment or advisory memo.")
+    tools_executed: List[str] = Field(
+        default_factory=list,
+        description="Names of all tools executed during this conversation turn.",
+    )
+    tool_records: List[ToolExecutionRecord] = Field(
+        default_factory=list,
+        description="Audit records for all tool executions during this turn.",
+    )
+    structured_evidence: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Structured dictionary of factual evidence extracted from executed tools.",
+    )
+    is_fallback: bool = Field(
+        False,
+        description="True if deterministic fallback was activated (e.g. Gemini API unreachable or rate-limited).",
+    )
+    fallback_reason: Optional[str] = Field(
+        None,
+        description="Reason why deterministic fallback was activated if applicable.",
+    )
+    conversation_status: ConversationStatus = Field(
+        ConversationStatus.COMPLETED,
+        description="'COMPLETED', 'FALLBACK', or 'ERROR'.",
+    )
+    model_name: Optional[str] = Field(
+        None,
+        description="Exact model identifier used for response generation (e.g., 'gemini-2.5-flash').",
+    )
+    total_duration_ms: float = Field(
+        ...,
+        description="Total round-trip processing duration in milliseconds.",
+    )
+    scientific_precedence_note: str = Field(
+        ...,
+        description="Mandatory scientific governance notice reinforcing AHP precedence and Census baseline limitations.",
+    )

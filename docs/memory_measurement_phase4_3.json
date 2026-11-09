@@ -1,0 +1,55 @@
+{
+  "benchmark_timestamp": "2026-11-09T06:57:00.732951+00:00",
+  "memory_limit_mib": 512.0,
+  "peak_rss_mib": 549.68,
+  "headroom_mib": -37.68,
+  "headroom_percent": -7.36,
+  "remains_suitable_for_render_free": false,
+  "concurrency_caveat": "Note: Measured in single-process Direct Mode. Concurrent request memory has not been benchmarked.",
+  "measurements": [
+    {
+      "stage": "idle_baseline",
+      "description": "Baseline Python runtime before loading platform components",
+      "rss_mib": 323.71,
+      "percent_of_512mib": 63.22
+    },
+    {
+      "stage": "overview_page",
+      "description": "Streamlit AppTest initial run rendering Overview page",
+      "rss_mib": 454.81,
+      "percent_of_512mib": 88.83
+    },
+    {
+      "stage": "gis_explorer_page",
+      "description": "Streamlit AppTest rendering GIS Explorer map and layer controls",
+      "rss_mib": 535.53,
+      "percent_of_512mib": 104.6
+    },
+    {
+      "stage": "community_profiles_page",
+      "description": "Streamlit AppTest rendering granular Community Profiles",
+      "rss_mib": 542.56,
+      "percent_of_512mib": 105.97
+    },
+    {
+      "stage": "assistant_initialization",
+      "description": "Streamlit AppTest navigating to Cyclone Assistant view",
+      "rss_mib": 542.65,
+      "percent_of_512mib": 105.99
+    },
+    {
+      "stage": "assistant_mock_llm_request",
+      "description": "Executing conversational turn with mocked Gemini tool-calling response (reusing singleton service)",
+      "rss_mib": 542.66,
+      "percent_of_512mib": 105.99,
+      "duration_ms": 0.73
+    },
+    {
+      "stage": "assistant_fallback_request",
+      "description": "Executing conversational turn with local deterministic fallback matrix (reusing singleton service)",
+      "rss_mib": 545.4,
+      "percent_of_512mib": 106.52,
+      "duration_ms": 97.72
+    }
+  ]
+}

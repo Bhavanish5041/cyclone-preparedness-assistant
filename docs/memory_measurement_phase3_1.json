@@ -1,0 +1,64 @@
+[
+  {
+    "page_key": "startup_idle",
+    "page_name": "Container Startup & Idle",
+    "mem_usage": "63.31MiB / 512MiB",
+    "mem_perc": "12.37%"
+  },
+  {
+    "page_key": "overview",
+    "page_name": "Overview",
+    "url": "http://localhost:10002/?page=overview",
+    "mem_usage": "255.4MiB / 512MiB",
+    "mem_perc": "49.89%",
+    "screenshot": "docs/screenshots/overview.png"
+  },
+  {
+    "page_key": "gis_explorer",
+    "page_name": "Regional GIS Explorer",
+    "url": "http://localhost:10002/?page=gis_explorer",
+    "mem_usage": "402MiB / 512MiB",
+    "mem_perc": "78.51%",
+    "screenshot": "docs/screenshots/gis_explorer.png"
+  },
+  {
+    "page_key": "community_profile",
+    "page_name": "Community Profiles",
+    "url": "http://localhost:10002/?page=community_profile",
+    "mem_usage": "416.7MiB / 512MiB",
+    "mem_perc": "81.40%",
+    "screenshot": "docs/screenshots/community_profile.png"
+  },
+  {
+    "page_key": "scenario_analysis",
+    "page_name": "Scenario Analysis",
+    "url": "http://localhost:10002/?page=scenario_analysis",
+    "mem_usage": "419.4MiB / 512MiB",
+    "mem_perc": "81.91%",
+    "screenshot": "docs/screenshots/scenario_analysis.png"
+  },
+  {
+    "page_key": "archetypes",
+    "page_name": "Vulnerability Archetypes",
+    "url": "http://localhost:10002/?page=archetypes",
+    "mem_usage": "418.5MiB / 512MiB",
+    "mem_perc": "81.74%",
+    "screenshot": "docs/screenshots/archetypes.png"
+  },
+  {
+    "page_key": "reports",
+    "page_name": "Reports and Export",
+    "url": "http://localhost:10002/?page=reports",
+    "mem_usage": "426.5MiB / 512MiB",
+    "mem_perc": "83.29%",
+    "screenshot": "docs/screenshots/reports.png"
+  },
+  {
+    "page_key": "ai_readiness",
+    "page_name": "AI Readiness (Preview)",
+    "url": "http://localhost:10002/?page=ai_readiness",
+    "mem_usage": "419.2MiB / 512MiB",
+    "mem_perc": "81.88%",
+    "screenshot": "docs/screenshots/ai_readiness.png"
+  }
+]

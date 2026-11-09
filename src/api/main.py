@@ -41,6 +41,8 @@ from src.api.schemas import (
     UnitSummary,
 )
 from src.assistant.decision_support import DecisionSupportService
+from src.assistant.llm.orchestrator import ToolCallingOrchestrator
+from src.assistant.llm.schemas import ChatRequest, ChatResponse
 from src.features.inference_features import engineer_inference_features
 from src.models.load_registered_model import RegisteredModelContainer, load_registered_model
 from src.monitoring.prometheus_metrics import (
@@ -73,6 +75,8 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing DecisionSupportService during application startup...")
     app.state.service = DecisionSupportService()
     logger.info("DecisionSupportService successfully initialized and cached in app.state.")
+    app.state.orchestrator = ToolCallingOrchestrator(service=app.state.service)
+    logger.info("ToolCallingOrchestrator successfully initialized and cached in app.state.")
 
     # Phase 2.4: Load W&B registered model artifact once during startup
     artifact_address = os.environ.get("WANDB_MODEL_ARTIFACT", "village-preparedness-classifier:v0")
@@ -178,6 +182,16 @@ def get_model(request: Request) -> RegisteredModelContainer:
                 detail=f"Registered model artifact is unavailable: {e}",
             )
     return container
+
+
+def get_orchestrator(request: Request) -> ToolCallingOrchestrator:
+    """Dependency injection provider for conversational ToolCallingOrchestrator."""
+    orchestrator = getattr(request.app.state, "orchestrator", None)
+    if orchestrator is None:
+        service = get_service(request)
+        orchestrator = ToolCallingOrchestrator(service=service)
+        request.app.state.orchestrator = orchestrator
+    return orchestrator
 
 
 @app.get(
@@ -641,4 +655,29 @@ def predict_model_tier(
         target_nature="AHP_CAPACITY_TIER_SURROGATE",
         disclaimer=MODEL_PREDICTION_DISCLAIMER,
     )
+
+
+# =============================================================================
+# Phase 4.2: Conversational AI Decision Support Assistant Endpoint
+# =============================================================================
+
+
+@app.post(
+    "/api/v1/assistant/chat",
+    response_model=ChatResponse,
+    tags=["AI Decision Support Assistant"],
+    summary="Conversational decision support assistant powered by Gemini with deterministic tool grounding",
+)
+async def chat_with_assistant(
+    request: ChatRequest,
+    orchestrator: ToolCallingOrchestrator = Depends(get_orchestrator),
+) -> ChatResponse:
+    """Execute a conversational interaction turn with the Gemini tool-calling assistant.
+
+    Processes the user query against registered deterministic tools (community lookup,
+    AHP assessment, district comparisons, infrastructure analysis, vulnerability archetypes,
+    and rule-based advisories). If the external LLM is unconfigured, unreachable, or rate-limited,
+    transparently falls back to direct deterministic decision-matrix outputs.
+    """
+    return await orchestrator.process_chat(request)
 

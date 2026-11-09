@@ -401,3 +401,17 @@ class ModelHealthResponse(BaseModel):
     model_provenance: str = Field(..., description="Lineage and reconstruction provenance")
     target_nature: str = Field("AHP_CAPACITY_TIER_SURROGATE", description="Operational nature of target")
 
+
+# =============================================================================
+# Phase 4.2: Conversational AI Decision Support Assistant Schemas
+# =============================================================================
+
+from src.assistant.llm.schemas import (  # noqa: E402
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    ConversationStatus,
+    MessageRole,
+    ToolExecutionRecord,
+)
+

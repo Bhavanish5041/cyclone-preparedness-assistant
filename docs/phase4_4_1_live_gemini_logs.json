@@ -1,0 +1,276 @@
+[
+  {
+    "tool_tested": "analyze_infrastructure_and_exposure",
+    "query": "Analyze the physical hazard exposure and healthcare infrastructure for Edmoge (PC11 ID 608720).",
+    "status": "ConversationStatus.FALLBACK",
+    "is_fallback": true,
+    "fallback_reason": "Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.",
+    "tools_executed": [
+      "analyze_infrastructure_and_exposure",
+      "explain_preparedness_assessment",
+      "lookup_community",
+      "explain_preparedness_assessment",
+      "analyze_infrastructure_and_exposure",
+      "get_intervention_recommendations"
+    ],
+    "tool_records": [
+      {
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "arguments": {
+          "identifier": "608720"
+        },
+        "success": true,
+        "execution_time_ms": 64.44,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "explain_preparedness_assessment",
+        "arguments": {
+          "identifier": "608720"
+        },
+        "success": true,
+        "execution_time_ms": 3.8,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "lookup_community",
+        "arguments": {
+          "query": "608720",
+          "limit": 10
+        },
+        "success": true,
+        "execution_time_ms": 10.99,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "explain_preparedness_assessment",
+        "arguments": {
+          "identifier": "608720"
+        },
+        "success": true,
+        "execution_time_ms": 4.89,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "arguments": {
+          "identifier": "608720"
+        },
+        "success": true,
+        "execution_time_ms": 5.34,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "get_intervention_recommendations",
+        "arguments": {
+          "identifier": "608720"
+        },
+        "success": true,
+        "execution_time_ms": 4.16,
+        "error": null,
+        "error_type": null
+      }
+    ],
+    "model_name": "deterministic-fallback",
+    "duration_ms": 3071.67,
+    "answer": "### Automated Decision Support Briefing (Deterministic Mode)\n\n> **System Notice:** Direct local decision-support evaluation active (Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.). All metrics retrieved from authoritative AHP calculations and historical Census baselines.\n\n#### Community Profile: Edmoge (Udupi)\n- **Census PC11 ID:** `608720` | **SHRID:** `11-29-569-05522-608720` | **Taluk:** Kundapura\n- **Deterministic AHP Preparedness Score:** **49.84 / 100.0** (Medium Tier)\n- **Assigned Priority Band:** `BAND_3_MODERATE` (Overall Priority Rank: #1050, Band Rank: #66)\n\n**Priority Justification and Supporting Indicators:**\nUnit assigned to BAND_3_MODERATE with Deterministic AHP Preparedness Score of 49.84 (Medium tier). No acute sector threshold triggers (coastal proximity, acute shelter or medical deficit) met. Archetype Context (Descriptive Background): Assigned to Cluster 1 (Remote Foothill & Healthcare-Isolated Communities). Cluster traits provide contextual background and do not imply unverified individual deficiencies.\n\n**AHP Domain Sub-Scores:**\n- Primary Emergency Shelters: N/A / 100.0\n- Primary Healthcare Access: N/A / 100.0\n- Coastal Hazard Buffer: N/A / 100.0\n- Demographic Baseline: N/A / 100.0\n\n#### Granular Infrastructure & Physical Exposure (Census 2011 Baseline):\n- **Coastal Proximity:** 25.98 km | **Mean Elevation:** 157.1 m\n- **Healthcare Proximity:** Nearest Primary Health Centre (PHC): 1.96 km | Local Health Sub-centre: 0.0 km | Nearest Apex Hospital: 45.77 km (12 hospitals within 10 km)\n- *Healthcare Facility Disambiguation:* PHC distance measures access to registered 24/7 Primary Health Centres (1.96 km). Local primary sub-centres within settlement boundaries register as 0.00 km, while secondary taluk and tertiary referral apex hospitals are measured independently.\n- **Emergency Shelters:** Nearest shelter: 26.3 km (0 shelters within 10 km, total capacity: 0)\n- **Transit & Connectivity:** All-weather pucca road: Yes | Bus connectivity: Yes | Road connectivity score: 2.0\n- **Demographics & Amenities:** Population: 2120 | Households: 426 | Drinking water score: 0.4\n- *Operational Baseline Caveat:* Physical facility coordinates represent administrative registration, NOT confirmed active doctor staffing, functioning ICU beds, or backup generator diesel status during cyclonic power failure. Demographic and amenity counts reflect the 2011 Census historical baseline.\n\n#### Evidence-Grounded Field Advisories:\n1. **[ADV_1_HOSPITAL_ISOLATION] Hospital Distance & Referral Transit Review:** Advisory to assess emergency transport routes to apex hospitals given Euclidean distance > 20 km, and verify primary medical supplies at local Primary Health Centres (PHCs).  \n   *Coordinating Authority:* Taluk Health Officer & Gram Panchayats\n\n#### Surrogate ML Demarcation:\n- **Logistic Regression Predicted Tier:** `Medium`\n- *Scientific Precaution:* Logistic Regression outputs serve strictly as an empirical tier surrogate approximating macro-feature boundaries. They are uncalibrated class likelihoods and do NOT represent physical cyclone strike, storm-surge inundation, or casualty forecasts.\n\n---\n*AHP PRECEDENCE MANDATE: Deterministic AHP Preparedness Scores and 4-band priority classifications maintain absolute operational precedence for disaster preparedness and emergency resource allocation. Logistic Regression class probabilities represent an empirical tier surrogate approximating AHP classification boundaries; they are uncalibrated class likelihoods and do NOT represent physical cyclone-risk, inundation depth, or casualty forecasts. Infrastructure and demographic indicators reflect the 2011 Census historical baseline.*"
+  },
+  {
+    "tool_tested": "get_intervention_recommendations",
+    "query": "What specific field advisories and disaster interventions are recommended for Tallur?",
+    "status": "ConversationStatus.FALLBACK",
+    "is_fallback": true,
+    "fallback_reason": "Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.",
+    "tools_executed": [
+      "lookup_community",
+      "lookup_community",
+      "explain_preparedness_assessment",
+      "analyze_infrastructure_and_exposure",
+      "get_intervention_recommendations"
+    ],
+    "tool_records": [
+      {
+        "tool_name": "lookup_community",
+        "arguments": {
+          "query": "Tallur"
+        },
+        "success": true,
+        "execution_time_ms": 9.9,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "lookup_community",
+        "arguments": {
+          "query": "tallur",
+          "limit": 10
+        },
+        "success": true,
+        "execution_time_ms": 6.95,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "explain_preparedness_assessment",
+        "arguments": {
+          "identifier": "608691"
+        },
+        "success": true,
+        "execution_time_ms": 3.08,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "arguments": {
+          "identifier": "608691"
+        },
+        "success": true,
+        "execution_time_ms": 2.64,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "get_intervention_recommendations",
+        "arguments": {
+          "identifier": "608691"
+        },
+        "success": true,
+        "execution_time_ms": 2.35,
+        "error": null,
+        "error_type": null
+      }
+    ],
+    "model_name": "deterministic-fallback",
+    "duration_ms": 3623.74,
+    "answer": "### Automated Decision Support Briefing (Deterministic Mode)\n\n> **System Notice:** Direct local decision-support evaluation active (Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.). All metrics retrieved from authoritative AHP calculations and historical Census baselines.\n\n#### Community Profile: Tallur (Udupi)\n- **Census PC11 ID:** `608691` | **SHRID:** `11-29-569-05522-608691` | **Taluk:** Kundapura\n- **Deterministic AHP Preparedness Score:** **74.34 / 100.0** (High Tier)\n- **Assigned Priority Band:** `BAND_4_ADEQUATE` (Overall Priority Rank: #1833, Band Rank: #550)\n\n**Priority Justification and Supporting Indicators:**\nUnit assigned to BAND_4_ADEQUATE with Deterministic AHP Preparedness Score of 74.34 (High tier). Triggered sector vulnerabilities: coastal proximity (1.7 km < 5 km). Archetype Context (Descriptive Background): Assigned to Cluster 3 (High-Exposure Coastal Rural Belt). Cluster traits provide contextual background and do not imply unverified individual deficiencies.\n\n**AHP Domain Sub-Scores:**\n- Primary Emergency Shelters: N/A / 100.0\n- Primary Healthcare Access: N/A / 100.0\n- Coastal Hazard Buffer: N/A / 100.0\n- Demographic Baseline: N/A / 100.0\n\n#### Granular Infrastructure & Physical Exposure (Census 2011 Baseline):\n- **Coastal Proximity:** 1.68 km | **Mean Elevation:** 3.1 m\n- **Healthcare Proximity:** Nearest Primary Health Centre (PHC): 3.09 km | Local Health Sub-centre: 0.0 km | Nearest Apex Hospital: 34.79 km (57 hospitals within 10 km)\n- *Healthcare Facility Disambiguation:* PHC distance measures access to registered 24/7 Primary Health Centres (3.09 km). Local primary sub-centres within settlement boundaries register as 0.00 km, while secondary taluk and tertiary referral apex hospitals are measured independently.\n- **Emergency Shelters:** Nearest shelter: 2.21 km (2 shelters within 10 km, total capacity: 1400)\n- **Transit & Connectivity:** All-weather pucca road: Yes | Bus connectivity: Yes | Road connectivity score: 3.0\n- **Demographics & Amenities:** Population: 3801 | Households: 818 | Drinking water score: 0.4\n- *Operational Baseline Caveat:* Physical facility coordinates represent administrative registration, NOT confirmed active doctor staffing, functioning ICU beds, or backup generator diesel status during cyclonic power failure. Demographic and amenity counts reflect the 2011 Census historical baseline.\n\n#### Evidence-Grounded Field Advisories:\n1. **[ADV_3_COASTAL_PROXIMITY] Coastal Barrier & Siren Check:** Advisory to inspect coastal protection structures and verify early-warning dissemination channels for settlements within 5 km of the coast.  \n   *Coordinating Authority:* Minor Irrigation & Coastal Protection Dept\n2. **[ADV_3_CYCLONE_SHELTER] Cyclone Shelter Physical Inspection:** Advisory to conduct physical inspections of recorded shelter structures to assess approach accessibility, building exterior integrity, and emergency backup power equipment.  \n   *Coordinating Authority:* District Disaster Management Authority (DDMA)\n3. **[ADV_3_HISTORIC_IMPACT] Historical Inundation Review:** Advisory to review local drainage and low-lying inundation zones based on reported severe weather impacts during Cyclone Tauktae (2021).  \n   *Coordinating Authority:* Revenue Dept & Coastal Police\n\n#### Surrogate ML Demarcation:\n- **Logistic Regression Predicted Tier:** `High`\n- *Scientific Precaution:* Logistic Regression outputs serve strictly as an empirical tier surrogate approximating macro-feature boundaries. They are uncalibrated class likelihoods and do NOT represent physical cyclone strike, storm-surge inundation, or casualty forecasts.\n\n---\n*AHP PRECEDENCE MANDATE: Deterministic AHP Preparedness Scores and 4-band priority classifications maintain absolute operational precedence for disaster preparedness and emergency resource allocation. Logistic Regression class probabilities represent an empirical tier surrogate approximating AHP classification boundaries; they are uncalibrated class likelihoods and do NOT represent physical cyclone-risk, inundation depth, or casualty forecasts. Infrastructure and demographic indicators reflect the 2011 Census historical baseline.*"
+  },
+  {
+    "tool_tested": "compare_districts",
+    "query": "Compare the cyclone preparedness metrics and priority bands between Dakshina Kannada and Udupi.",
+    "status": "ConversationStatus.FALLBACK",
+    "is_fallback": true,
+    "fallback_reason": "Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.",
+    "tools_executed": [
+      "compare_districts"
+    ],
+    "tool_records": [
+      {
+        "tool_name": "compare_districts",
+        "arguments": {
+          "district_a": "Dakshina Kannada",
+          "district_b": "Udupi"
+        },
+        "success": true,
+        "execution_time_ms": 12.66,
+        "error": null,
+        "error_type": null
+      }
+    ],
+    "model_name": "deterministic-fallback",
+    "duration_ms": 654.13,
+    "answer": "### District Comparative Analysis: Dakshina Kannada vs. Udupi (Deterministic Mode)\n\n> **System Notice:** Direct local decision-support evaluation active. Metrics retrieved from verified cross-tabulations across surveyed coastal units.\n\n#### Summary Metrics\n| Preparedness Indicator | Dakshina Kannada | Udupi |\n|---|---|---|\n| Total Surveyed Units | **369** | **253** |\n| Average AHP Preparedness Score | **61.06 / 100.0** | **65.04 / 100.0** |\n| Average Distance to Coastline | 33.66 km | 10.47 km |\n| Band 1: Critical Priority | 2 (0.5%) | 0 (0.0%) |\n| Band 2: Specialized Readiness | 123 (33.3%) | 20 (7.9%) |\n| Band 3: Moderate Priority | 45 (12.2%) | 43 (17.0%) |\n| Band 4: Adequate Baseline | 199 (53.9%) | 190 (75.1%) |\n\n#### Key Disparities and Observations:\n- Dakshina Kannada has a higher concentration of Critical Band 1 units (0.5% vs 0.0%, +0.5%).\n- Udupi units have higher average coastal proximity (mean 10.47 km vs 33.66 km).\n\n#### Methodological Context:\nDakshina Kannada (369 units) and Udupi (253 units) form the primary K-Means clustering study area. Uttara Kannada (1,257 units) is evaluated via authoritative AHP domain scores and the audited three-sector fallback engine (coastal proximity < 5 km, shelter score < 20, medical score < 35).\n\n---\n*AHP PRECEDENCE MANDATE: Deterministic AHP Preparedness Scores and 4-band priority classifications maintain absolute operational precedence for disaster preparedness and emergency resource allocation. Logistic Regression class probabilities represent an empirical tier surrogate approximating AHP classification boundaries; they are uncalibrated class likelihoods and do NOT represent physical cyclone-risk, inundation depth, or casualty forecasts. Infrastructure and demographic indicators reflect the 2011 Census historical baseline.*"
+  },
+  {
+    "tool_tested": "filter_and_rank_communities",
+    "query": "List the top Band 1 Critical communities in Dakshina Kannada.",
+    "status": "ConversationStatus.FALLBACK",
+    "is_fallback": true,
+    "fallback_reason": "Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.",
+    "tools_executed": [
+      "filter_and_rank_communities",
+      "explain_preparedness_assessment",
+      "explain_preparedness_assessment",
+      "analyze_infrastructure_and_exposure",
+      "analyze_infrastructure_and_exposure",
+      "filter_and_rank_communities"
+    ],
+    "tool_records": [
+      {
+        "tool_name": "filter_and_rank_communities",
+        "arguments": {
+          "sort_by": "overall_priority_rank",
+          "priority_band": "BAND_1_CRITICAL",
+          "limit": 10,
+          "district": "Dakshina Kannada"
+        },
+        "success": true,
+        "execution_time_ms": 10.41,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "explain_preparedness_assessment",
+        "arguments": {
+          "identifier": "617728"
+        },
+        "success": true,
+        "execution_time_ms": 4.94,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "explain_preparedness_assessment",
+        "arguments": {
+          "identifier": "803186"
+        },
+        "success": true,
+        "execution_time_ms": 3.97,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "arguments": {
+          "identifier": "617728"
+        },
+        "success": true,
+        "execution_time_ms": 5.48,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "arguments": {
+          "identifier": "803186"
+        },
+        "success": true,
+        "execution_time_ms": 4.95,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "tool_name": "filter_and_rank_communities",
+        "arguments": {
+          "limit": 10,
+          "priority_band": "BAND_1_CRITICAL",
+          "district": "Dakshina Kannada"
+        },
+        "success": true,
+        "execution_time_ms": 10.45,
+        "error": null,
+        "error_type": null
+      }
+    ],
+    "model_name": "deterministic-fallback",
+    "duration_ms": 10345.62,
+    "answer": "### Priority Band Roster: BAND_1_CRITICAL (Deterministic Mode)\n\n> **System Notice:** Direct local decision-support evaluation active. Units retrieved from authoritative multi-criteria ranking.\n\n- **Filter Applied:** Priority Band = `BAND_1_CRITICAL`\n- **Total Matching Units Across Study Area:** **2** (showing top 2 ranked by priority)\n\n#### Top Ranked Units for Pre-Landfall Focus\n| Overall Rank | Village Name | District | Taluk | Census PC11 ID | AHP Score | Band Rank |\n|---|---|---|---|---|---|---|\n| #116 | **Kodimbala** | Dakshina Kannada | Rural/Forest Pocket | `617728` | **38.44** | #116 |\n| #137 | **Sulya (TP)** | Dakshina Kannada | Rural/Forest Pocket | `803186` | **39.31** | #137 |\n\n---\n*AHP PRECEDENCE MANDATE: Deterministic AHP Preparedness Scores and 4-band priority classifications maintain absolute operational precedence for disaster preparedness and emergency resource allocation. Logistic Regression class probabilities represent an empirical tier surrogate approximating AHP classification boundaries; they are uncalibrated class likelihoods and do NOT represent physical cyclone-risk, inundation depth, or casualty forecasts. Infrastructure and demographic indicators reflect the 2011 Census historical baseline.*"
+  },
+  {
+    "tool_tested": "explain_vulnerability_archetype",
+    "query": "Explain the characteristics and planning needs for coastal vulnerability archetype 3.",
+    "status": "ConversationStatus.FALLBACK",
+    "is_fallback": true,
+    "fallback_reason": "Gemini API failure: Gemini API rate limit or quota exceeded (HTTP 429). Please retry shortly.",
+    "tools_executed": [],
+    "tool_records": [],
+    "model_name": "deterministic-fallback",
+    "duration_ms": 542.77,
+    "answer": "### Decision Support System Boundary (Deterministic Mode)\n\nI am unable to answer this inquiry directly in deterministic fallback mode.\n\n**Inquiry Received:** *\"Explain the characteristics and planning needs for coastal vulnerability archetype 3.\"*\n\n**Operational Scope:**\nThe Cyclone Preparedness Intelligence Platform is a closed-domain spatial decision-support system covering 1,879 surveyed administrative units across coastal Karnataka (Dakshina Kannada, Udupi, and Uttara Kannada).\n\n**Supported Operational Queries in Deterministic Mode:**\n1. **Community Assessments:** e.g., *\"Explain why Tallur has its current priority classification\"*, *\"Assess Edmoge\"*\n2. **District Comparisons:** e.g., *\"Compare Dakshina Kannada and Udupi\"*\n3. **Priority Band Rosters:** e.g., *\"Find Band 1 communities\"*, *\"List Band 2 units\"*\n4. **Methodological Briefings:** e.g., *\"Explain Uttara Kannada's fallback methodology\"*\n5. **Direct Identifiers:** Querying by 6-digit Census PC11 ID (e.g., `608691`, `608720`) or SHRID\n\nFor live cyclone track forecasts, active rainfall radar, or official evacuation orders, please consult the **India Meteorological Department (IMD)** and the **Karnataka State Disaster Management Authority (KSDMA)**.\n\n---\n*AHP PRECEDENCE MANDATE: Deterministic AHP Preparedness Scores and 4-band priority classifications maintain absolute operational precedence for disaster preparedness and emergency resource allocation. Logistic Regression class probabilities represent an empirical tier surrogate approximating AHP classification boundaries; they are uncalibrated class likelihoods and do NOT represent physical cyclone-risk, inundation depth, or casualty forecasts. Infrastructure and demographic indicators reflect the 2011 Census historical baseline.*"
+  }
+]

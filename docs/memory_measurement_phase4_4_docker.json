@@ -1,0 +1,167 @@
+{
+  "timestamp": "2026-11-09T07:59:22.224733+00:00",
+  "container_limit_mib": 512.0,
+  "peak_cgroup_mib": 415.8,
+  "final_cgroup_mib": 401.49,
+  "peak_process_rss_mib": 518.73,
+  "final_process_rss_mib": 497.24,
+  "headroom_mib": 96.2,
+  "headroom_percent": 18.79,
+  "render_free_compliant": true,
+  "stages": [
+    {
+      "stage": "baseline_idle",
+      "description": "Baseline container runtime before app initialization",
+      "process_rss_mib": 255.79,
+      "process_peak_mib": 255.79,
+      "cgroup_current_mib": 174.7,
+      "cgroup_peak_mib": 174.7,
+      "percent_of_512mib": 34.12,
+      "headroom_mib": 337.3,
+      "duration_ms": 0.0
+    },
+    {
+      "stage": "view_overview",
+      "description": "Streamlit initial render (Overview page)",
+      "process_rss_mib": 447.29,
+      "process_peak_mib": 447.29,
+      "cgroup_current_mib": 345.22,
+      "cgroup_peak_mib": 345.29,
+      "percent_of_512mib": 67.43,
+      "headroom_mib": 166.78,
+      "duration_ms": 1031.48
+    },
+    {
+      "stage": "view_gis_explorer",
+      "description": "Streamlit render Regional GIS Explorer",
+      "process_rss_mib": 494.09,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 399.79,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 78.08,
+      "headroom_mib": 112.21,
+      "duration_ms": 3534.22
+    },
+    {
+      "stage": "view_community_profiles",
+      "description": "Streamlit render Community Profiles",
+      "process_rss_mib": 500.79,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 404.93,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.09,
+      "headroom_mib": 107.07,
+      "duration_ms": 197.29
+    },
+    {
+      "stage": "view_scenario_analysis",
+      "description": "Streamlit render Scenario Analysis",
+      "process_rss_mib": 504.68,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 408.66,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.82,
+      "headroom_mib": 103.34,
+      "duration_ms": 84.47
+    },
+    {
+      "stage": "view_vulnerability_archetypes",
+      "description": "Streamlit render Vulnerability Archetypes",
+      "process_rss_mib": 504.91,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 408.7,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.82,
+      "headroom_mib": 103.3,
+      "duration_ms": 49.73
+    },
+    {
+      "stage": "view_reports_export",
+      "description": "Streamlit render Reports and Export",
+      "process_rss_mib": 504.91,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 408.93,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.87,
+      "headroom_mib": 103.07,
+      "duration_ms": 81.62
+    },
+    {
+      "stage": "view_cyclone_assistant_init",
+      "description": "Streamlit render Cyclone Assistant initial view",
+      "process_rss_mib": 504.91,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 408.93,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.87,
+      "headroom_mib": 103.07,
+      "duration_ms": 12.56
+    },
+    {
+      "stage": "conv_a_turn1",
+      "description": "Conversation A Turn 1: Tallur priority classification",
+      "process_rss_mib": 505.12,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 409.16,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.91,
+      "headroom_mib": 102.84,
+      "duration_ms": 37.02
+    },
+    {
+      "stage": "conv_a_turn2",
+      "description": "Conversation A Turn 2: Tallur infrastructure indicators",
+      "process_rss_mib": 505.12,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 409.16,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.91,
+      "headroom_mib": 102.84,
+      "duration_ms": 23.84
+    },
+    {
+      "stage": "conv_a_turn3",
+      "description": "Conversation A Turn 3: Tallur recommended interventions",
+      "process_rss_mib": 505.12,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 409.16,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 79.91,
+      "headroom_mib": 102.84,
+      "duration_ms": 23.08
+    },
+    {
+      "stage": "conv_b_turn1",
+      "description": "Conversation B Turn 1: Compare DK (369) vs Udupi (253)",
+      "process_rss_mib": 507.13,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 411.41,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 80.35,
+      "headroom_mib": 100.59,
+      "duration_ms": 5.42
+    },
+    {
+      "stage": "conv_b_turn2",
+      "description": "Conversation B Turn 2: Band 1 comparison follow-up",
+      "process_rss_mib": 507.13,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 411.41,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 80.35,
+      "headroom_mib": 100.59,
+      "duration_ms": 23.42
+    },
+    {
+      "stage": "conv_c_turn1",
+      "description": "Conversation C Turn 1: Ambiguous Siddapur disambiguation table",
+      "process_rss_mib": 507.16,
+      "process_peak_mib": 518.73,
+      "cgroup_current_mib": 411.41,
+      "cgroup_peak_mib": 415.8,
+      "percent_of_512mib": 80.35,
+      "headroom_mib": 100.59,
+      "duration_ms": 18.0
+    }
+  ]
+}

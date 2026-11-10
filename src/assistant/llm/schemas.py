@@ -193,3 +193,25 @@ class ChatResponse(BaseModel):
         ...,
         description="Mandatory scientific governance notice reinforcing AHP precedence and Census baseline limitations.",
     )
+
+
+class QwenIntentParse(BaseModel):
+    """Structured intent understanding and argument extraction schema from Qwen."""
+
+    intents: List[str] = Field(
+        default_factory=list,
+        description="List of registered deterministic tool names identified from the user query.",
+    )
+    arguments: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Extracted parameters and entity arguments for the identified tools.",
+    )
+    needs_clarification: bool = Field(
+        False,
+        description="Whether user query is underspecified, ambiguous, or requires clarification.",
+    )
+    clarification_question: Optional[str] = Field(
+        None,
+        description="Clarification prompt to return if needs_clarification is True.",
+    )
+

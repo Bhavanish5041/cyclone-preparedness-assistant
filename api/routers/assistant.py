@@ -9,7 +9,7 @@ from src.assistant.llm.orchestrator import ToolCallingOrchestrator
 from src.assistant.llm.schemas import ChatRequest, ChatResponse
 from src.assistant.tools.registry import get_default_registry
 
-router = APIRouter(prefix="/assistant", tags=["CycloneLM Assistant"])
+router = APIRouter(prefix="/assistant", tags=["Decision Support Assistant"])
 
 
 @router.post("/chat", response_model=ChatResponse, summary="Conversational decision support turn with deterministic tool grounding")

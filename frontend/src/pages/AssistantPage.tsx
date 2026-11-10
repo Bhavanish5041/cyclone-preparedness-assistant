@@ -142,7 +142,7 @@ export const AssistantPage: React.FC = () => {
 
       <DisclaimerBanner
         title="Assessment Scope & Tool Grounding Notice"
-        text="This conversational assistant executes in closed-domain mode with strict deterministic tool grounding. Model-generated explanations are bounded by authoritative AHP composite scores and operational priority bands. The backend uses the existing model integration with automated deterministic fallback."
+        text="This conversational assistant uses local Qwen-based intent orchestration with strict deterministic tool grounding. Explanations are bounded by authoritative AHP composite scores, descriptive K-Means archetypes, and operational priority bands. Deterministic tool verification and fallback remain active."
         variant="info"
       />
 

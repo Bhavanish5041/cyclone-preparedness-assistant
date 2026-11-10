@@ -39,4 +39,8 @@ dist/
 *.pth
 *.bin
 *.onnx
+*.joblib
+data/cyclonelm/v0.8/
+models/cyclonelm/v0.8/
+
 

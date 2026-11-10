@@ -16,9 +16,13 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Union
 
 if TYPE_CHECKING:
     from src.assistant.decision_support import DecisionSupportService
+    from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
+    from src.cyclonelm.classification.refusal_gate import RefusalGate
 from src.assistant.llm.client import (
     GeminiClient,
     GeminiClientError,
+    OllamaClient,
+    OllamaClientError,
     OpenRouterClient,
     OpenRouterClientError,
     get_default_llm_client,
@@ -40,6 +44,7 @@ from src.assistant.llm.schemas import (
     ChatResponse,
     ConversationStatus,
     MessageRole,
+    QwenIntentParse,
     ToolExecutionRecord,
 )
 from src.assistant.tools.registry import ToolRegistry, get_default_registry
@@ -93,6 +98,34 @@ def audit_and_guard_answer(answer: str, structured_evidence: Optional[Dict[str, 
     return answer
 
 
+def _clean_evidence_for_prompt(evidence: Any) -> Any:
+    """Strip repetitive legal boilerplate from evidence dictionary for prompt brevity."""
+    if isinstance(evidence, dict):
+        return {
+            k: _clean_evidence_for_prompt(v)
+            for k, v in evidence.items()
+            if k not in ("scientific_precedence_mandate", "disclaimer", "eligibility_rule")
+        }
+    elif isinstance(evidence, list):
+        return [_clean_evidence_for_prompt(x) for x in evidence]
+    return evidence
+
+
+QWEN_SYSTEM_INSTRUCTION = (
+    "You are CycloneLM, an AI technical assistant for coastal Karnataka cyclone preparedness intelligence. "
+    "Your duty is to assist District Disaster Management Authorities (DDMAs) and emergency planners "
+    "by formulating objective, grounded briefing memos using EXCLUSIVELY the provided deterministic evidence.\n\n"
+    "STRICT INVARIANTS:\n"
+    "1. Base all statements, scores, ranks, and priority tiers strictly on the provided evidence.\n"
+    "2. Always cite the exact authoritative AHP preparedness score (0.0 to 100.0) and exact priority band "
+    "(Band 1 Critical, Band 2 Specialized, Band 3 Moderate, or Band 4 Adequate) from the evidence. Never alter or contradict them.\n"
+    "3. Never invent live weather forecasts, wind speeds, shelter vacancy, hospital bed counts, or road conditions.\n"
+    "4. Logistic Regression tiers are empirical surrogate classifications approximating AHP boundaries on Census 2011 indicators, "
+    "not physical cyclone hazard risk or casualty forecasts.\n"
+    "5. If information is unrecorded in the evidence, explicitly state that it is unrecorded."
+)
+
+
 class ToolCallingOrchestrator:
     """Orchestrates multi-turn conversation and deterministic tool-calling with LLMs."""
 
@@ -114,6 +147,24 @@ class ToolCallingOrchestrator:
         self.client = client or get_default_llm_client()
         self.max_rounds = max_rounds
         self.max_tool_calls = max_tool_calls
+        self._refusal_gate: Optional["RefusalGate"] = None
+        self._argument_extractor: Optional["ArgumentExtractor"] = None
+
+    @property
+    def refusal_gate(self) -> "RefusalGate":
+        """Lazy-loaded RefusalGate for dynamic live telemetry checks."""
+        if self._refusal_gate is None:
+            from src.cyclonelm.classification.refusal_gate import RefusalGate
+            self._refusal_gate = RefusalGate()
+        return self._refusal_gate
+
+    @property
+    def argument_extractor(self) -> "ArgumentExtractor":
+        """Lazy-loaded ArgumentExtractor for entity resolution and Pydantic validation."""
+        if self._argument_extractor is None:
+            from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
+            self._argument_extractor = ArgumentExtractor(service=self.service)
+        return self._argument_extractor
 
     def _build_initial_gemini_contents(self, request: ChatRequest) -> List[Dict[str, Any]]:
         """Construct the Gemini contents array from conversation history and user prompt."""
@@ -582,6 +633,460 @@ class ToolCallingOrchestrator:
             scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
         )
 
+    def _deterministic_intent_parse(
+        self,
+        query: str,
+        community_hint: Optional[str] = None,
+    ) -> QwenIntentParse:
+        """Rule-based fallback intent and argument parser when Qwen parsing is unavailable or malformed."""
+        q_lower = query.lower()
+
+        # 1. District comparison check
+        if any(w in q_lower for w in ["compare", "versus", "vs", "difference"]):
+            da, db = None, None
+            if "dakshina" in q_lower:
+                da = "Dakshina Kannada"
+            if "udupi" in q_lower:
+                if da is None:
+                    da = "Udupi"
+                else:
+                    db = "Udupi"
+            if "uttara" in q_lower:
+                if da is None:
+                    da = "Uttara Kannada"
+                else:
+                    db = "Uttara Kannada"
+            if da and db:
+                return QwenIntentParse(
+                    intents=["compare_districts"],
+                    arguments={"district_a": da, "district_b": db},
+                )
+            elif da and not db:
+                return QwenIntentParse(
+                    intents=["compare_districts"],
+                    arguments={"district_a": da},
+                    needs_clarification=True,
+                    clarification_question=f"Comparison requires two districts. Please specify the second district to compare with {da}.",
+                )
+
+        # 2. Priority Band filter check
+        for band_num in [1, 2, 3, 4]:
+            if f"band {band_num}" in q_lower or (band_num == 1 and "critical" in q_lower):
+                dist = None
+                if "dakshina" in q_lower:
+                    dist = "Dakshina Kannada"
+                elif "udupi" in q_lower:
+                    dist = "Udupi"
+                elif "uttara" in q_lower:
+                    dist = "Uttara Kannada"
+                return QwenIntentParse(
+                    intents=["filter_and_rank_communities"],
+                    arguments={"priority_band": band_num, "district": dist},
+                )
+
+        # 3. Uttara Kannada fallback methodology check
+        if "uttara kannada" in q_lower and any(w in q_lower for w in ["fallback", "methodology", "unassigned", "heuristic"]):
+            return QwenIntentParse(
+                intents=["explain_vulnerability_archetype"],
+                arguments={"community_identifier": "Bappalgundi"},
+            )
+
+        # 4. Community search/lookup/assessment check
+        comm_cand = community_hint
+        if not comm_cand:
+            words = re.findall(r"\b[A-Za-z]{3,}\b", query)
+            for w in words:
+                if w.lower() in self.argument_extractor.village_index:
+                    comm_cand = w
+                    break
+
+        if comm_cand:
+            intents = []
+            if any(w in q_lower for w in ["where", "locate", "lookup", "look up", "find"]):
+                intents.append("lookup_community")
+            if any(w in q_lower for w in ["vulnerability", "archetype", "cluster"]):
+                intents.append("explain_vulnerability_archetype")
+            if any(w in q_lower for w in ["infrastructure", "pucca", "road", "hospital", "exposure"]):
+                intents.append("analyze_infrastructure_and_exposure")
+            if any(w in q_lower for w in ["intervention", "recommend", "action", "priority"]):
+                intents.append("get_intervention_recommendations")
+            if not intents or any(w in q_lower for w in ["preparedness", "score", "assessment", "tier", "rank"]):
+                intents.append("explain_preparedness_assessment")
+                if "get_intervention_recommendations" not in intents:
+                    intents.append("get_intervention_recommendations")
+
+            return QwenIntentParse(
+                intents=intents,
+                arguments={"identifier": comm_cand, "query": comm_cand, "community_identifier": comm_cand},
+            )
+
+        return QwenIntentParse(
+            intents=[],
+            arguments={},
+            needs_clarification=True,
+            clarification_question="Query is ambiguous or missing community/district details.",
+        )
+
+    async def _parse_query_intent_with_qwen(
+        self,
+        query: str,
+        community_hint: Optional[str] = None,
+    ) -> QwenIntentParse:
+        """Query Qwen via Ollama to identify required tools and structured arguments."""
+        prompt = (
+            "You are the CYCLONE INTEL intent understanding engine.\n"
+            "Analyze the user query and identify the exact deterministic tools needed to answer it.\n\n"
+            "Available Deterministic Tools:\n"
+            "1. compare_districts: Use for comparing preparedness, vulnerabilities, or priority metrics between two districts. "
+            "Arguments: district_a (str), district_b (str).\n"
+            "2. explain_preparedness_assessment: Use for AHP composite scores and preparedness tiers for a specific community/village. "
+            "Argument: identifier (str).\n"
+            "3. analyze_infrastructure_and_exposure: Use for detailed infrastructure vulnerabilities and road access for a specific community/village. "
+            "Argument: identifier (str).\n"
+            "4. get_intervention_recommendations: Use for prioritized policy interventions for a specific community/village. "
+            "Argument: identifier (str).\n"
+            "5. filter_and_rank_communities: Use for searching or listing communities by priority band (1-4) or district. "
+            "Arguments: priority_band (int 1-4, optional), district (str, optional).\n"
+            "6. lookup_community: Use for geographic or demographic lookup, location, or finding a specific village (e.g. 'Where is Belapu', 'Look up Ullal'). "
+            "Argument: query (str).\n"
+            "7. explain_vulnerability_archetype: Use for K-Means cluster archetypes or regional fallback methodologies. "
+            "Arguments: community_identifier (str, optional), archetype_id (int, optional).\n\n"
+            "Disambiguation Rules:\n"
+            "- If comparing two districts (e.g. 'Dakshina Kannada and Udupi'), select 'compare_districts' as the primary tool. Do NOT select single-community tools unless a specific village is named.\n"
+            "- If asking where a community is located or asking to look up a community, choose 'lookup_community' with 'query': <village name>.\n"
+            "- If asking about a specific community's assessment or score, select 'explain_preparedness_assessment' and/or 'get_intervention_recommendations'.\n"
+            "- If asking for communities in a priority band (e.g. Band 1 Critical), select 'filter_and_rank_communities'.\n"
+            "- If asking about Uttara Kannada fallback or unassigned units, select 'explain_vulnerability_archetype'.\n"
+            "- If the query is completely outside coastal cyclone disaster preparedness, set 'intents': [] and 'needs_clarification': true.\n\n"
+            "Return ONLY valid JSON matching this schema:\n"
+            "{\n"
+            '  "intents": ["tool_name"],\n'
+            '  "arguments": {"district_a": "...", "district_b": "...", "identifier": "...", "priority_band": 1},\n'
+            '  "needs_clarification": false,\n'
+            '  "clarification_question": null\n'
+            "}\n\n"
+            f'User Query: "{query}"\n'
+        )
+        if community_hint:
+            prompt += f'Context Community: "{community_hint}"\n'
+
+        try:
+            raw = await self.client.generate(
+                prompt=prompt,
+                system="You are a strict JSON intent parsing engine. Return valid JSON only, without commentary.",
+                temperature=0.0,
+                num_predict=180,
+                repeat_penalty=1.15,
+            )
+            cleaned = raw.strip()
+            if cleaned.startswith("```"):
+                cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+                cleaned = re.sub(r"\s*```$", "", cleaned)
+            parsed = json.loads(cleaned)
+            return QwenIntentParse.model_validate(parsed)
+        except Exception as exc:
+            logger.warning(f"Qwen intent parsing failed ({exc}); falling back to deterministic parser.")
+            return self._deterministic_intent_parse(query, community_hint)
+
+    async def _process_chat_ollama(
+        self,
+        request: ChatRequest,
+        start_time: float,
+        tool_records: List[ToolExecutionRecord],
+        tools_executed: List[str],
+    ) -> ChatResponse:
+        """Execute conversational turn using local Ollama (Qwen) with structured intent orchestration."""
+        query_text = request.message.strip()
+
+        # 1. Refusal check (dynamic operational telemetry / live data)
+        # Evaluated BEFORE LLM call for sub-millisecond safety gating
+        refusal_res = self.refusal_gate.evaluate(query_text)
+        if refusal_res.is_refused:
+            total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+            logger.info(
+                f"[ASSISTANT RUNTIME] MODE=DETERMINISTIC_REFUSAL | Query='{query_text[:50]}' | "
+                f"Duration={total_duration}ms"
+            )
+            return ChatResponse(
+                answer=refusal_res.reason or (
+                    "Request involves live dynamic operational telemetry which CYCLONE INTEL does not track. "
+                    "Please refer to IMD or district DDMA emergency bulletins."
+                ),
+                tools_executed=[],
+                tool_records=[],
+                structured_evidence=None,
+                is_fallback=False,
+                conversation_status=ConversationStatus.COMPLETED,
+                model_name="deterministic-gate",
+                total_duration_ms=total_duration,
+                scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+            )
+
+        # 2. Qwen Intent Understanding & Argument Extraction
+        t_parse_start = time.perf_counter()
+        qwen_parse = await self._parse_query_intent_with_qwen(
+            query=query_text,
+            community_hint=request.community_identifier,
+        )
+        parse_dur = round((time.perf_counter() - t_parse_start) * 1000, 2)
+        logger.info(
+            f"Qwen intent parse completed in {parse_dur}ms: intents={qwen_parse.intents}, "
+            f"args={qwen_parse.arguments}, needs_clarification={qwen_parse.needs_clarification}"
+        )
+
+        # 3. Resolve & filter target tools against registered catalog
+        allowed_tools = set(self.registry.get_tool_descriptions().keys())
+        target_tools = [t for t in qwen_parse.intents if t in allowed_tools]
+
+        # Domain heuristics fallback if Qwen returned no recognized tools:
+        query_lower = query_text.lower()
+        if not target_tools:
+            if "uttara kannada" in query_lower and any(w in query_lower for w in ["fallback", "methodology", "unassigned", "heuristic"]):
+                target_tools = ["explain_vulnerability_archetype"]
+                qwen_parse.arguments["community_identifier"] = "Bappalgundi"
+            elif any(w in query_lower for w in ["compare", "versus", "vs", "difference"]) and ("dakshina" in query_lower or "udupi" in query_lower):
+                target_tools = ["compare_districts"]
+            elif any(w in query_lower for w in ["band 1", "band 2", "band 3", "band 4", "critical", "moderate", "adequate"]):
+                target_tools = ["filter_and_rank_communities"]
+
+        # If still no valid tools and user needs clarification / out-of-scope:
+        if not target_tools:
+            total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+            if qwen_parse.needs_clarification and qwen_parse.clarification_question:
+                msg = qwen_parse.clarification_question
+                mode = "DETERMINISTIC_CLARIFICATION"
+            else:
+                msg = (
+                    "Query is outside the scope of coastal Karnataka cyclone preparedness intelligence. "
+                    "Supported tasks include community lookups, AHP evaluations, intervention recommendations, "
+                    "district comparisons, priority band filtering, and vulnerability archetypes."
+                )
+                mode = "DETERMINISTIC_OUT_OF_SCOPE"
+            logger.info(f"[ASSISTANT RUNTIME] MODE={mode} | Query='{query_text[:50]}' | Duration={total_duration}ms")
+            return ChatResponse(
+                answer=msg,
+                tools_executed=[],
+                tool_records=[],
+                structured_evidence=None,
+                is_fallback=False,
+                conversation_status=ConversationStatus.COMPLETED,
+                model_name="deterministic-gate",
+                total_duration_ms=total_duration,
+                scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+            )
+
+        # 4. Multi-Intent Argument Validation & Execution
+        structured_evidence: Dict[str, Any] = {}
+        is_district_query = "compare_districts" in target_tools or ("district_a" in qwen_parse.arguments and "district_b" in qwen_parse.arguments)
+
+        for tool_name in list(target_tools):
+            tool = self.registry.get_tool(tool_name)
+            if not tool:
+                continue
+
+            # Validate arguments through ArgumentExtractor
+            ext_res = self.argument_extractor.extract_arguments(tool_name, query_text)
+
+            # Check for ambiguous community matches across districts
+            if ext_res.is_ambiguous and not is_district_query:
+                total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+                candidates = ext_res.ambiguous_candidates
+                cand_msg = format_ambiguous_community_response(query_text, candidates) if candidates else (
+                    ext_res.validation_error or "Ambiguous community name. Please specify district."
+                )
+                logger.info(
+                    f"[ASSISTANT RUNTIME] MODE=DETERMINISTIC_DISAMBIGUATION | Query='{query_text[:50]}' | "
+                    f"Matches={len(candidates)} | Duration={total_duration}ms"
+                )
+                return ChatResponse(
+                    answer=cand_msg,
+                    tools_executed=[],
+                    tool_records=[],
+                    structured_evidence=None,
+                    is_fallback=False,
+                    conversation_status=ConversationStatus.COMPLETED,
+                    model_name="deterministic-router",
+                    total_duration_ms=total_duration,
+                    scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+                )
+
+            # Build final arguments: prioritize extractor parameters then qwen arguments
+            final_args = dict(ext_res.parameters)
+            for k, v in qwen_parse.arguments.items():
+                if k not in final_args or not final_args[k]:
+                    final_args[k] = v
+
+            # Handle missing required arguments
+            if tool_name == "compare_districts":
+                da = final_args.get("district_a")
+                db = final_args.get("district_b")
+                if not da or not db:
+                    total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+                    logger.info(f"[ASSISTANT RUNTIME] MODE=DETERMINISTIC_MISSING_ARGUMENT | Query='{query_text[:50]}'")
+                    return ChatResponse(
+                        answer="Comparison requires two coastal districts (e.g., 'Compare Dakshina Kannada and Udupi'). Please specify both districts.",
+                        tools_executed=[],
+                        tool_records=[],
+                        structured_evidence=None,
+                        is_fallback=False,
+                        conversation_status=ConversationStatus.COMPLETED,
+                        model_name="deterministic-router",
+                        total_duration_ms=total_duration,
+                        scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+                    )
+
+            elif tool_name in ("explain_preparedness_assessment", "analyze_infrastructure_and_exposure", "get_intervention_recommendations"):
+                if is_district_query and not final_args.get("identifier"):
+                    # Omit community tool in a broad district comparison
+                    continue
+                if not final_args.get("identifier"):
+                    if request.community_identifier:
+                        final_args["identifier"] = request.community_identifier
+                    else:
+                        for cand_k in ["community", "village", "query", "community_identifier"]:
+                            if qwen_parse.arguments.get(cand_k):
+                                final_args["identifier"] = qwen_parse.arguments[cand_k]
+                                break
+
+                if not final_args.get("identifier"):
+                    total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+                    return ChatResponse(
+                        answer=f"Please specify the community name to perform {tool_name.replace('_', ' ')}.",
+                        tools_executed=[],
+                        tool_records=[],
+                        structured_evidence=None,
+                        is_fallback=False,
+                        conversation_status=ConversationStatus.COMPLETED,
+                        model_name="deterministic-router",
+                        total_duration_ms=total_duration,
+                        scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+                    )
+
+            # Execute tool authoritatively
+            tools_executed.append(tool_name)
+            t_tool_start = time.perf_counter()
+            tool_res = self.registry.execute(tool_name, final_args)
+            tool_dur = round((time.perf_counter() - t_tool_start) * 1000, 2)
+            logger.info(f"[ASSISTANT RUNTIME] TOOL_EXECUTION | '{tool_name}' in {tool_dur}ms | Success: {tool_res.success}")
+
+            summary = tool_res.metadata.get("summary") or f"Status: {'ok' if tool_res.success else 'error'}"
+            tool_records.append(
+                ToolExecutionRecord(
+                    tool_name=tool_name,
+                    arguments=final_args,
+                    success=tool_res.success,
+                    execution_time_ms=tool_dur,
+                    result_summary=summary,
+                    error=tool_res.error,
+                    error_type=tool_res.error_type,
+                )
+            )
+
+            if tool_res.success and tool_res.data:
+                structured_evidence[tool_name] = tool_res.data
+
+        # If explain_preparedness_assessment was executed, also ensure get_intervention_recommendations is retrieved
+        if "explain_preparedness_assessment" in structured_evidence and "get_intervention_recommendations" not in structured_evidence:
+            ident = structured_evidence["explain_preparedness_assessment"].get("village_name") or request.community_identifier
+            if ident:
+                adv_res = self.registry.execute("get_intervention_recommendations", {"identifier": ident})
+                if adv_res.success and adv_res.data:
+                    structured_evidence["get_intervention_recommendations"] = adv_res.data
+                    tools_executed.append("get_intervention_recommendations")
+                    tool_records.append(
+                        ToolExecutionRecord(
+                            tool_name="get_intervention_recommendations",
+                            arguments={"identifier": ident},
+                            success=True,
+                            execution_time_ms=1.0,
+                            result_summary="Intervention advisories retrieved",
+                        )
+                    )
+
+        if not structured_evidence:
+            total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+            return ChatResponse(
+                answer="No authoritative evidence could be retrieved for the specified parameters.",
+                tools_executed=tools_executed,
+                tool_records=tool_records,
+                structured_evidence=None,
+                is_fallback=True,
+                fallback_reason="All tool executions failed or returned empty data.",
+                conversation_status=ConversationStatus.ERROR,
+                model_name=self.client.model,
+                total_duration_ms=total_duration,
+                scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+            )
+
+        # 5. Natural-Language Synthesis via Local Qwen Conditioned on Evidence
+        prompt_evidence = _clean_evidence_for_prompt(structured_evidence)
+        prompt = (
+            f"User Query: {query_text}\n\n"
+            f"Authoritative Deterministic Evidence:\n"
+            f"```json\n{json.dumps(prompt_evidence, indent=2, default=str)}\n```\n\n"
+            f"Instruction: Formulate a concise, evidence-grounded briefing memo answering the user query. "
+            f"Explicitly cite the exact authoritative composite scores, priority bands, metrics, and recommendations "
+            f"from the evidence above."
+        )
+
+        t_gen_start = time.perf_counter()
+        try:
+            raw_synthesis = await self.client.generate(
+                prompt=prompt,
+                system=QWEN_SYSTEM_INSTRUCTION,
+                temperature=request.temperature or 0.0,
+                num_predict=350,
+                repeat_penalty=1.15,
+            )
+            qwen_dur = round((time.perf_counter() - t_gen_start) * 1000, 2)
+            final_answer = raw_synthesis or "Analysis complete based on deterministic evidence."
+            is_fallback = False
+            fallback_reason = None
+            logger.info(
+                f"[ASSISTANT RUNTIME] MODE=QWEN_SYNTHESIS | Model={self.client.model} | "
+                f"GenerationLatency={qwen_dur}ms | Tools={tools_executed}"
+            )
+        except Exception as qwen_err:
+            qwen_dur = round((time.perf_counter() - t_gen_start) * 1000, 2)
+            logger.warning(
+                f"[ASSISTANT RUNTIME] MODE=DETERMINISTIC_FALLBACK | Reason='{qwen_err}' | "
+                f"Latency={qwen_dur}ms | Serving deterministic template briefing."
+            )
+            is_fallback = True
+            fallback_reason = str(qwen_err)
+            if "compare_districts" in structured_evidence:
+                comp_data = structured_evidence["compare_districts"]
+                final_answer = format_district_comparison_response(comp_data, query_text)
+            elif "explain_preparedness_assessment" in structured_evidence:
+                eval_data = structured_evidence["explain_preparedness_assessment"]
+                adv_data = structured_evidence.get("get_intervention_recommendations", {}).get("advisories")
+                final_answer = format_community_assessment_response(eval_data, adv_data, query_text, f"Deterministic mode (local LLM: {qwen_err})")
+            elif "filter_and_rank_communities" in structured_evidence:
+                filter_data = structured_evidence["filter_and_rank_communities"]
+                final_answer = format_band_filter_response(filter_data, query_text)
+            elif "explain_vulnerability_archetype" in structured_evidence and "uttara kannada" in query_text.lower():
+                arch_data = structured_evidence["explain_vulnerability_archetype"]
+                reg_summary = self.service.get_regional_decision_summary()
+                final_answer = format_uttara_kannada_fallback_response(arch_data, query_text, reg_summary)
+            else:
+                final_answer = f"### Authoritative Tool Output\n\n```json\n{json.dumps(structured_evidence, indent=2, default=str)}\n```"
+
+        guarded_answer = audit_and_guard_answer(final_answer, structured_evidence)
+        total_duration = round((time.perf_counter() - start_time) * 1000, 2)
+
+        return ChatResponse(
+            answer=guarded_answer,
+            tools_executed=tools_executed,
+            tool_records=tool_records,
+            structured_evidence=structured_evidence if structured_evidence else None,
+            is_fallback=is_fallback,
+            fallback_reason=fallback_reason,
+            conversation_status=ConversationStatus.COMPLETED if not is_fallback else ConversationStatus.FALLBACK,
+            model_name=self.client.model if not is_fallback else "deterministic-fallback",
+            total_duration_ms=total_duration,
+            scientific_precedence_note=SCIENTIFIC_PRECEDENCE_DISCLAIMER,
+        )
+
     async def _process_chat_openrouter(
         self,
         request: ChatRequest,
@@ -773,8 +1278,15 @@ class ToolCallingOrchestrator:
                 start_time=start_time,
             )
 
-        provider = getattr(self.client, "provider_name", "gemini")
-        if provider == "openrouter":
+        provider = getattr(self.client, "provider_name", "ollama")
+        if provider == "ollama":
+            return await self._process_chat_ollama(
+                request=request,
+                start_time=start_time,
+                tool_records=tool_records,
+                tools_executed=tools_executed,
+            )
+        elif provider == "openrouter":
             return await self._process_chat_openrouter(
                 request=request,
                 start_time=start_time,

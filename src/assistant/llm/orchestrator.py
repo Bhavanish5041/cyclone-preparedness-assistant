@@ -772,11 +772,27 @@ class ToolCallingOrchestrator:
                 arguments={"identifier": comm_cand, "query": comm_cand, "community_identifier": comm_cand},
             )
 
+        DOMAIN_KEYWORDS = {
+            "cyclone", "disaster", "preparedness", "vulnerability", "hazard", "risk",
+            "karnataka", "dakshina", "udupi", "uttara", "coastal", "village", "district",
+            "ahp", "tier", "band", "shelter", "hospital", "pucca", "kutcha", "flood",
+            "tsunami", "infrastructure", "exposure", "evacuation", "archetype", "cluster",
+            "score", "assessment", "rank", "intervention", "ddma", "ksdma", "capacity",
+        }
+        has_domain_context = any(kw in q_lower for kw in DOMAIN_KEYWORDS)
+        if has_domain_context:
+            return QwenIntentParse(
+                intents=[],
+                arguments={},
+                needs_clarification=True,
+                clarification_question="Query is ambiguous or missing community/district details.",
+            )
+
         return QwenIntentParse(
             intents=[],
             arguments={},
-            needs_clarification=True,
-            clarification_question="Query is ambiguous or missing community/district details.",
+            needs_clarification=False,
+            clarification_question=None,
         )
 
     async def _parse_query_intent_with_qwen(

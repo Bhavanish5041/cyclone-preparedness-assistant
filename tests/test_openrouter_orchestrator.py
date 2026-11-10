@@ -766,12 +766,12 @@ def test_get_default_llm_client_resolution():
         c2 = get_default_llm_client()
         assert c2.provider_name == "openrouter"
 
-    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "dummy-or", "GEMINI_API_KEY": "dummy-gemini"}, clear=True):
+    with patch.dict(os.environ, {"LLM_PROVIDER": "", "OPENROUTER_API_KEY": "dummy-or", "GEMINI_API_KEY": "dummy-gemini"}, clear=True):
         # OpenRouter takes precedence over Gemini when LLM_PROVIDER is not set
         c3 = get_default_llm_client()
         assert c3.provider_name == "openrouter"
 
-    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "", "GEMINI_API_KEY": "dummy-gemini"}, clear=False):
+    with patch.dict(os.environ, {"LLM_PROVIDER": "", "OPENROUTER_API_KEY": "", "GEMINI_API_KEY": "dummy-gemini"}, clear=False):
         c4 = get_default_llm_client()
         assert c4.provider_name == "gemini"
 

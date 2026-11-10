@@ -151,19 +151,71 @@ class ToolCallingOrchestrator:
         self._argument_extractor: Optional["ArgumentExtractor"] = None
 
     @property
-    def refusal_gate(self) -> "RefusalGate":
-        """Lazy-loaded RefusalGate for dynamic live telemetry checks."""
+    def refusal_gate(self) -> Any:
+        """Lazy-loaded RefusalGate for dynamic live telemetry checks with lightweight fallback."""
         if self._refusal_gate is None:
-            from src.cyclonelm.classification.refusal_gate import RefusalGate
-            self._refusal_gate = RefusalGate()
+            try:
+                from src.cyclonelm.classification.refusal_gate import RefusalGate
+                self._refusal_gate = RefusalGate()
+            except Exception as err:
+                logger.warning("Full semantic RefusalGate unavailable (%s); using deterministic regex refusal gate.", err)
+
+                class _RegexRefusalGate:
+                    DYNAMIC_PATTERNS = [
+                        re.compile(r"\b(right now|at this moment|currently|live|real[- ]time|today)\b.*?\b(wind speed|wind|forecast|storm track|landfall|surge|pressure|radar)\b", re.IGNORECASE),
+                        re.compile(r"\b(wind speed|forecast|track|surge)\b.*?\b(right now|at this moment|currently|live|today)\b", re.IGNORECASE),
+                        re.compile(r"\b(live|current|vacant|available)\b.*?\b(hospital bed|bed|beds|doctor|doctors|staff|personnel|ambulance|ambulances)\b", re.IGNORECASE),
+                        re.compile(r"\b(bed vacancy|hospital beds|vacant beds)\b", re.IGNORECASE),
+                        re.compile(r"\b(live|current|real[- ]time)\b.*?\b(shelter occupancy|occupancy|evacuee|evacuees|headcount)\b", re.IGNORECASE),
+                        re.compile(r"\b(shelter occupancy)\b.*?\b(right now|today|currently)\b", re.IGNORECASE),
+                        re.compile(r"\b(passable|flooded|waterlogged|submerged)\b.*?\b(right now|today|at this moment|currently)\b", re.IGNORECASE),
+                        re.compile(r"\b(road passability|highway passable)\b", re.IGNORECASE),
+                        re.compile(r"\b(ndrf|police|fire force|rescue team)\b.*?\b(on duty|deployed|active)\b.*?\b(right now|today)\b", re.IGNORECASE),
+                    ]
+
+                    def evaluate(self, text: str):
+                        clean = (text or "").strip()
+                        for pat in self.DYNAMIC_PATTERNS:
+                            m = pat.search(clean)
+                            if m:
+                                matched_str = m.group(0)
+                                return type("RefusalDecision", (), {
+                                    "is_refused": True,
+                                    "domain": "live_telemetry",
+                                    "reason": (
+                                        f"Refusal required: Request involves dynamic live telemetry ({matched_str}). "
+                                        "CYCLONE INTEL provides static baseline preparedness assessments derived "
+                                        "from Census 2011 and geospatial criteria. For live weather, shelter occupancy, "
+                                        "hospital beds, or road conditions, please consult IMD, KSDMA, or district DDMA channels."
+                                    ),
+                                    "confidence": 0.98,
+                                    "matched_pattern": matched_str,
+                                })()
+                        return type("RefusalDecision", (), {"is_refused": False, "reason": None, "confidence": 0.0})()
+
+                self._refusal_gate = _RegexRefusalGate()
         return self._refusal_gate
 
     @property
-    def argument_extractor(self) -> "ArgumentExtractor":
+    def argument_extractor(self) -> Any:
         """Lazy-loaded ArgumentExtractor for entity resolution and Pydantic validation."""
         if self._argument_extractor is None:
-            from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
-            self._argument_extractor = ArgumentExtractor(service=self.service)
+            try:
+                import importlib.util
+                from pathlib import Path
+                module_path = Path(__file__).resolve().parent.parent.parent / "cyclonelm" / "classification" / "argument_extractor.py"
+                if module_path.exists():
+                    spec = importlib.util.spec_from_file_location("standalone_arg_extractor", str(module_path))
+                    if spec and spec.loader:
+                        mod = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(mod)
+                        self._argument_extractor = mod.ArgumentExtractor(service=self.service)
+            except Exception as err:
+                logger.warning("Direct standalone ArgumentExtractor load failed (%s); trying standard import.", err)
+
+            if self._argument_extractor is None:
+                from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
+                self._argument_extractor = ArgumentExtractor(service=self.service)
         return self._argument_extractor
 
     def _build_initial_gemini_contents(self, request: ChatRequest) -> List[Dict[str, Any]]:

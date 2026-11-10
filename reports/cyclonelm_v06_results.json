@@ -1,0 +1,290 @@
+{
+  "239k_baseline": {
+    "name": "239k_baseline",
+    "checkpoint": "models/cyclonelm/experiments/239k/checkpoints/best_model.pt",
+    "standard_metrics": {
+      "test_loss": 3.8575,
+      "test_perplexity": 47.35,
+      "val_loss": 3.4772,
+      "val_perplexity": 32.37,
+      "domain_accuracy": 3.3,
+      "tool_selection_accuracy": 0.0,
+      "argument_validity": 0.0,
+      "grounding_accuracy": 0.0,
+      "ms_per_token": 2.74
+    },
+    "semantic_metrics": {
+      "total_questions": 100,
+      "domain_knowledge": {
+        "total": 30,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0,
+        "semantic_correct_count": 1,
+        "semantic_accuracy": 3.3,
+        "refusal_correct_abstentions": 0,
+        "refusal_questions_total": 3,
+        "unsupported_claims_count": 0
+      },
+      "tool_selection": {
+        "total": 30,
+        "exact_json_match_count": 0,
+        "exact_json_accuracy": 0.0,
+        "tool_intent_detected_count": 0,
+        "tool_intent_accuracy": 0.0,
+        "valid_json_count": 0
+      },
+      "argument_generation": {
+        "total": 20,
+        "schema_valid_count": 0,
+        "schema_valid_accuracy": 0.0,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0
+      },
+      "evidence_grounding": {
+        "total": 20,
+        "grounded_count": 0,
+        "grounding_accuracy": 0.0,
+        "unsupported_claims_count": 0
+      },
+      "language_coherence": {
+        "distinct_1": 21.4,
+        "distinct_2": 51.9,
+        "distinct_3": 77.3,
+        "trigram_repetition_rate": 22.7
+      }
+    },
+    "decoding_comparison": {
+      "what_is_ahp": {
+        "greedy": "{\": \": \": \": \": \": \": \": \": \": \": ",
+        "raw_sampling": "\": \", \", in \": \": for (in \": \": \", \": ",
+        "calibrated": "{\": \": \", \": \", \": \": \": \": \": \": "
+      },
+      "lookup_tallur": {
+        "greedy": "{\": \": \": \": \": \": \": \": \": \": \": ",
+        "raw_sampling": "{\": \", \": {\"",
+        "calibrated": "{\": \": \": \": \": \", \": \": \": \": \": "
+      },
+      "live_refusal": {
+        "greedy": "{ and and ( ( and ( (s ( (s ( (e (and ( and ",
+        "raw_sampling": " and fiion the and the SDAA-ding r- are and Dakshina in AHP ",
+        "calibrated": "{\": \": \": \": \": \": \": \": \", \": \": "
+      }
+    }
+  },
+  "5m_baseline": {
+    "name": "5m_baseline",
+    "checkpoint": "models/cyclonelm/experiments/5m/checkpoints/best_model.pt",
+    "standard_metrics": {
+      "test_loss": 3.5738,
+      "test_perplexity": 35.65,
+      "val_loss": 3.1358,
+      "val_perplexity": 23.01,
+      "domain_accuracy": 3.3,
+      "tool_selection_accuracy": 0.0,
+      "argument_validity": 0.0,
+      "grounding_accuracy": 0.0,
+      "ms_per_token": 6.57
+    },
+    "semantic_metrics": {
+      "total_questions": 100,
+      "domain_knowledge": {
+        "total": 30,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0,
+        "semantic_correct_count": 0,
+        "semantic_accuracy": 0.0,
+        "refusal_correct_abstentions": 0,
+        "refusal_questions_total": 3,
+        "unsupported_claims_count": 0
+      },
+      "tool_selection": {
+        "total": 30,
+        "exact_json_match_count": 0,
+        "exact_json_accuracy": 0.0,
+        "tool_intent_detected_count": 0,
+        "tool_intent_accuracy": 0.0,
+        "valid_json_count": 0
+      },
+      "argument_generation": {
+        "total": 20,
+        "schema_valid_count": 0,
+        "schema_valid_accuracy": 0.0,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0
+      },
+      "evidence_grounding": {
+        "total": 20,
+        "grounded_count": 0,
+        "grounding_accuracy": 0.0,
+        "unsupported_claims_count": 0
+      },
+      "language_coherence": {
+        "distinct_1": 14.2,
+        "distinct_2": 46.1,
+        "distinct_3": 70.0,
+        "trigram_repetition_rate": 30.0
+      }
+    },
+    "decoding_comparison": {
+      "what_is_ahp": {
+        "greedy": "The the the the the the the the the the the the the the the the the the",
+        "raw_sampling": "The for Dakshina in (PA (1 Kannada Ullal units) AHP baseline baseline AHP units.The",
+        "calibrated": "The are wis the and shelter the the the the (< the the a to for AHP"
+      },
+      "lookup_tallur": {
+        "greedy": "{\": \", \": \", \"tool\": \", \", \"}}}}}}}}}",
+        "raw_sampling": "{\": \": \"parameters\": \"tool\": \"}}}}",
+        "calibrated": ""
+      },
+      "live_refusal": {
+        "greedy": "The the the the the the the the the and to the the the the the the the",
+        "raw_sampling": "The and in s to the ner of the with shelter ares of of of the to",
+        "calibrated": "The war."
+      }
+    }
+  },
+  "5m_sft": {
+    "name": "5m_sft",
+    "checkpoint": "models/cyclonelm/experiments/5m_sft/checkpoints/best_model.pt",
+    "standard_metrics": {
+      "test_loss": 4.5778,
+      "test_perplexity": 97.3,
+      "val_loss": 3.2046,
+      "val_perplexity": 24.64,
+      "domain_accuracy": 6.7,
+      "tool_selection_accuracy": 0.0,
+      "argument_validity": 0.0,
+      "grounding_accuracy": 0.0,
+      "ms_per_token": 5.6
+    },
+    "semantic_metrics": {
+      "total_questions": 100,
+      "domain_knowledge": {
+        "total": 30,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0,
+        "semantic_correct_count": 0,
+        "semantic_accuracy": 0.0,
+        "refusal_correct_abstentions": 0,
+        "refusal_questions_total": 3,
+        "unsupported_claims_count": 0
+      },
+      "tool_selection": {
+        "total": 30,
+        "exact_json_match_count": 0,
+        "exact_json_accuracy": 0.0,
+        "tool_intent_detected_count": 0,
+        "tool_intent_accuracy": 0.0,
+        "valid_json_count": 0
+      },
+      "argument_generation": {
+        "total": 20,
+        "schema_valid_count": 0,
+        "schema_valid_accuracy": 0.0,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0
+      },
+      "evidence_grounding": {
+        "total": 20,
+        "grounded_count": 1,
+        "grounding_accuracy": 5.0,
+        "unsupported_claims_count": 0
+      },
+      "language_coherence": {
+        "distinct_1": 16.0,
+        "distinct_2": 61.7,
+        "distinct_3": 91.5,
+        "trigram_repetition_rate": 8.5
+      }
+    },
+    "decoding_comparison": {
+      "what_is_ahp": {
+        "greedy": "The (e s or rate to (').",
+        "raw_sampling": "The reor ('}}}",
+        "calibrated": "The (e sing or to aall and Census to and is village all and repe "
+      },
+      "lookup_tallur": {
+        "greedy": "{\"tool\": \", \"parameters\": {\": \": \"}",
+        "raw_sampling": "{\"tool\"tool\": \", \": {\", \", \"parameters\"}",
+        "calibrated": "{\"tool\": \", \"parameters\": {\"identifier\": \"}"
+      },
+      "live_refusal": {
+        "greedy": "The s tal s s are and or or or or or s and and and and ",
+        "raw_sampling": "The t_as tre are en rese the < AHP nugricigen of the the ",
+        "calibrated": "The s st and AHP nuor (e < ri-time a to (40.0) and"
+      }
+    }
+  },
+  "5m_tuned_lr": {
+    "name": "5m_tuned_lr",
+    "checkpoint": "models/cyclonelm/experiments/5m_tuned_lr/checkpoints/best_model.pt",
+    "standard_metrics": {
+      "test_loss": 4.5868,
+      "test_perplexity": 98.18,
+      "val_loss": 3.1476,
+      "val_perplexity": 23.28,
+      "domain_accuracy": 6.7,
+      "tool_selection_accuracy": 0.0,
+      "argument_validity": 0.0,
+      "grounding_accuracy": 0.0,
+      "ms_per_token": 9.98
+    },
+    "semantic_metrics": {
+      "total_questions": 100,
+      "domain_knowledge": {
+        "total": 30,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0,
+        "semantic_correct_count": 1,
+        "semantic_accuracy": 3.3,
+        "refusal_correct_abstentions": 0,
+        "refusal_questions_total": 3,
+        "unsupported_claims_count": 0
+      },
+      "tool_selection": {
+        "total": 30,
+        "exact_json_match_count": 0,
+        "exact_json_accuracy": 0.0,
+        "tool_intent_detected_count": 2,
+        "tool_intent_accuracy": 6.7,
+        "valid_json_count": 0
+      },
+      "argument_generation": {
+        "total": 20,
+        "schema_valid_count": 0,
+        "schema_valid_accuracy": 0.0,
+        "exact_match_count": 0,
+        "exact_match_accuracy": 0.0
+      },
+      "evidence_grounding": {
+        "total": 20,
+        "grounded_count": 0,
+        "grounding_accuracy": 0.0,
+        "unsupported_claims_count": 0
+      },
+      "language_coherence": {
+        "distinct_1": 25.6,
+        "distinct_2": 57.7,
+        "distinct_3": 76.0,
+        "trigram_repetition_rate": 24.0
+      }
+    },
+    "decoding_comparison": {
+      "what_is_ahp": {
+        "greedy": "The (e or (e (e (e (', ', ') '), 'Uttara ')",
+        "raw_sampling": "The the and Census t evaluate Census (ro/3 Census (ch), coastal (Tier: (e",
+        "calibrated": "The (e or (e (', ', ') or or and 'Udupi')."
+      },
+      "lookup_tallur": {
+        "greedy": "{\"tool\": \", \"parameters\": {\"identifier\": \"}}",
+        "raw_sampling": "To specify to the specify Kannada, and village village village the PC11 the or ('districts sit",
+        "calibrated": "{\"tool\": \", \"parameters\": {\"identifier\": \"}"
+      },
+      "live_refusal": {
+        "greedy": "The s tal-time ditual nt is t dynamic ci-time try in net",
+        "raw_sampling": "{\"tool\"tool\": \", \"parameters\": {\"Tallur\": \"}}",
+        "calibrated": "The s revenue in Please wrual-time on or dynamic on so try static net"
+      }
+    }
+  }
+}

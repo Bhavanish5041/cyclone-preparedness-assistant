@@ -1,0 +1,2006 @@
+{
+  "239k": {
+    "profile": "239k",
+    "checkpoint": "models/cyclonelm/experiments/239k/checkpoints/best_model.pt",
+    "total_prompts_tested": 13,
+    "aggregate_metrics": {
+      "avg_tokens_per_word": 2.99,
+      "distinct_1": 34.5,
+      "distinct_2": 85.0,
+      "distinct_3": 97.0,
+      "trigram_repetition_rate": 3.0,
+      "avg_trial_consistency": 0.07,
+      "avg_framing_jaccard_similarity": 0.09,
+      "spurious_tool_call_generations": 4,
+      "unclosed_tool_calls": 3
+    },
+    "per_prompt_results": [
+      {
+        "id": "diag_eng_01",
+        "category": "basic_conversation",
+        "prompt": "<user>Hello, how can you help me today?</user><assistant>",
+        "output_sampled_temp07": "o",
+        "output_greedy": "{ and ( and and ( (s and ( (s ( (s (e ( and ( ( (",
+        "output_unformatted_raw": "or units Band and  the and and = = 1 and 3..",
+        "tokens_count": 3,
+        "words_count": 1,
+        "tokens_per_word": 3.0,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_eng_02",
+        "category": "basic_conversation",
+        "prompt": "<user>What is your purpose in this system?</user><assistant>",
+        "output_sampled_temp07": "Community the (h Kannada infrastructure Kannada the preparedness (s and s units of (biat 3 (fe-age",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": ". in (wcain = Udupi and the (is units R preparedness and (s is the priority (",
+        "tokens_count": 40,
+        "words_count": 17,
+        "tokens_per_word": 2.35,
+        "repetition_metrics": {
+          "distinct_1": 72.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.25
+      },
+      {
+        "id": "diag_expl_01",
+        "category": "simple_explanations",
+        "prompt": "<user>Explain what a cyclone warning means in simple terms.</user><assistant>",
+        "output_sampled_temp07": ", far",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "and d in km.\": {\":  { \": {\": \": \", \": \"tool",
+        "tokens_count": 5,
+        "words_count": 1,
+        "tokens_per_word": 5.0,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.09
+      },
+      {
+        "id": "diag_expl_02",
+        "category": "simple_explanations",
+        "prompt": "<user>Why is coastal disaster preparedness important?</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_term_01",
+        "category": "cyclone_terminology",
+        "prompt": "<user>Define what a Very Severe Cyclonic Storm is according to the IMD.</user><assistant>",
+        "output_sampled_temp07": "es of (AST in nating (and in or and (1 and Band and units st the d",
+        "output_greedy": "{ and ( (s ( ( and and ( and ( ( ( (e (s and (s (",
+        "output_unformatted_raw": "s (the and RI (and a preparedness d and 1.",
+        "tokens_count": 40,
+        "words_count": 17,
+        "tokens_per_word": 2.35,
+        "repetition_metrics": {
+          "distinct_1": 70.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.26,
+        "framing_sensitivity_jaccard": 0.26
+      },
+      {
+        "id": "diag_term_02",
+        "category": "cyclone_terminology",
+        "prompt": "<user>What wind speed defines a Super Cyclonic Storm?</user><assistant>",
+        "output_sampled_temp07": ") preparedness and the for fe to the and ((d{ Kannada and 3., of and and",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 15,
+        "tokens_per_word": 2.67,
+        "repetition_metrics": {
+          "distinct_1": 71.4,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<assistant>",
+            "<tool_call>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": true,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.17,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_01",
+        "category": "ahp_explanations",
+        "prompt": "<user>Explain the Analytic Hierarchy Process and how composite preparedness scores are calculated.</user><assistant>",
+        "output_sampled_temp07": "\"tool\".",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "h of a M) = (= Seral (ding s h preparedness the reder Kannada Dakshina are",
+        "tokens_count": 6,
+        "words_count": 1,
+        "tokens_per_word": 6.0,
+        "repetition_metrics": {
+          "distinct_1": 75.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<tool_call>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": true,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.07,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_02",
+        "category": "ahp_explanations",
+        "prompt": "<user>What does a consistency ratio below 0.10 mean in AHP?</user><assistant>",
+        "output_sampled_temp07": "il with and units.{\" st-eral \": {\": \"}\": \" \":",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "gp-ued the (R) the (an Kannada",
+        "tokens_count": 40,
+        "words_count": 6,
+        "tokens_per_word": 6.67,
+        "repetition_metrics": {
+          "distinct_1": 54.5,
+          "distinct_2": 76.2,
+          "distinct_3": 95.0,
+          "trigram_repetition_rate": 5.0
+        },
+        "special_tokens": {
+          "total_tags": 7,
+          "tags_found": [
+            "</user>",
+            "<assistant>",
+            "<tool_call>",
+            "</tool_call>",
+            "</user>",
+            "<assistant>",
+            "<tool_call>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.18,
+        "framing_sensitivity_jaccard": 0.05
+      },
+      {
+        "id": "diag_tier_01",
+        "category": "preparedness_tiers",
+        "prompt": "<user>What are the score boundaries for High, Moderate, and Low Preparedness tiers?</user><assistant>",
+        "output_sampled_temp07": "(of and for (e and in a score or (r.",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "{\"parameters\": \": for \", \"",
+        "tokens_count": 26,
+        "words_count": 10,
+        "tokens_per_word": 2.6,
+        "repetition_metrics": {
+          "distinct_1": 78.6,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 3,
+          "tags_found": [
+            "<tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": true,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.06
+      },
+      {
+        "id": "diag_tier_02",
+        "category": "preparedness_tiers",
+        "prompt": "<user>How does an AHP High preparedness score differ from Low preparedness?</user><assistant>",
+        "output_sampled_temp07": "ability Tier 1 preparedness the S",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "\": the the \": the \". \": \"} for {\" \").{\"",
+        "tokens_count": 14,
+        "words_count": 6,
+        "tokens_per_word": 2.33,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 3,
+          "tags_found": [
+            "<user>",
+            "</evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.08
+      },
+      {
+        "id": "diag_sum_01",
+        "category": "summarization",
+        "prompt": "<user>Summarize the following: Dakshina Kannada has 369 revenue units with an average AHP score of 61.06, classified under K-Means Cluster Archetypes.</user><assistant>",
+        "output_sampled_temp07": "Synthesize and 1 (du the Kannada are the are 1 units S in shelter the or and (the",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "pe with are (= to of is in bo a of Ses.",
+        "tokens_count": 40,
+        "words_count": 18,
+        "tokens_per_word": 2.22,
+        "repetition_metrics": {
+          "distinct_1": 65.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<user>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.12,
+        "framing_sensitivity_jaccard": 0.13
+      },
+      {
+        "id": "diag_inst_01",
+        "category": "structured_instructions",
+        "prompt": "<user>Answer with only the district name: In which district is Ullal located?</user><assistant>",
+        "output_sampled_temp07": "Please the Udupi (dainion the wat.",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "To to for shelter Band and in and AHP with and and of the Dakshina the 1 are preparedness",
+        "tokens_count": 18,
+        "words_count": 6,
+        "tokens_per_word": 3.0,
+        "repetition_metrics": {
+          "distinct_1": 87.5,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.12,
+        "framing_sensitivity_jaccard": 0.05
+      },
+      {
+        "id": "diag_inst_02",
+        "category": "structured_instructions",
+        "prompt": "<user>Output JSON format: {\"district\": \"Udupi\"}</user><assistant>",
+        "output_sampled_temp07": "es \"}: \": Udupi \": {\" 1 (\":des: \"_\": \"identifier\": in \":",
+        "output_greedy": "\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": ", {\": \": \").er for \", \": in \": \", a\": \": {",
+        "tokens_count": 40,
+        "words_count": 6,
+        "tokens_per_word": 6.67,
+        "repetition_metrics": {
+          "distinct_1": 42.9,
+          "distinct_2": 74.1,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.22
+      }
+    ]
+  },
+  "1m": {
+    "profile": "1m",
+    "checkpoint": "models/cyclonelm/experiments/1m/checkpoints/best_model.pt",
+    "total_prompts_tested": 13,
+    "aggregate_metrics": {
+      "avg_tokens_per_word": 4.13,
+      "distinct_1": 16.4,
+      "distinct_2": 31.3,
+      "distinct_3": 51.9,
+      "trigram_repetition_rate": 48.1,
+      "avg_trial_consistency": 0.18,
+      "avg_framing_jaccard_similarity": 0.05,
+      "spurious_tool_call_generations": 6,
+      "unclosed_tool_calls": 2
+    },
+    "per_prompt_results": [
+      {
+        "id": "diag_eng_01",
+        "category": "basic_conversation",
+        "prompt": "<user>Hello, how can you help me today?</user><assistant>",
+        "output_sampled_temp07": "{\"tool\", \"identifier\": \": \"identifier\"parameters\": \": for \": \"tool\"}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 37,
+        "words_count": 6,
+        "tokens_per_word": 6.17,
+        "repetition_metrics": {
+          "distinct_1": 34.6,
+          "distinct_2": 56.0,
+          "distinct_3": 75.0,
+          "trigram_repetition_rate": 25.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.58,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_eng_02",
+        "category": "basic_conversation",
+        "prompt": "<user>What is your purpose in this system?</user><assistant>",
+        "output_sampled_temp07": "{\"tool\": \": \"parameters\": {\"parameters\": \"parameters\": \"parameters{\"district\": \"identifier\"parameters\"parameters",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "Reing S) and rulriar as of DS). S in bt s is (Cared",
+        "tokens_count": 40,
+        "words_count": 9,
+        "tokens_per_word": 4.44,
+        "repetition_metrics": {
+          "distinct_1": 21.2,
+          "distinct_2": 40.6,
+          "distinct_3": 64.5,
+          "trigram_repetition_rate": 35.5
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<tool_call>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": true,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.05,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_expl_01",
+        "category": "simple_explanations",
+        "prompt": "<user>Explain what a cyclone warning means in simple terms.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_expl_02",
+        "category": "simple_explanations",
+        "prompt": "<user>Why is coastal disaster preparedness important?</user><assistant>",
+        "output_sampled_temp07": "{\"explain_preparedness_assessment\"query\", \"tool\"parameters\"}}}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "0. ae or was and S. the (is d in and (on diit (NAdy",
+        "tokens_count": 20,
+        "words_count": 3,
+        "tokens_per_word": 6.67,
+        "repetition_metrics": {
+          "distinct_1": 53.3,
+          "distinct_2": 92.9,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_term_01",
+        "category": "cyclone_terminology",
+        "prompt": "<user>Define what a Very Severe Cyclonic Storm is according to the IMD.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_term_02",
+        "category": "cyclone_terminology",
+        "prompt": "<user>What wind speed defines a Super Cyclonic Storm?</user><assistant>",
+        "output_sampled_temp07": "The re the Band the the the the are 1 the the the the in Band Mer and km high",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 20,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 55.0,
+          "distinct_2": 73.7,
+          "distinct_3": 83.3,
+          "trigram_repetition_rate": 16.7
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.18,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_01",
+        "category": "ahp_explanations",
+        "prompt": "<user>Explain the Analytic Hierarchy Process and how composite preparedness scores are calculated.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_02",
+        "category": "ahp_explanations",
+        "prompt": "<user>What does a consistency ratio below 0.10 mean in AHP?</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "{\": \": {\": \"parameters\": \": \": \"tool\"}}",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_tier_01",
+        "category": "preparedness_tiers",
+        "prompt": "<user>What are the score boundaries for High, Moderate, and Low Preparedness tiers?</user><assistant>",
+        "output_sampled_temp07": "{\": \"}}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 11,
+        "words_count": 1,
+        "tokens_per_word": 11.0,
+        "repetition_metrics": {
+          "distinct_1": 66.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_tier_02",
+        "category": "preparedness_tiers",
+        "prompt": "<user>How does an AHP High preparedness score differ from Low preparedness?</user><assistant>",
+        "output_sampled_temp07": "{\"identifier\"parameters\"tool\": \"parameters\"}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "{\": for \": \": \", \"}}",
+        "tokens_count": 18,
+        "words_count": 4,
+        "tokens_per_word": 4.5,
+        "repetition_metrics": {
+          "distinct_1": 53.8,
+          "distinct_2": 83.3,
+          "distinct_3": 90.9,
+          "trigram_repetition_rate": 9.1
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.71,
+        "framing_sensitivity_jaccard": 0.44
+      },
+      {
+        "id": "diag_sum_01",
+        "category": "summarization",
+        "prompt": "<user>Summarize the following: Dakshina Kannada has 369 revenue units with an average AHP score of 61.06, classified under K-Means Cluster Archetypes.</user><assistant>",
+        "output_sampled_temp07": "i- the AHP for AHP with ({\"parameters\": \"}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "{\"}",
+        "tokens_count": 26,
+        "words_count": 7,
+        "tokens_per_word": 3.71,
+        "repetition_metrics": {
+          "distinct_1": 80.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.25,
+        "framing_sensitivity_jaccard": 0.25
+      },
+      {
+        "id": "diag_inst_01",
+        "category": "structured_instructions",
+        "prompt": "<user>Answer with only the district name: In which district is Ullal located?</user><assistant>",
+        "output_sampled_temp07": "\": the \": \": \": \": \"parameters\"identifier\"Someshwara\": for Kannada\"tool\": \", \"parameters",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 8,
+        "tokens_per_word": 5.0,
+        "repetition_metrics": {
+          "distinct_1": 34.5,
+          "distinct_2": 60.7,
+          "distinct_3": 77.8,
+          "trigram_repetition_rate": 22.2
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<tool_call>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": true,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_02",
+        "category": "structured_instructions",
+        "prompt": "<user>Output JSON format: {\"district\": \"Udupi\"}</user><assistant>",
+        "output_sampled_temp07": "{\"tool\": Kannada\": \": \": \": \": \"parameters\": \"identifier\"identifier\"}",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "",
+        "tokens_count": 37,
+        "words_count": 5,
+        "tokens_per_word": 7.4,
+        "repetition_metrics": {
+          "distinct_1": 30.8,
+          "distinct_2": 48.0,
+          "distinct_3": 62.5,
+          "trigram_repetition_rate": 37.5
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.56,
+        "framing_sensitivity_jaccard": 0.0
+      }
+    ]
+  },
+  "5m": {
+    "profile": "5m",
+    "checkpoint": "models/cyclonelm/experiments/5m/checkpoints/best_model.pt",
+    "total_prompts_tested": 13,
+    "aggregate_metrics": {
+      "avg_tokens_per_word": 2.76,
+      "distinct_1": 53.9,
+      "distinct_2": 93.2,
+      "distinct_3": 97.7,
+      "trigram_repetition_rate": 2.3,
+      "avg_trial_consistency": 0.1,
+      "avg_framing_jaccard_similarity": 0.04,
+      "spurious_tool_call_generations": 0,
+      "unclosed_tool_calls": 0
+    },
+    "per_prompt_results": [
+      {
+        "id": "diag_eng_01",
+        "category": "basic_conversation",
+        "prompt": "<user>Hello, how can you help me today?</user><assistant>",
+        "output_sampled_temp07": "Coy and the is the the trackeroouthies?The bele are in AHP baseline of",
+        "output_greedy": "The the and the the the is the the the the the the the the the the the the the",
+        "output_unformatted_raw": "The is depenal Map Agression confatta in and reces G aficic The c",
+        "tokens_count": 40,
+        "words_count": 14,
+        "tokens_per_word": 2.86,
+        "repetition_metrics": {
+          "distinct_1": 86.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</user>",
+            "<assistant>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.16,
+        "framing_sensitivity_jaccard": 0.19
+      },
+      {
+        "id": "diag_eng_02",
+        "category": "basic_conversation",
+        "prompt": "<user>What is your purpose in this system?</user><assistant>",
+        "output_sampled_temp07": "DOLoy preparedness in in the name to preparedness to or the and for pre-Exposure Kannada in to",
+        "output_greedy": "The the the the the the the the the the are the the the the the the the the the",
+        "output_unformatted_raw": "The the a the the Band with score s h?The and nt score s real s",
+        "tokens_count": 40,
+        "words_count": 18,
+        "tokens_per_word": 2.22,
+        "repetition_metrics": {
+          "distinct_1": 68.4,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.2,
+        "framing_sensitivity_jaccard": 0.09
+      },
+      {
+        "id": "diag_expl_01",
+        "category": "simple_explanations",
+        "prompt": "<user>Explain what a cyclone warning means in simple terms.</user><assistant>",
+        "output_sampled_temp07": "The with for Dakshina Kannada Kannada.",
+        "output_greedy": "",
+        "output_unformatted_raw": "",
+        "tokens_count": 14,
+        "words_count": 6,
+        "tokens_per_word": 2.33,
+        "repetition_metrics": {
+          "distinct_1": 85.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_expl_02",
+        "category": "simple_explanations",
+        "prompt": "<user>Why is coastal disaster preparedness important?</user><assistant>",
+        "output_sampled_temp07": "No the shelter the in sment, in 3.",
+        "output_greedy": "The the the the the the and the the the the the the the the the the the the the",
+        "output_unformatted_raw": "The (High-score_shelters and of and (C by shelter (< (Eber).",
+        "tokens_count": 20,
+        "words_count": 8,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 80.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.12,
+        "framing_sensitivity_jaccard": 0.1
+      },
+      {
+        "id": "diag_term_01",
+        "category": "cyclone_terminology",
+        "prompt": "<user>Define what a Very Severe Cyclonic Storm is according to the IMD.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "The fy the cis and net the fy A a a the f a nual (e A",
+        "output_unformatted_raw": "The TLo. ROG SROC PNOS Adion is re Y Rook a M",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_term_02",
+        "category": "cyclone_terminology",
+        "prompt": "<user>What wind speed defines a Super Cyclonic Storm?</user><assistant>",
+        "output_sampled_temp07": "Aensit",
+        "output_greedy": "The the and the the the the the the the the the the the the the the the the the",
+        "output_unformatted_raw": "Primary and the (9.",
+        "tokens_count": 4,
+        "words_count": 1,
+        "tokens_per_word": 4.0,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_01",
+        "category": "ahp_explanations",
+        "prompt": "<user>Explain the Analytic Hierarchy Process and how composite preparedness scores are calculated.</user><assistant>",
+        "output_sampled_temp07": "The overbbut inatjts for district.",
+        "output_greedy": "The the the (< (Tiers (< (< (Tier: (Tiers).0), (< (Tiers (",
+        "output_unformatted_raw": "{\": infrastructure for for \": \", \": \"get_intervention_recommendations\", \", \"tool\", \": \"tool",
+        "tokens_count": 17,
+        "words_count": 5,
+        "tokens_per_word": 3.4,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.08
+      },
+      {
+        "id": "diag_ahp_02",
+        "category": "ahp_explanations",
+        "prompt": "<user>What does a consistency ratio below 0.10 mean in AHP?</user><assistant>",
+        "output_sampled_temp07": "Aatio (ey access priority or the of (65.",
+        "output_greedy": "The the and (< (< (Tiers).",
+        "output_unformatted_raw": "The of units) km shelter Reted and the Ro high (< a, bin ch fe",
+        "tokens_count": 22,
+        "words_count": 8,
+        "tokens_per_word": 2.75,
+        "repetition_metrics": {
+          "distinct_1": 90.9,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.09,
+        "framing_sensitivity_jaccard": 0.12
+      },
+      {
+        "id": "diag_tier_01",
+        "category": "preparedness_tiers",
+        "prompt": "<user>What are the score boundaries for High, Moderate, and Low Preparedness tiers?</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "",
+        "output_unformatted_raw": "Cluster = LDODEHCEORCY the Oshelters:",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_tier_02",
+        "category": "preparedness_tiers",
+        "prompt": "<user>How does an AHP High preparedness score differ from Low preparedness?</user><assistant>",
+        "output_sampled_temp07": "The reExposure and name Udupi and Kannada.",
+        "output_greedy": "",
+        "output_unformatted_raw": "",
+        "tokens_count": 17,
+        "words_count": 7,
+        "tokens_per_word": 2.43,
+        "repetition_metrics": {
+          "distinct_1": 87.5,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_sum_01",
+        "category": "summarization",
+        "prompt": "<user>Summarize the following: Dakshina Kannada has 369 revenue units with an average AHP score of 61.06, classified under K-Means Cluster Archetypes.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "The 0 0 1 0 (Tier 0 0 0.",
+        "output_unformatted_raw": "of Band 2 157 (score_The 3 = 0. 2 2 Critical.",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_01",
+        "category": "structured_instructions",
+        "prompt": "<user>Answer with only the district name: In which district is Ullal located?</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "The the the the the the the the the the the the the the the the the the the the",
+        "output_unformatted_raw": "The to and road to the or by surge a or units storm-time of and asses and the",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_02",
+        "category": "structured_instructions",
+        "prompt": "<user>Output JSON format: {\"district\": \"Udupi\"}</user><assistant>",
+        "output_sampled_temp07": "{\": {\"parameters\"}}}}}",
+        "output_greedy": "{\": \"}}}}}}}",
+        "output_unformatted_raw": "",
+        "tokens_count": 17,
+        "words_count": 1,
+        "tokens_per_word": 17.0,
+        "repetition_metrics": {
+          "distinct_1": 41.7,
+          "distinct_2": 63.6,
+          "distinct_3": 80.0,
+          "trigram_repetition_rate": 20.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.67,
+        "framing_sensitivity_jaccard": 0.0
+      }
+    ]
+  },
+  "10m": {
+    "profile": "10m",
+    "checkpoint": "models/cyclonelm/experiments/10m/checkpoints/best_model.pt",
+    "total_prompts_tested": 13,
+    "aggregate_metrics": {
+      "avg_tokens_per_word": 2.94,
+      "distinct_1": 50.2,
+      "distinct_2": 85.9,
+      "distinct_3": 94.1,
+      "trigram_repetition_rate": 5.9,
+      "avg_trial_consistency": 0.14,
+      "avg_framing_jaccard_similarity": 0.04,
+      "spurious_tool_call_generations": 1,
+      "unclosed_tool_calls": 0
+    },
+    "per_prompt_results": [
+      {
+        "id": "diag_eng_01",
+        "category": "basic_conversation",
+        "prompt": "<user>Hello, how can you help me today?</user><assistant>",
+        "output_sampled_temp07": "The ning of pisy the cro the the ises model cribut by expartinnow (",
+        "output_greedy": "The a the the the DDRo D the the the D) L the the the the Ler the",
+        "output_unformatted_raw": "The fbows the the F f s the dynamic ND).0:",
+        "tokens_count": 40,
+        "words_count": 13,
+        "tokens_per_word": 3.08,
+        "repetition_metrics": {
+          "distinct_1": 85.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.06,
+        "framing_sensitivity_jaccard": 0.09
+      },
+      {
+        "id": "diag_eng_02",
+        "category": "basic_conversation",
+        "prompt": "<user>What is your purpose in this system?</user><assistant>",
+        "output_sampled_temp07": "The the the the the of the the TMet AHP in baseline?Please of model for community the",
+        "output_greedy": "The the the the the the the AHP AHP the the the the the AHP the model the the the",
+        "output_unformatted_raw": "The the for community Ullal the = Analyart LRAogistics I-time DS CAY cr",
+        "tokens_count": 40,
+        "words_count": 18,
+        "tokens_per_word": 2.22,
+        "repetition_metrics": {
+          "distinct_1": 63.2,
+          "distinct_2": 83.3,
+          "distinct_3": 94.1,
+          "trigram_repetition_rate": 5.9
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</user>",
+            "<assistant>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.17,
+        "framing_sensitivity_jaccard": 0.18
+      },
+      {
+        "id": "diag_expl_01",
+        "category": "simple_explanations",
+        "prompt": "<user>Explain what a cyclone warning means in simple terms.</user><assistant>",
+        "output_sampled_temp07": "Reage atial respes st from ve ancin drissuated excutptwitts by h",
+        "output_greedy": "The the the the the the the the the the the the AHP AHP the the the the AHP AHP",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 11,
+        "tokens_per_word": 3.64,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_expl_02",
+        "category": "simple_explanations",
+        "prompt": "<user>Why is coastal disaster preparedness important?</user><assistant>",
+        "output_sampled_temp07": "Cluster units units  2 Corridor ta travel (Critical due st by a differed to as ined",
+        "output_greedy": "The the the the the the the the the the the the the the the the the the the the",
+        "output_unformatted_raw": "AHP 1.",
+        "tokens_count": 40,
+        "words_count": 16,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 94.1,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.15,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_term_01",
+        "category": "cyclone_terminology",
+        "prompt": "<user>Define what a Very Severe Cyclonic Storm is according to the IMD.</user><assistant>",
+        "output_sampled_temp07": "The INTEL models model?The ( bi-pes colans crolevels and ision, dulability",
+        "output_greedy": "The S cut culed culatial the Mo culatial ci-time ise t culation,",
+        "output_unformatted_raw": "TION s S (NMNA G must S D) (SDAAROG) S) G Mit D",
+        "tokens_count": 40,
+        "words_count": 12,
+        "tokens_per_word": 3.33,
+        "repetition_metrics": {
+          "distinct_1": 93.8,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</user>",
+            "<assistant>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.07,
+        "framing_sensitivity_jaccard": 0.04
+      },
+      {
+        "id": "diag_term_02",
+        "category": "cyclone_terminology",
+        "prompt": "<user>What wind speed defines a Super Cyclonic Storm?</user><assistant>",
+        "output_sampled_temp07": "The the ge-pts h by be the wis limaras and (CR the to to ca",
+        "output_greedy": "The to culated the to the the the the the the the the the cutpt the cis",
+        "output_unformatted_raw": "D): 1. (< (< (40. 33 of (6) 1.",
+        "tokens_count": 40,
+        "words_count": 16,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 83.3,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.08,
+        "framing_sensitivity_jaccard": 0.04
+      },
+      {
+        "id": "diag_ahp_01",
+        "category": "ahp_explanations",
+        "prompt": "<user>Explain the Analytic Hierarchy Process and how composite preparedness scores are calculated.</user><assistant>",
+        "output_sampled_temp07": "To as s to with the the of Udupi.0 K-IC) storm the fan modelsion the p",
+        "output_greedy": "",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 18,
+        "tokens_per_word": 2.22,
+        "repetition_metrics": {
+          "distinct_1": 85.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_02",
+        "category": "ahp_explanations",
+        "prompt": "<user>What does a consistency ratio below 0.10 mean in AHP?</user><assistant>",
+        "output_sampled_temp07": "{\"tool\"lookup_community\": \"tool\", \": \"\": \", \": \"identifier\"}",
+        "output_greedy": "The the the model the the the the the model ci-time cutpt is pt t the t",
+        "output_unformatted_raw": "The AHP the Kannada shelter model?The models platform regmentsic is ride-time and tment",
+        "tokens_count": 34,
+        "words_count": 3,
+        "tokens_per_word": 11.33,
+        "repetition_metrics": {
+          "distinct_1": 33.3,
+          "distinct_2": 56.5,
+          "distinct_3": 72.7,
+          "trigram_repetition_rate": 27.3
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.16,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_tier_01",
+        "category": "preparedness_tiers",
+        "prompt": "<user>What are the score boundaries for High, Moderate, and Low Preparedness tiers?</user><assistant>",
+        "output_sampled_temp07": "The model resized the bted st is a spates clic hstage tic tments.",
+        "output_greedy": "The the is the the the the model the the model ree real-time culated t cis c",
+        "output_unformatted_raw": "The of AHP ounder by threshold.",
+        "tokens_count": 40,
+        "words_count": 13,
+        "tokens_per_word": 3.08,
+        "repetition_metrics": {
+          "distinct_1": 100.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.04,
+        "framing_sensitivity_jaccard": 0.11
+      },
+      {
+        "id": "diag_tier_02",
+        "category": "preparedness_tiers",
+        "prompt": "<user>How does an AHP High preparedness score differ from Low preparedness?</user><assistant>",
+        "output_sampled_temp07": "Lo the tion to for Kannada the the communities. village Census ining the ny the fallsering",
+        "output_greedy": "The the the the the the the the the the the the the the the the the the AHP AHP",
+        "output_unformatted_raw": "To units 1 (7 to inspecialized a 1 aslet) travel to h 1 (Moderate, with",
+        "tokens_count": 40,
+        "words_count": 16,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 76.5,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.18,
+        "framing_sensitivity_jaccard": 0.04
+      },
+      {
+        "id": "diag_sum_01",
+        "category": "summarization",
+        "prompt": "<user>Summarize the following: Dakshina Kannada has 369 revenue units with an average AHP score of 61.06, classified under K-Means Cluster Archetypes.</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "",
+        "output_unformatted_raw": "65. Units 1 clustered (Rural 2 clustered Units: (Tiers: (Tiers Belt.2 km, area) Cluster",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_01",
+        "category": "structured_instructions",
+        "prompt": "<user>Answer with only the district name: In which district is Ullal located?</user><assistant>",
+        "output_sampled_temp07": "Please in the intervention archetype units is in units the within 1 0 (1 in coastal the 1. (>",
+        "output_greedy": "The the the the the the the the the the the the the the AHP AHP the the the the",
+        "output_unformatted_raw": "{\"parameters\"lookup_community\": \", \": \"explain_preparedness_assessment\"identifier\": \": \", \"query\": {\"}",
+        "tokens_count": 40,
+        "words_count": 18,
+        "tokens_per_word": 2.22,
+        "repetition_metrics": {
+          "distinct_1": 63.6,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.06,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_02",
+        "category": "structured_instructions",
+        "prompt": "<user>Output JSON format: {\"district\": \"Udupi\"}</user><assistant>",
+        "output_sampled_temp07": "{\", \", \": {\": \"}}}",
+        "output_greedy": "{\": \", \"}}",
+        "output_unformatted_raw": "",
+        "tokens_count": 22,
+        "words_count": 1,
+        "tokens_per_word": 22.0,
+        "repetition_metrics": {
+          "distinct_1": 35.7,
+          "distinct_2": 61.5,
+          "distinct_3": 91.7,
+          "trigram_repetition_rate": 8.3
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "<tool_call>",
+            "</tool_call>",
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": true,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.83,
+        "framing_sensitivity_jaccard": 0.0
+      }
+    ]
+  },
+  "20m": {
+    "profile": "20m",
+    "checkpoint": "models/cyclonelm/experiments/20m/checkpoints/best_model.pt",
+    "total_prompts_tested": 13,
+    "aggregate_metrics": {
+      "avg_tokens_per_word": 2.92,
+      "distinct_1": 44.3,
+      "distinct_2": 89.5,
+      "distinct_3": 98.4,
+      "trigram_repetition_rate": 1.6,
+      "avg_trial_consistency": 0.13,
+      "avg_framing_jaccard_similarity": 0.1,
+      "spurious_tool_call_generations": 0,
+      "unclosed_tool_calls": 0
+    },
+    "per_prompt_results": [
+      {
+        "id": "diag_eng_01",
+        "category": "basic_conversation",
+        "prompt": "<user>Hello, how can you help me today?</user><assistant>",
+        "output_sampled_temp07": "OGe Ki- Sed nes a h on is on is st bs ni are nes b",
+        "output_greedy": "A and and and and and and and and and and and and and and and and and and and",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 16,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 82.4,
+          "distinct_2": 93.8,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.08,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_eng_02",
+        "category": "basic_conversation",
+        "prompt": "<user>What is your purpose in this system?</user><assistant>",
+        "output_sampled_temp07": "The s to and st to a (Dement (DNMECetal per exts (lu to",
+        "output_greedy": "What (the (the (the (the ((((((((the (((((((((((((((",
+        "output_unformatted_raw": "47 AHP Udupi, the (3') for the preparedness village units.Community, ((2, (Score:",
+        "tokens_count": 40,
+        "words_count": 13,
+        "tokens_per_word": 3.08,
+        "repetition_metrics": {
+          "distinct_1": 75.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.14,
+        "framing_sensitivity_jaccard": 0.03
+      },
+      {
+        "id": "diag_expl_01",
+        "category": "simple_explanations",
+        "prompt": "<user>Explain what a cyclone warning means in simple terms.</user><assistant>",
+        "output_sampled_temp07": "Ate res is of conte and the of rates nes ((AHP (bpates refw",
+        "output_greedy": "The and and (and and and and and (and and and and and and and and and and and",
+        "output_unformatted_raw": "0) Band 0 of priority or or are 1 score the score km AHP 1.",
+        "tokens_count": 40,
+        "words_count": 13,
+        "tokens_per_word": 3.08,
+        "repetition_metrics": {
+          "distinct_1": 81.2,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.13
+      },
+      {
+        "id": "diag_expl_02",
+        "category": "simple_explanations",
+        "prompt": "<user>Why is coastal disaster preparedness important?</user><assistant>",
+        "output_sampled_temp07": "Primary in or (Band = and Band 3 and (MCated MAars.",
+        "output_greedy": "AHP the the the the the the the the the the the (the the (the ((the (the (",
+        "output_unformatted_raw": "preparedness with of the 2.\": village (the or recommendations the 3 reunSummarize the and units.",
+        "tokens_count": 31,
+        "words_count": 10,
+        "tokens_per_word": 3.1,
+        "repetition_metrics": {
+          "distinct_1": 78.6,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.29,
+        "framing_sensitivity_jaccard": 0.23
+      },
+      {
+        "id": "diag_term_01",
+        "category": "cyclone_terminology",
+        "prompt": "<user>Define what a Very Severe Cyclonic Storm is according to the IMD.</user><assistant>",
+        "output_sampled_temp07": "Cyclonic (LEDHARObut dage high (Ftal (CA in units re the st wity",
+        "output_greedy": "Ses and and and and and and and and and and and and and and and and and and and",
+        "output_unformatted_raw": "Mevy shelter (Tet the of the a and are (of (des the (and to are",
+        "tokens_count": 40,
+        "words_count": 12,
+        "tokens_per_word": 3.33,
+        "repetition_metrics": {
+          "distinct_1": 86.7,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.09,
+        "framing_sensitivity_jaccard": 0.09
+      },
+      {
+        "id": "diag_term_02",
+        "category": "cyclone_terminology",
+        "prompt": "<user>What wind speed defines a Super Cyclonic Storm?</user><assistant>",
+        "output_sampled_temp07": "Sue the (doput of exlis w in and in of to des in datits",
+        "output_greedy": "AHP (the (((the ((((((((((((((((((((((((((((((",
+        "output_unformatted_raw": "NunObpen and and of bdriSge (to S a). units or s of d",
+        "tokens_count": 40,
+        "words_count": 14,
+        "tokens_per_word": 2.86,
+        "repetition_metrics": {
+          "distinct_1": 80.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.09,
+        "framing_sensitivity_jaccard": 0.18
+      },
+      {
+        "id": "diag_ahp_01",
+        "category": "ahp_explanations",
+        "prompt": "<user>Explain the Analytic Hierarchy Process and how composite preparedness scores are calculated.</user><assistant>",
+        "output_sampled_temp07": "C s. units, bpats), be of 1 and and (EElain-ie co-mi",
+        "output_greedy": "S (and (and (and (and (and (and (and (S (Ses (S and (Ses and",
+        "output_unformatted_raw": "",
+        "tokens_count": 40,
+        "words_count": 13,
+        "tokens_per_word": 3.08,
+        "repetition_metrics": {
+          "distinct_1": 85.0,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.22,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_ahp_02",
+        "category": "ahp_explanations",
+        "prompt": "<user>What does a consistency ratio below 0.10 mean in AHP?</user><assistant>",
+        "output_sampled_temp07": "Summarize (1 of Kannada for 4 and Score 1 in Kannada units: of 1 MECDDA =",
+        "output_greedy": "The and and and and and and (So and and and and and and and and and and and",
+        "output_unformatted_raw": "RFted 3 to (the ((1 the he and and (of km ric (ded (",
+        "tokens_count": 39,
+        "words_count": 15,
+        "tokens_per_word": 2.6,
+        "repetition_metrics": {
+          "distinct_1": 77.8,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 1,
+          "tags_found": [
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.06,
+        "framing_sensitivity_jaccard": 0.18
+      },
+      {
+        "id": "diag_tier_01",
+        "category": "preparedness_tiers",
+        "prompt": "<user>What are the score boundaries for High, Moderate, and Low Preparedness tiers?</user><assistant>",
+        "output_sampled_temp07": "Summarize Preparedness and and in in District: '3.",
+        "output_greedy": "S (AHP the (the the (the (the (the (((the ((the (the ((((the",
+        "output_unformatted_raw": "Lo MCSeve the in nes the the = (AHP retime units the with of and",
+        "tokens_count": 20,
+        "words_count": 8,
+        "tokens_per_word": 2.5,
+        "repetition_metrics": {
+          "distinct_1": 81.8,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.11,
+        "framing_sensitivity_jaccard": 0.1
+      },
+      {
+        "id": "diag_tier_02",
+        "category": "preparedness_tiers",
+        "prompt": "<user>How does an AHP High preparedness score differ from Low preparedness?</user><assistant>",
+        "output_sampled_temp07": "Primary in the coastal of for (Highs, to in units Kannada.",
+        "output_greedy": "AHP (the (the (the ((the (the ((((((((((((((((((((((",
+        "output_unformatted_raw": "A preparedness the score (in the AHP Band a reall to wut ((s and the ((S",
+        "tokens_count": 29,
+        "words_count": 11,
+        "tokens_per_word": 2.64,
+        "repetition_metrics": {
+          "distinct_1": 92.9,
+          "distinct_2": 100.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 4,
+          "tags_found": [
+            "</user>",
+            "<assistant>",
+            "</evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": true,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.17
+      },
+      {
+        "id": "diag_sum_01",
+        "category": "summarization",
+        "prompt": "<user>Summarize the following: Dakshina Kannada has 369 revenue units with an average AHP score of 61.06, classified under K-Means Cluster Archetypes.</user><assistant>",
+        "output_sampled_temp07": "Lpe and and (((of the (3.",
+        "output_greedy": "AHP ((((((((((((((((((((((((((and (the (((((((",
+        "output_unformatted_raw": "",
+        "tokens_count": 20,
+        "words_count": 6,
+        "tokens_per_word": 3.33,
+        "repetition_metrics": {
+          "distinct_1": 63.6,
+          "distinct_2": 90.0,
+          "distinct_3": 100.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "</assistant>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.33,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_01",
+        "category": "structured_instructions",
+        "prompt": "<user>Answer with only the district name: In which district is Ullal located?</user><assistant>",
+        "output_sampled_temp07": "",
+        "output_greedy": "S (and (and (and ((and (and (and (and (and (and (and (and ((and",
+        "output_unformatted_raw": "Rank the priority.",
+        "tokens_count": 2,
+        "words_count": 1,
+        "tokens_per_word": 2.0,
+        "repetition_metrics": {
+          "distinct_1": 0.0,
+          "distinct_2": 0.0,
+          "distinct_3": 0.0,
+          "trigram_repetition_rate": 0.0
+        },
+        "special_tokens": {
+          "total_tags": 2,
+          "tags_found": [
+            "<evidence>",
+            "<eos>"
+          ],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": true
+        },
+        "consistency_jaccard_between_trials": 0.0,
+        "framing_sensitivity_jaccard": 0.0
+      },
+      {
+        "id": "diag_inst_02",
+        "category": "structured_instructions",
+        "prompt": "<user>Output JSON format: {\"district\": \"Udupi\"}</user><assistant>",
+        "output_sampled_temp07": "{\": \": {\": the ID the \": the High the Kannada: preparedness the the Kannada\": in",
+        "output_greedy": "{\": \": \": \": \": \": \": \": \": \": \": \": \":",
+        "output_unformatted_raw": "}{\"parameters\"}",
+        "tokens_count": 40,
+        "words_count": 12,
+        "tokens_per_word": 3.33,
+        "repetition_metrics": {
+          "distinct_1": 36.0,
+          "distinct_2": 70.8,
+          "distinct_3": 91.3,
+          "trigram_repetition_rate": 8.7
+        },
+        "special_tokens": {
+          "total_tags": 0,
+          "tags_found": [],
+          "has_tool_call": false,
+          "has_unclosed_tool_call": false,
+          "has_spurious_user_tag": false,
+          "has_eos": false
+        },
+        "consistency_jaccard_between_trials": 0.33,
+        "framing_sensitivity_jaccard": 0.18
+      }
+    ]
+  }
+}

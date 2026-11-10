@@ -1,0 +1,11 @@
+{
+  "total_parameters": 239360,
+  "global_steps": 250,
+  "total_epochs": 8,
+  "final_train_loss": 3.520514864670603,
+  "final_val_loss": 3.071367931365967,
+  "final_val_perplexity": 21.571390683541807,
+  "best_val_loss": 3.071367931365967,
+  "elapsed_seconds": 8.994405746459961,
+  "device": "cpu"
+}

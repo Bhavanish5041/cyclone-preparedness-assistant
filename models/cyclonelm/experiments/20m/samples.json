@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sample_ahp_role",
+    "category": "domain_knowledge",
+    "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+    "generated_text": "RArulic (Ales and ded and res exst-s s and in s sts, to fal or an t nic",
+    "clean_text": "RArulic (Ales and ded and res exst-s s and in s sts, to fal or an t nic"
+  },
+  {
+    "id": "sample_tool_lookup",
+    "category": "tool_selection",
+    "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+    "generated_text": "= for in for Kannada units), Kannada for village for Kannada': for or Kannada Dakshina Dakshina village and Kannada '.</user><assistant>Ullal: the",
+    "clean_text": "= for in for Kannada units), Kannada for village for Kannada': for or Kannada Dakshina Dakshina village and Kannada '.Ullal: the"
+  },
+  {
+    "id": "sample_live_telemetry_refusal",
+    "category": "governance_refusal",
+    "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+    "generated_text": "oi the and res stculage ted Sage (Mt Band and and ds extor 1 MWhat of of Putid",
+    "clean_text": "oi the and res stculage ted Sage (Mt Band and and ds extor 1 MWhat of of Putid"
+  },
+  {
+    "id": "sample_tiers_vs_bands",
+    "category": "governance_distinction",
+    "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+    "generated_text": "Dakshina units Dakshina for '.</user><assistant>{\", for the revenue identifier \": Ullal for PC11 \"tool\"tool\".</user><assistant><evidence><eos>",
+    "clean_text": "Dakshina units Dakshina for '.{\", for the revenue identifier \": Ullal for PC11 \"tool\"tool\"."
+  },
+  {
+    "id": "sample_ml_surrogate_limit",
+    "category": "ml_governance",
+    "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+    "generated_text": "RIparles (Moy in fps. the and Band and the in (Tier 0. and the Preparedness (are with in ",
+    "clean_text": "RIparles (Moy in fps. the and Band and the in (Tier 0. and the Preparedness (are with in "
+  },
+  {
+    "id": "sample_archetype_cluster3",
+    "category": "archetypes",
+    "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+    "generated_text": "Preparedness of (the 1 km, the an in road to the 1. the the (of the (of or and (and (priority (",
+    "clean_text": "Preparedness of (the 1 km, the an in road to the 1. the the (of the (of or and (and (priority ("
+  }
+]

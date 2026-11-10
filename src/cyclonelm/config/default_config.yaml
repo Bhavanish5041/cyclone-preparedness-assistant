@@ -1,0 +1,30 @@
+# CycloneLM v0.1 Default Configuration
+# Domain-specialised Tiny Transformer for Coastal Karnataka Decision Support System
+
+model:
+  vocab_size: 1024
+  d_model: 64
+  n_layers: 2
+  n_heads: 4
+  d_ff: 256
+  max_seq_len: 128
+  dropout: 0.1
+  bias: true
+  layer_norm_eps: 0.00001
+  tie_word_embeddings: false
+
+training:
+  batch_size: 8
+  learning_rate: 0.001
+  min_learning_rate: 0.0001
+  weight_decay: 0.01
+  warmup_steps: 50
+  max_steps: 500
+  epochs: 15
+  grad_clip: 1.0
+  device: "cpu"
+  seed: 42
+  log_interval: 10
+  eval_interval: 25
+  save_interval: 50
+  checkpoint_dir: "models/cyclonelm/checkpoints"

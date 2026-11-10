@@ -1,0 +1,17 @@
+{
+  "total_parameters": 10560640,
+  "non_embedding_parameters": 10192000,
+  "global_steps": 250,
+  "total_epochs": 12,
+  "final_train_loss": 2.6379736959934235,
+  "final_val_loss": 3.128551185131073,
+  "final_val_perplexity": 22.840863376157994,
+  "best_val_loss": 3.128551185131073,
+  "elapsed_seconds": 185.5224039554596,
+  "cpu_utilization_pct": 1174.5,
+  "peak_rss_mb": 1264.234375,
+  "checkpoint_size_kb": 124426.2978515625,
+  "training_tokens_per_second": 1379.8872510376739,
+  "device": "cpu",
+  "early_stopped": false
+}

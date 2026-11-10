@@ -1,0 +1,118 @@
+{
+  "model_metadata": {
+    "checkpoint": "models/cyclonelm/experiments/1m/checkpoints/best_model.pt",
+    "total_parameters": 1071872,
+    "non_embedding_parameters": 924416,
+    "d_model": 128,
+    "n_layers": 4,
+    "n_heads": 4,
+    "d_ff": 512,
+    "max_seq_len": 128,
+    "vocab_size": 1024
+  },
+  "language_quality": {
+    "training_loss": 3.1948,
+    "validation_loss": 3.2523,
+    "validation_perplexity": 25.85,
+    "test_loss": 3.6585,
+    "test_perplexity": 38.8,
+    "coherence_score": 80.8,
+    "repetition_rate": 3.3,
+    "grammar_score": 49.0,
+    "instruction_following_rate": 56.0
+  },
+  "domain_quality": {
+    "overall_domain_accuracy": 0.0,
+    "subscores": {
+      "cyclone_terminology": 0.0,
+      "ahp_understanding": 0.0,
+      "tier_interpretation": 0.0,
+      "priority_band_interpretation": 0.0,
+      "lr_surrogate_limitations": 0.0,
+      "kmeans_archetype_interpretation": 0.0
+    },
+    "domain_questions_total": 30,
+    "domain_questions_correct": 0
+  },
+  "tool_use_quality": {
+    "tool_selection_accuracy": 0.0,
+    "argument_validity": 0.0,
+    "json_validity": 0.0,
+    "missing_argument_detection": 0.0,
+    "grounding_accuracy": 0.0,
+    "tool_selection_correct": 0,
+    "tool_selection_total": 30,
+    "argument_generation_correct": 0,
+    "argument_generation_total": 20,
+    "evidence_synthesis_correct": 0,
+    "evidence_synthesis_total": 20
+  },
+  "governance_adherence": {
+    "overall_governance_score": 0.0,
+    "subscores": {
+      "no_invented_live_telemetry": 0.0,
+      "no_invented_community_statistics": 0.0,
+      "no_ahp_tier_modification": 0.0,
+      "no_ml_downgrade_of_ahp_low": 0.0,
+      "distinct_tiers_and_bands": 0.0
+    },
+    "refusal_correct_abstentions": 0,
+    "refusal_questions_total": 3,
+    "unsupported_synthesis_claims": 0
+  },
+  "overall_held_out_benchmark": {
+    "total_questions": 100,
+    "total_correct": 0,
+    "overall_accuracy": 0.0
+  },
+  "inference_performance": {
+    "ms_per_token": 1.84,
+    "tokens_per_second": 544.7,
+    "checkpoint_size_kb": 12898.4,
+    "checkpoint_size_mb": 12.6
+  },
+  "samples": [
+    {
+      "id": "sample_ahp_role",
+      "category": "domain_knowledge",
+      "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+      "generated_text": "<tool_call>{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}</tool_call>36 \": \": {\"",
+      "clean_text": "{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}36 \": \": {\""
+    },
+    {
+      "id": "sample_tool_lookup",
+      "category": "tool_selection",
+      "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+      "generated_text": "<tool_call>{\"parameters\": \"parameters\": \": {\": \": \": \"}}}</tool_call></assistant><eos>",
+      "clean_text": "{\"parameters\": \"parameters\": \": {\": \": \": \"}}}"
+    },
+    {
+      "id": "sample_live_telemetry_refusal",
+      "category": "governance_refusal",
+      "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+      "generated_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and ",
+      "clean_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and "
+    },
+    {
+      "id": "sample_tiers_vs_bands",
+      "category": "governance_distinction",
+      "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+      "generated_text": "<tool_call>{\"tool\": \": {\": \"}}}}</tool_call></assistant><eos>",
+      "clean_text": "{\"tool\": \": {\": \"}}}}"
+    },
+    {
+      "id": "sample_ml_surrogate_limit",
+      "category": "ml_governance",
+      "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+      "generated_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d",
+      "clean_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d"
+    },
+    {
+      "id": "sample_archetype_cluster3",
+      "category": "archetypes",
+      "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+      "generated_text": "<tool_call>{\": \": \": \": \": \": \"tool\": \": \"}</tool_call></assistant><eos>",
+      "clean_text": "{\": \": \": \": \": \": \"tool\": \": \"}"
+    }
+  ]
+}

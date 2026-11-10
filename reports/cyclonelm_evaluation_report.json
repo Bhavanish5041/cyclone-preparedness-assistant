@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-11-10 11:16:17",
+  "model_metadata": {
+    "total_parameters": 239360,
+    "non_embedding_parameters": 165632,
+    "within_one_million_limit": true,
+    "d_model": 64,
+    "n_layers": 2,
+    "n_heads": 4,
+    "d_ff": 256,
+    "max_seq_len": 128,
+    "vocab_size": 1024
+  },
+  "checkpoint_verification": {
+    "checkpoint_file": "models/cyclonelm/checkpoints/best_model.pt",
+    "checkpoint_size_kb": 2977.7880859375,
+    "weights_identical": true,
+    "max_absolute_weight_diff": 0.0,
+    "training_step": 250,
+    "recorded_val_loss": 3.071367931365967
+  },
+  "inference_performance": {
+    "trials": 5,
+    "avg_total_seconds": 0.03894120139993902,
+    "ms_per_token": 1.2169125437480943,
+    "tokens_per_second": 821.7517397922425
+  },
+  "tool_protocol": {
+    "tools_registered_count": 7,
+    "tools_list": [
+      "analyze_infrastructure_and_exposure",
+      "compare_districts",
+      "explain_preparedness_assessment",
+      "explain_vulnerability_archetype",
+      "filter_and_rank_communities",
+      "get_intervention_recommendations",
+      "lookup_community"
+    ],
+    "lookup_community_success": true,
+    "compare_districts_success": true,
+    "explain_archetype_success": true,
+    "unrecognized_tool_safely_blocked": true,
+    "duplicate_calls_detected": true,
+    "orchestration_session_success": true
+  },
+  "scientific_governance": {
+    "statement_checks": [
+      {
+        "mentions_ahp_or_precedence": true,
+        "demarcates_surrogate": true,
+        "refuses_live_fabrication": false,
+        "distinguishes_tiers_and_bands": true
+      },
+      {
+        "mentions_ahp_or_precedence": false,
+        "demarcates_surrogate": false,
+        "refuses_live_fabrication": true,
+        "distinguishes_tiers_and_bands": false
+      },
+      {
+        "mentions_ahp_or_precedence": true,
+        "demarcates_surrogate": false,
+        "refuses_live_fabrication": false,
+        "distinguishes_tiers_and_bands": true
+      }
+    ],
+    "all_rules_covered": true
+  },
+  "memory_usage": {
+    "peak_rss_mb": 1264.234375
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "profile": "239k",
+  "dataset_version": "0.2.0",
+  "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+  "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+  "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+  "tokenizer_version": "0.2.0",
+  "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+  "tokenizer_vocab_size": 1024,
+  "random_seed": 42,
+  "training_hyperparameters": {
+    "max_steps": 250,
+    "epochs": 15,
+    "batch_size": 8,
+    "grad_accum_steps": 1,
+    "learning_rate": 0.001,
+    "min_learning_rate": 0.0001,
+    "warmup_steps": 30,
+    "grad_clip": 1.0
+  },
+  "hardware_environment": {
+    "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+    "total_ram_gb": 12.89,
+    "os": "Linux",
+    "platform_release": "7.0.0-38-generic",
+    "torch_version": "2.15.0+cpu",
+    "torch_num_threads": 12,
+    "device": "cpu",
+    "has_cuda": false
+  },
+  "architecture_audit": {
+    "profile": "239k",
+    "total_parameters": 239360,
+    "non_embedding_parameters": 165632,
+    "formula_matches_actual": true,
+    "d_model": 64,
+    "n_layers": 2,
+    "n_heads": 4,
+    "head_dim": 16,
+    "d_ff": 256,
+    "max_seq_len": 128,
+    "vocab_size": 1024,
+    "is_divisible": true,
+    "causal_mask_verified": true,
+    "weights_mb": 0.91,
+    "optimizer_mb": 1.83,
+    "estimated_train_ram_mb": 103.65
+  },
+  "timestamp": "2026-11-10 21:07:25"
+}

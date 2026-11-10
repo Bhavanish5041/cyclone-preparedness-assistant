@@ -1,0 +1,30 @@
+{
+  "dataset_name": "CycloneLM Curated Coastal Karnataka Domain Corpus",
+  "version": "0.1.0",
+  "provenance": {
+    "meteorology": "India Meteorological Department (IMD) cyclone classification standards and public advisories",
+    "regional_geography": "Government of Karnataka Coastal Disaster Management documentation",
+    "mcda_methodology": "Thomas Saaty Analytic Hierarchy Process (AHP) open academic specifications",
+    "machine_learning_surrogate": "Surrogate Logistic Regression architecture and non-downgrading safety invariant from Milestone 3A/3B",
+    "clustering": "K-Means archetypes derived for Dakshina Kannada and Udupi (N=622 units)",
+    "safety_rules": "Strict refusal to fabricate dynamic weather or live shelter occupancy"
+  },
+  "license": "CC0 1.0 Universal / Open Project Academic Documentation",
+  "unit_records_memorization": false,
+  "note": "Community numerical information must be fetched deterministically via tools, not memorized in model weights.",
+  "pretraining_corpus_paragraphs": 9,
+  "total_instruction_examples": 160,
+  "instruction_categories": [
+    "ahp_methodology",
+    "surrogate_demarcation",
+    "vulnerability_archetypes",
+    "scientific_governance",
+    "tool_orchestration"
+  ],
+  "splits": {
+    "pretraining_train_paragraphs": 7,
+    "pretraining_val_paragraphs": 2,
+    "instructions_train_count": 136,
+    "instructions_val_count": 24
+  }
+}

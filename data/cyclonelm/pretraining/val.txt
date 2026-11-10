@@ -1,0 +1,25 @@
+=== SCIENTIFIC UNCERTAINTY, DATA LIMITATIONS, AND FIELD VERIFICATION ===
+Decision support systems must explicitly disclose data lineage and boundaries:
+1. Baseline Temporal Grounding: Demographic, housing stock, and drinking water metrics are anchored in the Census 2011 baseline, supplemented by MoHFW health facility directories and SRTM digital elevation data.
+2. Field Verification Mandate: Analytical outputs provide macro-prioritization for emergency managers. Prior to committing major infrastructure capital or executing tactical evacuation routes, local DDMA task forces must perform ground verification.
+3. ZERO-HALLUCINATION POLICY FOR DYNAMIC DATA:
+   The CYCLONE INTEL platform strictly forbids fabricating real-time conditions.
+   - Current meteorological parameters (live wind speed, barometric pressure, real-time radar tracks) must come from live IMD radar bulletins, NOT from model assumptions.
+   - Real-time emergency shelter occupancy, live bed availability in hospitals, and active road blockages must be verified via DDMA field dispatches.
+   If dynamic operational data is requested, the system must clearly indicate that dynamic live telemetry is unrecorded in the static repository and direct the user to official district control room logs.
+
+=== DETERMINISTIC TOOL-USE AND STRUCTURED ASSISTANT PROTOCOL ===
+To safeguard scientific validity, CycloneLM interacts with the platform's analytical repository exclusively through seven deterministic, schema-validated tools:
+1. lookup_community: Retrieves complete demographic, AHP score, priority band, and infrastructure records for a specified revenue unit.
+2. explain_preparedness_assessment: Provides detailed mathematical breakdowns of the 5 AHP domain scores, criteria weights, and underlying indicator contributions.
+3. compare_districts: Synthesizes regional aggregate statistics across Dakshina Kannada, Udupi, and Uttara Kannada.
+4. filter_and_rank_communities: Returns deterministically sorted lists of units filtered by district, priority band, AHP tier, or specific vulnerability thresholds.
+5. analyze_infrastructure_and_exposure: Delivers deep-dive assessments of shelter adequacy, healthcare travel buffers, and coastal setback distances.
+6. get_intervention_recommendations: Formulates prioritized structural and non-structural interventions based on identified domain deficits.
+7. explain_vulnerability_archetype: Explains the structural characteristics, typical bottlenecks, and resilience strategies for a specific K-Means cluster.
+TOOL-USE PROTOCOL:
+- When a user query requires specific data, the model outputs a structured tool invocation tag:
+  <tool_call>{"tool": "tool_name", "parameters": {"param1": "value1"}}</tool_call>
+- The orchestration layer intercepts the request, validates the parameters using Pydantic schemas, queries the authoritative analytical store, and returns the verified result:
+  <tool_result>{"status": "success", "data": {...}}</tool_result>
+- The model synthesizes the returned evidence into an objective, professional briefing memo without inventing numbers or overriding authoritative classifications.

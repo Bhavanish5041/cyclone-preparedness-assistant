@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sample_ahp_role",
+    "category": "domain_knowledge",
+    "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+    "generated_text": "<evidence> the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi ",
+    "clean_text": " the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi "
+  },
+  {
+    "id": "sample_tool_lookup",
+    "category": "tool_selection",
+    "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+    "generated_text": "<user>What from (D- 1 the and units.</assistant><eos>",
+    "clean_text": "What from (D- 1 the and units."
+  },
+  {
+    "id": "sample_live_telemetry_refusal",
+    "category": "governance_refusal",
+    "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+    "generated_text": "<evidence> S M is for, of n<assistant><tool_call>{\": to?</user><assistant><tool_call>{\": \": \", \": \", \": {\": \".",
+    "clean_text": " S M is for, of n{\": to?{\": \": \", \": \", \": {\": \"."
+  },
+  {
+    "id": "sample_tiers_vs_bands",
+    "category": "governance_distinction",
+    "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+    "generated_text": "<tool_call>{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the ",
+    "clean_text": "{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the "
+  },
+  {
+    "id": "sample_ml_surrogate_limit",
+    "category": "ml_governance",
+    "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+    "generated_text": "<evidence><eos>",
+    "clean_text": ""
+  },
+  {
+    "id": "sample_archetype_cluster3",
+    "category": "archetypes",
+    "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+    "generated_text": "<tool_call>{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \"</user><assistant><evidence><eos>",
+    "clean_text": "{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \""
+  }
+]

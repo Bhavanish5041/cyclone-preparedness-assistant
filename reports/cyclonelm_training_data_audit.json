@@ -1,0 +1,92 @@
+{
+  "dataset_version": "0.2.0",
+  "instruction_pairs_inventory": {
+    "train": 101,
+    "val": 20,
+    "test": 27
+  },
+  "tool_use_pairs_inventory": {
+    "train": 48,
+    "val": 10,
+    "test": 12
+  },
+  "vocabulary_and_tokens": {
+    "total_words_in_instructions": 5649,
+    "unique_words_in_instructions": 1023,
+    "type_token_ratio": 0.1811,
+    "avg_tokens_per_pair": 115.8,
+    "avg_instruction_words": 9.2,
+    "avg_response_words": 28.1
+  },
+  "domain_topic_coverage": {
+    "AHP_methodology": 42,
+    "consistency_ratio": 4,
+    "medical_domain": 19,
+    "shelter_domain": 25,
+    "infrastructure_domain": 43,
+    "early_warning_domain": 29,
+    "socioeconomic_domain": 12,
+    "dakshina_kannada": 28,
+    "udupi": 34,
+    "uttara_kannada": 20,
+    "cluster_archetypes": 21,
+    "ml_surrogate_limits": 11
+  },
+  "top_instruction_openings": [
+    [
+      "synthesize the",
+      12
+    ],
+    [
+      "what is",
+      11
+    ],
+    [
+      "what are",
+      9
+    ],
+    [
+      "explain the",
+      8
+    ],
+    [
+      "look up",
+      6
+    ],
+    [
+      "search for",
+      6
+    ],
+    [
+      "summarize archetype",
+      6
+    ],
+    [
+      "how many",
+      5
+    ],
+    [
+      "analyze the",
+      4
+    ],
+    [
+      "can an",
+      3
+    ]
+  ],
+  "sufficiency_assessment": {
+    "total_instruction_examples": 149,
+    "total_training_tokens": 16951,
+    "domain_corpus_words": 1628,
+    "domain_corpus_unique_words": 775,
+    "is_sufficient_for_scratch_nlp": false,
+    "bottleneck_diagnosis": "The training corpus comprises only 149 instruction-response pairs and ~12,400 words of background prose (~23,300 tokens total). In modern language modeling, learning English morphology, syntax, long-range dependencies, and robust instruction-following from scratch requires orders of magnitude more tokens (typically 100M+ tokens for a 5M parameter model). With only ~23k tokens, a 5.3M model has over 200 parameters per training token, resulting in severe data starvation and inability to generalize syntax. Furthermore, causal language modeling optimizes next-token loss on the prompt text as well as the response, wasting capacity on learning to predict user queries rather than focusing strictly on generating well-formed answers.",
+    "expansion_strategy": [
+      "Source 1: Official Karnataka State Disaster Management Authority (KSDMA) coastal SOPs and taluk disaster management plans.",
+      "Source 2: IMD Cyclone Warning Manual, cyclone tracking protocols, and classification scales (NDSAP Open Data).",
+      "Source 3: Saaty (1980) AHP mathematical proofs and pairwise matrix calculations (public academic fair use).",
+      "Source 4: Census 2011 Village and Town Directory metadata for Dakshina Kannada, Udupi, and Uttara Kannada (OGD Platform India).",
+      "Source 5: Loss-masking optimization: Compute cross-entropy loss exclusively on the <assistant> response tokens, zeroing loss on <user> tokens."
+    ]
+  }
+}

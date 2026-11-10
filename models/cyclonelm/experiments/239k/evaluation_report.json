@@ -1,0 +1,118 @@
+{
+  "model_metadata": {
+    "checkpoint": "models/cyclonelm/experiments/239k/checkpoints/best_model.pt",
+    "total_parameters": 239360,
+    "non_embedding_parameters": 165632,
+    "d_model": 64,
+    "n_layers": 2,
+    "n_heads": 4,
+    "d_ff": 256,
+    "max_seq_len": 128,
+    "vocab_size": 1024
+  },
+  "language_quality": {
+    "training_loss": 3.4512,
+    "validation_loss": 3.4772,
+    "validation_perplexity": 32.37,
+    "test_loss": 3.8575,
+    "test_perplexity": 47.35,
+    "coherence_score": 86.7,
+    "repetition_rate": 1.6,
+    "grammar_score": 31.0,
+    "instruction_following_rate": 8.0
+  },
+  "domain_quality": {
+    "overall_domain_accuracy": 3.3,
+    "subscores": {
+      "cyclone_terminology": 0.0,
+      "ahp_understanding": 12.5,
+      "tier_interpretation": 0.0,
+      "priority_band_interpretation": 0.0,
+      "lr_surrogate_limitations": 0.0,
+      "kmeans_archetype_interpretation": 16.7
+    },
+    "domain_questions_total": 30,
+    "domain_questions_correct": 1
+  },
+  "tool_use_quality": {
+    "tool_selection_accuracy": 0.0,
+    "argument_validity": 0.0,
+    "json_validity": 0.0,
+    "missing_argument_detection": 0.0,
+    "grounding_accuracy": 0.0,
+    "tool_selection_correct": 0,
+    "tool_selection_total": 30,
+    "argument_generation_correct": 0,
+    "argument_generation_total": 20,
+    "evidence_synthesis_correct": 0,
+    "evidence_synthesis_total": 20
+  },
+  "governance_adherence": {
+    "overall_governance_score": 3.3,
+    "subscores": {
+      "no_invented_live_telemetry": 0.0,
+      "no_invented_community_statistics": 16.7,
+      "no_ahp_tier_modification": 0.0,
+      "no_ml_downgrade_of_ahp_low": 0.0,
+      "distinct_tiers_and_bands": 0.0
+    },
+    "refusal_correct_abstentions": 0,
+    "refusal_questions_total": 3,
+    "unsupported_synthesis_claims": 0
+  },
+  "overall_held_out_benchmark": {
+    "total_questions": 100,
+    "total_correct": 1,
+    "overall_accuracy": 1.0
+  },
+  "inference_performance": {
+    "ms_per_token": 2.22,
+    "tokens_per_second": 451.4,
+    "checkpoint_size_kb": 2977.9,
+    "checkpoint_size_mb": 2.91
+  },
+  "samples": [
+    {
+      "id": "sample_ahp_role",
+      "category": "domain_knowledge",
+      "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+      "generated_text": "<evidence> the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi ",
+      "clean_text": " the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi "
+    },
+    {
+      "id": "sample_tool_lookup",
+      "category": "tool_selection",
+      "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+      "generated_text": "<user>What from (D- 1 the and units.</assistant><eos>",
+      "clean_text": "What from (D- 1 the and units."
+    },
+    {
+      "id": "sample_live_telemetry_refusal",
+      "category": "governance_refusal",
+      "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+      "generated_text": "<evidence> S M is for, of n<assistant><tool_call>{\": to?</user><assistant><tool_call>{\": \": \", \": \", \": {\": \".",
+      "clean_text": " S M is for, of n{\": to?{\": \": \", \": \", \": {\": \"."
+    },
+    {
+      "id": "sample_tiers_vs_bands",
+      "category": "governance_distinction",
+      "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+      "generated_text": "<tool_call>{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the ",
+      "clean_text": "{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the "
+    },
+    {
+      "id": "sample_ml_surrogate_limit",
+      "category": "ml_governance",
+      "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+      "generated_text": "<evidence><eos>",
+      "clean_text": ""
+    },
+    {
+      "id": "sample_archetype_cluster3",
+      "category": "archetypes",
+      "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+      "generated_text": "<tool_call>{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \"</user><assistant><evidence><eos>",
+      "clean_text": "{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \""
+    }
+  ]
+}

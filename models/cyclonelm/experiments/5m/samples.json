@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sample_ahp_role",
+    "category": "domain_knowledge",
+    "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+    "generated_text": "A-position for surrogate Dakshina Cluster 3. Mean 3 = 65.04 1 = Cluster = 1 50. Rook = Priority (PC",
+    "clean_text": "A-position for surrogate Dakshina Cluster 3. Mean 3 = 65.04 1 = Cluster = 1 50. Rook = Priority (PC"
+  },
+  {
+    "id": "sample_tool_lookup",
+    "category": "tool_selection",
+    "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+    "generated_text": "<tool_call>{\"}}}</tool_call></assistant><eos>",
+    "clean_text": "{\"}}}"
+  },
+  {
+    "id": "sample_live_telemetry_refusal",
+    "category": "governance_refusal",
+    "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+    "generated_text": "In ner or of state regent st or road structural to to of to the is or reg.</assistant><eos>",
+    "clean_text": "In ner or of state regent st or road structural to to of to the is or reg."
+  },
+  {
+    "id": "sample_tiers_vs_bands",
+    "category": "governance_distinction",
+    "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+    "generated_text": "In in in (C score and (Kannada units), and with village High-time to (Per h (hug. (1, in ",
+    "clean_text": "In in in (C score and (Kannada units), and with village High-time to (Per h (hug. (1, in "
+  },
+  {
+    "id": "sample_ml_surrogate_limit",
+    "category": "ml_governance",
+    "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+    "generated_text": "The and to the for Dakshina Kannada.<eos>",
+    "clean_text": "The and to the for Dakshina Kannada."
+  },
+  {
+    "id": "sample_archetype_cluster3",
+    "category": "archetypes",
+    "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+    "generated_text": "The Band 2 3: Low Pasts units), by Band (6.0, SOEh ESRed area), 2), (EO",
+    "clean_text": "The Band 2 3: Low Pasts units), by Band (6.0, SOEh ESRed area), 2), (EO"
+  }
+]

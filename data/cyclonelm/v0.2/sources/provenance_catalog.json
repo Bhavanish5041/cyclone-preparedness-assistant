@@ -1,0 +1,79 @@
+{
+  "catalog_version": "0.2.0",
+  "sources": [
+    {
+      "id": "IMD_SOP_CYCLONE",
+      "title": "Cyclone Warning Services in India: Standard Operating Procedure",
+      "publisher": "India Meteorological Department, Ministry of Earth Sciences, Government of India",
+      "url": "https://mausam.imd.gov.in",
+      "access_date": "2026-11-10",
+      "copyright": "Government of India (Open Data Policy - NDSAP)",
+      "permitted_usage": "Public information and academic research reference",
+      "usage_mode": "Paraphrased and synthesized in original domain prose",
+      "covers": [
+        "8-stage cyclone intensity scale",
+        "4-stage cyclone alerts",
+        "Arabian Sea basin dynamics"
+      ]
+    },
+    {
+      "id": "UNDRR_SENDAI_2015",
+      "title": "Sendai Framework for Disaster Risk Reduction 2015-2030",
+      "publisher": "United Nations Office for Disaster Risk Reduction (UNDRR)",
+      "url": "https://www.undrr.org/implementing-sendai-framework/what-sendai-framework",
+      "access_date": "2026-11-10",
+      "copyright": "United Nations",
+      "permitted_usage": "Public international disaster risk reduction policy citation",
+      "usage_mode": "Conceptual framework reference for coastal preparedness and resilience",
+      "covers": [
+        "Disaster risk identification",
+        "Early warning systems",
+        "Resilient infrastructure"
+      ]
+    },
+    {
+      "id": "SAATY_AHP_1980",
+      "title": "The Analytic Hierarchy Process: Planning, Priority Setting, Resource Allocation",
+      "publisher": "McGraw-Hill International (Thomas L. Saaty)",
+      "access_date": "2026-11-10",
+      "copyright": "Academic foundational literature",
+      "permitted_usage": "Academic scientific citation and mathematical formulation",
+      "usage_mode": "Mathematical implementation (pairwise comparisons, consistency ratio CR < 0.10)",
+      "covers": [
+        "AHP methodology",
+        "Consistency index",
+        "Reciprocal matrix mathematics"
+      ]
+    },
+    {
+      "id": "KSDMA_COASTAL_PLAN",
+      "title": "Karnataka State Disaster Management Plan: Coastal Hazards and Vulnerability",
+      "publisher": "Revenue Department (Disaster Management), Government of Karnataka",
+      "url": "https://dm.karnataka.gov.in",
+      "access_date": "2026-11-10",
+      "copyright": "Government of Karnataka",
+      "permitted_usage": "Government public disaster management documentation",
+      "usage_mode": "Paraphrased administrative and geographical reference",
+      "covers": [
+        "Dakshina Kannada, Udupi, Uttara Kannada coastline",
+        "Estuarine networks",
+        "Multi-Purpose Cyclone Shelters"
+      ]
+    },
+    {
+      "id": "CENSUS_INDIA_2011_DK_UDUPI_UK",
+      "title": "District Census Handbooks: Dakshina Kannada, Udupi, and Uttara Kannada",
+      "publisher": "Office of the Registrar General & Census Commissioner, Ministry of Home Affairs, Government of India",
+      "url": "https://censusindia.gov.in",
+      "access_date": "2026-11-10",
+      "copyright": "Open Government Data (OGD) Platform India",
+      "permitted_usage": "Statistical and geographical public reference",
+      "usage_mode": "Baseline demographic and habitation boundaries (1,879 administrative units)",
+      "covers": [
+        "Revenue village boundaries",
+        "Housing stock characteristics",
+        "Demographic vulnerability"
+      ]
+    }
+  ]
+}

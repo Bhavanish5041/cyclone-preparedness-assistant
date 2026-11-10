@@ -1,0 +1,206 @@
+{
+  "blockers": [],
+  "warnings": [],
+  "checks": {
+    "tokenizer": {
+      "vocab_size": 1024,
+      "all_special_tokens_present": true,
+      "missing_specials": [],
+      "atomic_encoding_verified": true,
+      "non_atomic_details": [],
+      "sample_roundtrip_verified": true
+    },
+    "partitions": {
+      "train_instructions": 101,
+      "val_instructions": 20,
+      "test_instructions": 27,
+      "train_tool_use": 48,
+      "val_tool_use": 10,
+      "test_tool_use": 12,
+      "held_out_100_eval": 100,
+      "train_corpus_chars": 61868,
+      "val_corpus_chars": 9590,
+      "test_corpus_chars": 12287
+    },
+    "leakage": {
+      "exact_train_val_overlap": 0,
+      "exact_train_test_overlap": 0,
+      "exact_train_heldout_overlap": 0,
+      "exact_val_heldout_overlap": 0,
+      "high_jaccard_train_heldout_count": 0,
+      "verbatim_heldout_in_train_corpus_count": 0,
+      "zero_leakage_verified": true
+    },
+    "tools": {
+      "registered_count": 7,
+      "all_seven_tools_present": true,
+      "tool_details": {
+        "lookup_community": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "query",
+            "district",
+            "limit"
+          ]
+        },
+        "analyze_infrastructure_and_exposure": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "identifier"
+          ]
+        },
+        "explain_preparedness_assessment": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "identifier"
+          ]
+        },
+        "get_intervention_recommendations": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "identifier"
+          ]
+        },
+        "compare_districts": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "district_a",
+            "district_b"
+          ]
+        },
+        "filter_and_rank_communities": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "priority_band",
+            "district",
+            "sort_by",
+            "ascending",
+            "limit",
+            "offset"
+          ]
+        },
+        "explain_vulnerability_archetype": {
+          "registered": true,
+          "has_schema": true,
+          "schema_fields": [
+            "archetype_id",
+            "community_identifier"
+          ]
+        }
+      }
+    },
+    "token_counts": {
+      "train_tokens": 23162,
+      "val_tokens": 3634,
+      "test_tokens": 4683,
+      "max_instruction_seq_len": 247,
+      "mean_instruction_seq_len": 115.8,
+      "within_context_window_128": false
+    },
+    "provenance": {
+      "provenance_catalog_exists": true,
+      "metadata_exists": true,
+      "sources_count": 5,
+      "provenance_retained": true
+    },
+    "scaling_profiles": {
+      "239k": {
+        "profile": "239k",
+        "total_parameters": 239360,
+        "non_embedding_parameters": 165632,
+        "formula_matches_actual": true,
+        "d_model": 64,
+        "n_layers": 2,
+        "n_heads": 4,
+        "head_dim": 16,
+        "d_ff": 256,
+        "max_seq_len": 128,
+        "vocab_size": 1024,
+        "is_divisible": true,
+        "causal_mask_verified": true,
+        "weights_mb": 0.91,
+        "optimizer_mb": 1.83,
+        "estimated_train_ram_mb": 103.65
+      },
+      "1m": {
+        "profile": "1m",
+        "total_parameters": 1071872,
+        "non_embedding_parameters": 924416,
+        "formula_matches_actual": true,
+        "d_model": 128,
+        "n_layers": 4,
+        "n_heads": 4,
+        "head_dim": 32,
+        "d_ff": 512,
+        "max_seq_len": 128,
+        "vocab_size": 1024,
+        "is_divisible": true,
+        "causal_mask_verified": true,
+        "weights_mb": 4.09,
+        "optimizer_mb": 8.18,
+        "estimated_train_ram_mb": 116.36
+      },
+      "5m": {
+        "profile": "5m",
+        "total_parameters": 5296128,
+        "non_embedding_parameters": 5001216,
+        "formula_matches_actual": true,
+        "d_model": 256,
+        "n_layers": 6,
+        "n_heads": 8,
+        "head_dim": 32,
+        "d_ff": 1024,
+        "max_seq_len": 128,
+        "vocab_size": 1024,
+        "is_divisible": true,
+        "causal_mask_verified": true,
+        "weights_mb": 20.2,
+        "optimizer_mb": 40.41,
+        "estimated_train_ram_mb": 180.81
+      },
+      "10m": {
+        "profile": "10m",
+        "total_parameters": 10560640,
+        "non_embedding_parameters": 10192000,
+        "formula_matches_actual": true,
+        "d_model": 320,
+        "n_layers": 8,
+        "n_heads": 8,
+        "head_dim": 40,
+        "d_ff": 1280,
+        "max_seq_len": 128,
+        "vocab_size": 1024,
+        "is_divisible": true,
+        "causal_mask_verified": true,
+        "weights_mb": 40.29,
+        "optimizer_mb": 80.57,
+        "estimated_train_ram_mb": 261.14
+      },
+      "20m": {
+        "profile": "20m",
+        "total_parameters": 20029440,
+        "non_embedding_parameters": 19439616,
+        "formula_matches_actual": true,
+        "d_model": 512,
+        "n_layers": 6,
+        "n_heads": 8,
+        "head_dim": 64,
+        "d_ff": 2048,
+        "max_seq_len": 128,
+        "vocab_size": 1024,
+        "is_divisible": true,
+        "causal_mask_verified": true,
+        "weights_mb": 76.41,
+        "optimizer_mb": 152.81,
+        "estimated_train_ram_mb": 405.62
+      }
+    }
+  },
+  "ready_to_train": true
+}

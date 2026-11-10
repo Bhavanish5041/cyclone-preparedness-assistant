@@ -1,0 +1,4676 @@
+{
+  "special_tokens": [
+    "<pad>",
+    "<unk>",
+    "<bos>",
+    "<eos>",
+    "<tool_call>",
+    "</tool_call>",
+    "<tool_result>",
+    "</tool_result>",
+    "<user>",
+    "</user>",
+    "<assistant>",
+    "</assistant>",
+    "<system>",
+    "</system>",
+    "<evidence>",
+    "</evidence>"
+  ],
+  "unk_token": "<unk>",
+  "pad_token": "<pad>",
+  "bos_token": "<bos>",
+  "eos_token": "<eos>",
+  "token_to_id": {
+    "<pad>": 0,
+    "<unk>": 1,
+    "<bos>": 2,
+    "<eos>": 3,
+    "<tool_call>": 4,
+    "</tool_call>": 5,
+    "<tool_result>": 6,
+    "</tool_result>": 7,
+    "<user>": 8,
+    "</user>": 9,
+    "<assistant>": 10,
+    "</assistant>": 11,
+    "<system>": 12,
+    "</system>": 13,
+    "<evidence>": 14,
+    "</evidence>": 15,
+    "\t": 16,
+    "\n": 17,
+    "\u000b": 18,
+    "\f": 19,
+    "\r": 20,
+    " ": 21,
+    "!": 22,
+    "\"": 23,
+    "#": 24,
+    "$": 25,
+    "%": 26,
+    "&": 27,
+    "'": 28,
+    "(": 29,
+    ")": 30,
+    "*": 31,
+    "+": 32,
+    ",": 33,
+    "-": 34,
+    ".": 35,
+    "/": 36,
+    "0": 37,
+    "1": 38,
+    "2": 39,
+    "3": 40,
+    "4": 41,
+    "5": 42,
+    "6": 43,
+    "7": 44,
+    "8": 45,
+    "9": 46,
+    ":": 47,
+    ";": 48,
+    "<": 49,
+    "=": 50,
+    ">": 51,
+    "?": 52,
+    "@": 53,
+    "A": 54,
+    "B": 55,
+    "C": 56,
+    "D": 57,
+    "E": 58,
+    "F": 59,
+    "G": 60,
+    "H": 61,
+    "I": 62,
+    "J": 63,
+    "K": 64,
+    "L": 65,
+    "M": 66,
+    "N": 67,
+    "O": 68,
+    "P": 69,
+    "Q": 70,
+    "R": 71,
+    "S": 72,
+    "T": 73,
+    "U": 74,
+    "V": 75,
+    "W": 76,
+    "X": 77,
+    "Y": 78,
+    "Z": 79,
+    "[": 80,
+    "\\": 81,
+    "]": 82,
+    "^": 83,
+    "_": 84,
+    "`": 85,
+    "a": 86,
+    "b": 87,
+    "c": 88,
+    "d": 89,
+    "e": 90,
+    "f": 91,
+    "g": 92,
+    "h": 93,
+    "i": 94,
+    "j": 95,
+    "k": 96,
+    "l": 97,
+    "m": 98,
+    "n": 99,
+    "o": 100,
+    "p": 101,
+    "q": 102,
+    "r": 103,
+    "s": 104,
+    "t": 105,
+    "u": 106,
+    "v": 107,
+    "w": 108,
+    "x": 109,
+    "y": 110,
+    "z": 111,
+    "{": 112,
+    "|": 113,
+    "}": 114,
+    "~": 115,
+    "°": 116,
+    "—": 117,
+    "er": 118,
+    "an": 119,
+    "st": 120,
+    "re": 121,
+    "in": 122,
+    "al": 123,
+    "it": 124,
+    "ss": 125,
+    "at": 126,
+    "en": 127,
+    "ist": 128,
+    "or": 129,
+    "on": 130,
+    "he": 131,
+    "ic": 132,
+    "ass": 133,
+    "us": 134,
+    "ar": 135,
+    "istan": 136,
+    "and": 137,
+    "user": 138,
+    "assistan": 139,
+    "assistant": 140,
+    "co": 141,
+    "ed": 142,
+    "to": 143,
+    "the": 144,
+    "un": 145,
+    "ion": 146,
+    "ity": 147,
+    "are": 148,
+    "ro": 149,
+    "ent": 150,
+    "es": 151,
+    "all": 152,
+    "ter": 153,
+    "ing": 154,
+    "ur": 155,
+    "ol": 156,
+    "ad": 157,
+    "id": 158,
+    "ess": 159,
+    "ac": 160,
+    "is": 161,
+    "mm": 162,
+    "tool": 163,
+    "il": 164,
+    "ev": 165,
+    "el": 166,
+    "ct": 167,
+    "ast": 168,
+    "ge": 169,
+    "ri": 170,
+    "th": 171,
+    "for": 172,
+    "up": 173,
+    "me": 174,
+    "ure": 175,
+    "pare": 176,
+    "enc": 177,
+    "unit": 178,
+    "ara": 179,
+    "ation": 180,
+    "if": 181,
+    "ann": 182,
+    "os": 183,
+    "comm": 184,
+    "as": 185,
+    "ric": 186,
+    "Kann": 187,
+    "Kannad": 188,
+    "Kannada": 189,
+    "tool_": 190,
+    "tool_c": 191,
+    "tool_call": 192,
+    "ig": 193,
+    "repare": 194,
+    "repared": 195,
+    "ul": 196,
+    "ness": 197,
+    "reparedness": 198,
+    "core": 199,
+    "ate": 200,
+    "of": 201,
+    "ain": 202,
+    "AH": 203,
+    "AHP": 204,
+    "pe": 205,
+    "rict": 206,
+    "cl": 207,
+    "ier": 208,
+    "om": 209,
+    "ical": 210,
+    "con": 211,
+    "iv": 212,
+    "ab": 213,
+    "od": 214,
+    "ex": 215,
+    "uct": 216,
+    "sh": 217,
+    "istrict": 218,
+    "ruct": 219,
+    "pl": 220,
+    "ust": 221,
+    "ence": 222,
+    "em": 223,
+    "ters": 224,
+    "pos": 225,
+    "units": 226,
+    "et": 227,
+    "ine": 228,
+    "ver": 229,
+    "unity": 230,
+    "igh": 231,
+    "ak": 232,
+    "rior": 233,
+    "score": 234,
+    "Ud": 235,
+    "Udup": 236,
+    "Udupi": 237,
+    "preparedness": 238,
+    "idence": 239,
+    "pro": 240,
+    "age": 241,
+    "Band": 242,
+    "evidence": 243,
+    "ow": 244,
+    "ies": 245,
+    "ut": 246,
+    "ina": 247,
+    "iz": 248,
+    "Dak": 249,
+    "Daksh": 250,
+    "Dakshina": 251,
+    "ive": 252,
+    "uster": 253,
+    "fr": 254,
+    "district": 255,
+    "hel": 256,
+    "riority": 257,
+    "ment": 258,
+    "meters": 259,
+    "ructure": 260,
+    "para": 261,
+    "oc": 262,
+    "ap": 263,
+    "ility": 264,
+    "frast": 265,
+    "frastructure": 266,
+    "parameters": 267,
+    "tr": 268,
+    "community": 269,
+    "ens": 270,
+    "ated": 271,
+    "ident": 272,
+    "AN": 273,
+    "qu": 274,
+    "tt": 275,
+    "ith": 276,
+    "inter": 277,
+    "Wh": 278,
+    "vent": 279,
+    "Co": 280,
+    "Utt": 281,
+    "Uttara": 282,
+    "ill": 283,
+    "identif": 284,
+    "ch": 285,
+    "astal": 286,
+    "vention": 287,
+    "AND": 288,
+    "In": 289,
+    "com": 290,
+    "ural": 291,
+    "with": 292,
+    "de": 293,
+    "shel": 294,
+    "infrastructure": 295,
+    "ability": 296,
+    "intervention": 297,
+    "identifier": 298,
+    "sur": 299,
+    "im": 300,
+    "posure": 301,
+    "res": 302,
+    "ycl": 303,
+    "we": 304,
+    "lo": 305,
+    "rit": 306,
+    "yclon": 307,
+    "ly": 308,
+    "ency": 309,
+    "gre": 310,
+    "che": 311,
+    "Cl": 312,
+    "ind": 313,
+    "per": 314,
+    "end": 315,
+    "km": 316,
+    "mar": 317,
+    "gr": 318,
+    "Cluster": 319,
+    "spe": 320,
+    "ations": 321,
+    "uln": 322,
+    "ulner": 323,
+    "alth": 324,
+    "its": 325,
+    "yn": 326,
+    "The": 327,
+    "le": 328,
+    "high": 329,
+    "ti": 330,
+    "uth": 331,
+    "ative": 332,
+    "ll": 333,
+    "ty": 334,
+    "BAND": 335,
+    "ON": 336,
+    "TE": 337,
+    "ce": 338,
+    "io": 339,
+    "BAND_": 340,
+    "TI": 341,
+    "ts": 342,
+    "coastal": 343,
+    "Ull": 344,
+    "Ullal": 345,
+    "25": 346,
+    "road": 347,
+    "Preparedness": 348,
+    "shelter": 349,
+    "ize": 350,
+    "rec": 351,
+    "aly": 352,
+    "60": 353,
+    "min": 354,
+    "ue": 355,
+    "exposure": 356,
+    "RI": 357,
+    "cess": 358,
+    "und": 359,
+    "althc": 360,
+    "althcare": 361,
+    "priority": 362,
+    "Tier": 363,
+    "ritical": 364,
+    "What": 365,
+    "commend": 366,
+    "illage": 367,
+    "orm": 368,
+    "ir": 369,
+    "fo": 370,
+    "av": 371,
+    "type": 372,
+    "Comm": 373,
+    "unities": 374,
+    "fro": 375,
+    "from": 376,
+    "assess": 377,
+    "assessment": 378,
+    "village": 379,
+    "bas": 380,
+    "mod": 381,
+    "ater": 382,
+    "yclone": 383,
+    "uthor": 384,
+    "econ": 385,
+    "recommend": 386,
+    "Tall": 387,
+    "Tallur": 388,
+    "by": 389,
+    "her": 390,
+    "ect": 391,
+    "mo": 392,
+    "AL": 393,
+    "stu": 394,
+    "ag": 395,
+    "Priority": 396,
+    "ok": 397,
+    "Score": 398,
+    "ase": 399,
+    "Ben": 400,
+    "rimar": 401,
+    "rimary": 402,
+    "ial": 403,
+    "elev": 404,
+    "uthorit": 405,
+    "ocio": 406,
+    "ocioecon": 407,
+    "ocioeconom": 408,
+    "ocioeconomic": 409,
+    "ulnerability": 410,
+    "ide": 411,
+    "plain": 412,
+    "chetype": 413,
+    "erate": 414,
+    "High": 415,
+    "struct": 416,
+    "District": 417,
+    "model": 418,
+    "gate": 419,
+    "over": 420,
+    "ans": 421,
+    "ized": 422,
+    "Ex": 423,
+    "erg": 424,
+    "rev": 425,
+    "Bengre": 426,
+    "Un": 427,
+    "eline": 428,
+    "score_": 429,
+    "ital": 430,
+    "thes": 431,
+    "stat": 432,
+    "recommendations": 433,
+    "osp": 434,
+    "11": 435,
+    "ack": 436,
+    "water": 437,
+    "ord": 438,
+    "comp": 439,
+    "ame": 440,
+    "ign": 441,
+    "uthoritative": 442,
+    "baseline": 443,
+    "access": 444,
+    "Mod": 445,
+    "Critical": 446,
+    "rogate": 447,
+    "healthcare": 448,
+    "fer": 449,
+    "ensus": 450,
+    "pre": 451,
+    "Ar": 452,
+    "am": 453,
+    "ific": 454,
+    "Low": 455,
+    "20": 456,
+    "minist": 457,
+    "hic": 458,
+    "ear": 459,
+    "ergency": 460,
+    "ynthes": 461,
+    "get": 462,
+    "alu": 463,
+    "surrogate": 464,
+    "cluster": 465,
+    "requ": 466,
+    "ban": 467,
+    "arn": 468,
+    "aster": 469,
+    "reven": 470,
+    "revenue": 471,
+    "be": 472,
+    "IN": 473,
+    "ational": 474,
+    "our": 475,
+    "look": 476,
+    "emergency": 477,
+    "omain": 478,
+    "cyclone": 479,
+    "ates": 480,
+    "Moderate": 481,
+    "communities": 482,
+    "vulnerability": 483,
+    "ot": 484,
+    "analy": 485,
+    "Census": 486,
+    "storm": 487,
+    "ally": 488,
+    "ren": 489,
+    "bet": 490,
+    "betwe": 491,
+    "between": 492,
+    "isaster": 493,
+    "Community": 494,
+    "Ed": 495,
+    "Edmo": 496,
+    "Edmoge": 497,
+    "ze": 498,
+    "EC": 499,
+    "ile": 500,
+    "oth": 501,
+    "ever": 502,
+    "ia": 503,
+    "61": 504,
+    "po": 505,
+    "perational": 506,
+    "posit": 507,
+    "10": 508,
+    "ospital": 509,
+    "cap": 510,
+    "ivity": 511,
+    "Me": 512,
+    "fic": 513,
+    "dat": 514,
+    "record": 515,
+    "vide": 516,
+    "TION": 517,
+    "acro": 518,
+    "fall": 519,
+    "line": 520,
+    "districts": 521,
+    "ca": 522,
+    "grap": 523,
+    "graphic": 524,
+    "ell": 525,
+    "24": 526,
+    "spec": 527,
+    "form": 528,
+    "mat": 529,
+    "authoritative": 530,
+    "40": 531,
+    "ement": 532,
+    "DE": 533,
+    "ATE": 534,
+    "Rural": 535,
+    "lookup": 536,
+    "name": 537,
+    "Synthes": 538,
+    "Synthesize": 539,
+    "Units": 540,
+    "og": 541,
+    "across": 542,
+    "thre": 543,
+    "ied": 544,
+    "class": 545,
+    "ery": 546,
+    "act": 547,
+    "ph": 548,
+    "ard": 549,
+    "uc": 550,
+    "stud": 551,
+    "study": 552,
+    "area": 553,
+    "por": 554,
+    "Mal": 555,
+    "Malpe": 556,
+    "su": 557,
+    "arning": 558,
+    "able": 559,
+    "ify": 560,
+    "ulti": 561,
+    "domain": 562,
+    "med": 563,
+    "time": 564,
+    "but": 565,
+    "ature": 566,
+    "ified": 567,
+    "St": 568,
+    "surge": 569,
+    "back": 570,
+    "ong": 571,
+    "Com": 572,
+    "using": 573,
+    "ographic": 574,
+    "operational": 575,
+    "Shel": 576,
+    "PC": 577,
+    "scores": 578,
+    "Primary": 579,
+    "hospital": 580,
+    "structural": 581,
+    "ucca": 582,
+    "Socioeconomic": 583,
+    "sist": 584,
+    "ire": 585,
+    "rid": 586,
+    "Re": 587,
+    "fe": 588,
+    "interventions": 589,
+    "lookup_": 590,
+    "lookup_community": 591,
+    "query": 592,
+    "archetype": 593,
+    "CY": 594,
+    "ian": 595,
+    "ea": 596,
+    "ification": 597,
+    "87": 598,
+    "Su": 599,
+    "ern": 600,
+    "ys": 601,
+    "port": 602,
+    "hi": 603,
+    "He": 604,
+    "trav": 605,
+    "travel": 606,
+    "compar": 607,
+    "sistency": 608,
+    "grad": 609,
+    "evalu": 610,
+    "static": 611,
+    "sup": 612,
+    "13": 613,
+    "ffer": 614,
+    "trans": 615,
+    "65": 616,
+    "ank": 617,
+    "provide": 618,
+    "CYC": 619,
+    "CYCL": 620,
+    "CYCLON": 621,
+    "CYCLONE": 622,
+    "fac": 623,
+    "int": 624,
+    "xim": 625,
+    "ynam": 626,
+    "ynamic": 627,
+    "indic": 628,
+    "ced": 629,
+    "evere": 630,
+    "dist": 631,
+    "speed": 632,
+    "phys": 633,
+    "physical": 634,
+    "est": 635,
+    "sp": 636,
+    "ministr": 637,
+    "ris": 638,
+    "Man": 639,
+    "ish": 640,
+    "ors": 641,
+    "man": 642,
+    "ior": 643,
+    "CRI": 644,
+    "capac": 645,
+    "capacity": 646,
+    "ho": 647,
+    "dr": 648,
+    "ions": 649,
+    "plat": 650,
+    "platform": 651,
+    "istic": 652,
+    "feature": 653,
+    "cont": 654,
+    "Ur": 655,
+    "Urban": 656,
+    "othill": 657,
+    "dem": 658,
+    "How": 659,
+    "To": 660,
+    "records": 661,
+    "ID": 662,
+    "Som": 663,
+    "Somes": 664,
+    "Somesh": 665,
+    "Someshw": 666,
+    "Someshwara": 667,
+    "analyze": 668,
+    "explain": 669,
+    "Summ": 670,
+    "Summar": 671,
+    "Summarize": 672,
+    "ip": 673,
+    "um": 674,
+    "aver": 675,
+    "Coastal": 676,
+    "36": 677,
+    "administr": 678,
+    "ck": 679,
+    "INTE": 680,
+    "INTEL": 681,
+    "15": 682,
+    "weat": 683,
+    "weather": 684,
+    "ating": 685,
+    "specify": 686,
+    "conn": 687,
+    "connect": 688,
+    "connectivity": 689,
+    "Exposure": 690,
+    "comparis": 691,
+    "comparison": 692,
+    "BAND_1": 693,
+    "BAND_1_": 694,
+    "BAND_1_CRI": 695,
+    "BAND_1_CRITI": 696,
+    "BAND_1_CRITIC": 697,
+    "BAND_1_CRITICAL": 698,
+    "ili": 699,
+    "elevated": 700,
+    "bo": 701,
+    "igned": 702,
+    "irect": 703,
+    "multi": 704,
+    "Mean": 705,
+    "dynamic": 706,
+    "clustered": 707,
+    "Ple": 708,
+    "Please": 709,
+    "AR": 710,
+    "cal": 711,
+    "yclonic": 712,
+    "Arab": 713,
+    "Arabian": 714,
+    "Sea": 715,
+    "De": 716,
+    "into": 717,
+    "tier": 718,
+    "ma": 719,
+    "primary": 720,
+    "flo": 721,
+    "flood": 722,
+    "along": 723,
+    "hat": 724,
+    "elt": 725,
+    "cover": 726,
+    "estu": 727,
+    "estuar": 728,
+    "253": 729,
+    "257": 730,
+    "ories": 731,
+    "gover": 732,
+    "govern": 733,
+    "elevation": 734,
+    "disaster": 735,
+    "ulnerable": 736,
+    "uation": 737,
+    "An": 738,
+    "Analy": 739,
+    "riter": 740,
+    "riteria": 741,
+    "medical": 742,
+    "Infrastructure": 743,
+    "shelters": 744,
+    "pucca": 745,
+    "distan": 746,
+    "au": 747,
+    "within": 748,
+    "socioeconomic": 749,
+    "posite": 750,
+    "requir": 751,
+    "requiring": 752,
+    "arget": 753,
+    "argeted": 754,
+    "main": 755,
+    "ance": 756,
+    "must": 757,
+    "orrid": 758,
+    "06": 759,
+    "data": 760,
+    "Explain": 761,
+    "plac": 762,
+    "aging": 763,
+    "PC11": 764,
+    "analyze_": 765,
+    "analyze_infrastructure": 766,
+    "analyze_infrastructure_": 767,
+    "analyze_infrastructure_and": 768,
+    "analyze_infrastructure_and_": 769,
+    "analyze_infrastructure_and_exposure": 770,
+    "explain_": 771,
+    "explain_preparedness": 772,
+    "explain_preparedness_": 773,
+    "explain_preparedness_assessment": 774,
+    "get_": 775,
+    "get_intervention": 776,
+    "get_intervention_": 777,
+    "get_intervention_recommendations": 778,
+    "compare": 779,
+    "ple": 780,
+    "please": 781,
+    "Archetype": 782,
+    "SEC": 783,
+    "SECTION": 784,
+    "op": 785,
+    "low": 786,
+    "Ind": 787,
+    "proxim": 788,
+    "thresh": 789,
+    "threshol": 790,
+    "threshold": 791,
+    "wind": 792,
+    "no": 793,
+    "ssion": 794,
+    "az": 795,
+    "azard": 796,
+    "administrative": 797,
+    "It": 798,
+    "ext": 799,
+    "li": 800,
+    "land": 801,
+    "se": 802,
+    "ork": 803,
+    "prior": 804,
+    "acuation": 805,
+    "gine": 806,
+    "ers": 807,
+    "housing": 808,
+    "CR": 809,
+    "edi": 810,
+    "ening": 811,
+    "ZE": 812,
+    "upgrad": 813,
+    "Res": 814,
+    "ilience": 815,
+    "prob": 816,
+    "mand": 817,
+    "vis": 818,
+    "ourced": 819,
+    "bu": 820,
+    "buffer": 821,
+    "defic": 822,
+    "rig": 823,
+    "04": 824,
+    "direct": 825,
+    "loc": 826,
+    "urren": 827,
+    "urrent": 828,
+    "transit": 829,
+    "eed": 830,
+    "Kod": 831,
+    "Kodim": 832,
+    "Kodimb": 833,
+    "Kodimbal": 834,
+    "Kodimbala": 835,
+    "44": 836,
+    "Sul": 837,
+    "Suly": 838,
+    "Sulya": 839,
+    "TP": 840,
+    "prof": 841,
+    "profile": 842,
+    "yo": 843,
+    "you": 844,
+    "char": 845,
+    "acter": 846,
+    "four": 847,
+    "severe": 848,
+    "olog": 849,
+    "ensity": 850,
+    "tiers": 851,
+    "Wind": 852,
+    "kno": 853,
+    "knots": 854,
+    "higher": 855,
+    "West": 856,
+    "Western": 857,
+    "Ghat": 858,
+    "Ghats": 859,
+    "marine": 860,
+    "ishing": 861,
+    "fore": 862,
+    "Disaster": 863,
+    "work": 864,
+    "der": 865,
+    "anc": 866,
+    "ef": 867,
+    "Warning": 868,
+    "urpos": 869,
+    "urpose": 870,
+    "Shelters": 871,
+    "ators": 872,
+    "ECI": 873,
+    "Pro": 874,
+    "MC": 875,
+    "sol": 876,
+    "ib": 877,
+    "Cent": 878,
+    "distance": 879,
+    "Con": 880,
+    "Consistency": 881,
+    "strict": 882,
+    "Inter": 883,
+    "Communities": 884,
+    "forc": 885,
+    "BAND_4": 886,
+    "BAND_4_": 887,
+    "BAND_4_A": 888,
+    "BAND_4_ADE": 889,
+    "BAND_4_ADEQ": 890,
+    "BAND_4_ADEQU": 891,
+    "BAND_4_ADEQUATE": 892,
+    "Well": 893,
+    "ail": 894,
+    "ML": 895,
+    "dic": 896,
+    "ote": 897,
+    "Belt": 898,
+    "engine": 899,
+    "met": 900,
+    "terminist": 901,
+    "terministic": 902,
+    "criteria": 903,
+    "construct": 904,
+    "earch": 905,
+    "6087": 906,
+    "608720": 907,
+    "Compare": 908,
+    "district_": 909,
+    "Ass": 910,
+    "Assigned": 911,
+    "Need": 912,
+    "evel": 913,
+    "character": 914,
+    "face": 915,
+    "gal": 916,
+    "ely": 917,
+    "tim": 918,
+    "times": 919,
+    "that": 920,
+    "urban": 921,
+    "minut": 922,
+    "31": 923,
+    "50": 924,
+    "Storm": 925,
+    "22": 926,
+    "yst": 927,
+    "ystem": 928,
+    "gen": 929,
+    "hazard": 930,
+    "wher": 931,
+    "where": 932,
+    "rain": 933,
+    "coast": 934,
+    "coastline": 935,
+    "Can": 936,
+    "369": 937,
+    "ult": 938,
+    "mon": 939,
+    "Ear": 940,
+    "Early": 941,
+    "Cyclone": 942,
+    "evacuation": 943,
+    "oring": 944,
+    "five": 945,
+    "Healthcare": 946,
+    "dur": 947,
+    "kut": 948,
+    "kutch": 949,
+    "kutcha": 950,
+    "roads": 951,
+    "ink": 952,
+    "early": 953,
+    "warning": 954,
+    "set": 955,
+    "pa": 956,
+    "pair": 957,
+    "weigh": 958,
+    "atio": 959,
+    "CI": 960,
+    "BAND_2": 961,
+    "BAND_2_": 962,
+    "BAND_2_S": 963,
+    "BAND_2_SP": 964,
+    "BAND_2_SPECI": 965,
+    "BAND_2_SPECIAL": 966,
+    "BAND_2_SPECIALI": 967,
+    "BAND_2_SPECIALIZE": 968,
+    "BAND_2_SPECIALIZED": 969,
+    "targeted": 970,
+    "maint": 971,
+    "Ade": 972,
+    "Adequ": 973,
+    "Adequate": 974,
+    "such": 975,
+    "fet": 976,
+    "undar": 977,
+    "predic": 978,
+    "classification": 979,
+    "Resourced": 980,
+    "Corrid": 981,
+    "Corridor": 982,
+    "130": 983,
+    "Rem": 984,
+    "Remote": 985,
+    "Fo": 986,
+    "Foothill": 987,
+    "Socioeconomically": 988,
+    "Vulnerable": 989,
+    "Interior": 990,
+    "161": 991,
+    "demographic": 992,
+    "249": 993,
+    "ore": 994,
+    "critical": 995,
+    "deterministic": 996,
+    "live": 997,
+    "ancy": 998,
+    "composite": 999,
+    "ant": 1000,
+    "do": 1001,
+    "does": 1002,
+    "resilience": 1003,
+    "Why": 1004,
+    "ne": 1005,
+    "construction": 1006,
+    "rank": 1007,
+    "current": 1008,
+    "ay": 1009,
+    "28": 1010,
+    "eor": 1011,
+    "eorolog": 1012,
+    "eorological": 1013,
+    "distin": 1014,
+    "distinct": 1015,
+    "system": 1016,
+    "river": 1017,
+    "rises": 1018,
+    "cent": 1019,
+    "estuarine": 1020,
+    "ensit": 1021,
+    "cial": 1022,
+    "fishing": 1023
+  },
+  "merges": [
+    [
+      "e",
+      "r"
+    ],
+    [
+      "a",
+      "n"
+    ],
+    [
+      "s",
+      "t"
+    ],
+    [
+      "r",
+      "e"
+    ],
+    [
+      "i",
+      "n"
+    ],
+    [
+      "a",
+      "l"
+    ],
+    [
+      "i",
+      "t"
+    ],
+    [
+      "s",
+      "s"
+    ],
+    [
+      "a",
+      "t"
+    ],
+    [
+      "e",
+      "n"
+    ],
+    [
+      "i",
+      "st"
+    ],
+    [
+      "o",
+      "r"
+    ],
+    [
+      "o",
+      "n"
+    ],
+    [
+      "h",
+      "e"
+    ],
+    [
+      "i",
+      "c"
+    ],
+    [
+      "a",
+      "ss"
+    ],
+    [
+      "u",
+      "s"
+    ],
+    [
+      "a",
+      "r"
+    ],
+    [
+      "ist",
+      "an"
+    ],
+    [
+      "an",
+      "d"
+    ],
+    [
+      "us",
+      "er"
+    ],
+    [
+      "ass",
+      "istan"
+    ],
+    [
+      "assistan",
+      "t"
+    ],
+    [
+      "c",
+      "o"
+    ],
+    [
+      "e",
+      "d"
+    ],
+    [
+      "t",
+      "o"
+    ],
+    [
+      "t",
+      "he"
+    ],
+    [
+      "u",
+      "n"
+    ],
+    [
+      "i",
+      "on"
+    ],
+    [
+      "it",
+      "y"
+    ],
+    [
+      "a",
+      "re"
+    ],
+    [
+      "r",
+      "o"
+    ],
+    [
+      "en",
+      "t"
+    ],
+    [
+      "e",
+      "s"
+    ],
+    [
+      "al",
+      "l"
+    ],
+    [
+      "t",
+      "er"
+    ],
+    [
+      "in",
+      "g"
+    ],
+    [
+      "u",
+      "r"
+    ],
+    [
+      "o",
+      "l"
+    ],
+    [
+      "a",
+      "d"
+    ],
+    [
+      "i",
+      "d"
+    ],
+    [
+      "e",
+      "ss"
+    ],
+    [
+      "a",
+      "c"
+    ],
+    [
+      "i",
+      "s"
+    ],
+    [
+      "m",
+      "m"
+    ],
+    [
+      "to",
+      "ol"
+    ],
+    [
+      "i",
+      "l"
+    ],
+    [
+      "e",
+      "v"
+    ],
+    [
+      "e",
+      "l"
+    ],
+    [
+      "c",
+      "t"
+    ],
+    [
+      "a",
+      "st"
+    ],
+    [
+      "g",
+      "e"
+    ],
+    [
+      "r",
+      "i"
+    ],
+    [
+      "t",
+      "h"
+    ],
+    [
+      "f",
+      "or"
+    ],
+    [
+      "u",
+      "p"
+    ],
+    [
+      "m",
+      "e"
+    ],
+    [
+      "u",
+      "re"
+    ],
+    [
+      "p",
+      "are"
+    ],
+    [
+      "en",
+      "c"
+    ],
+    [
+      "un",
+      "it"
+    ],
+    [
+      "ar",
+      "a"
+    ],
+    [
+      "at",
+      "ion"
+    ],
+    [
+      "i",
+      "f"
+    ],
+    [
+      "an",
+      "n"
+    ],
+    [
+      "o",
+      "s"
+    ],
+    [
+      "co",
+      "mm"
+    ],
+    [
+      "a",
+      "s"
+    ],
+    [
+      "r",
+      "ic"
+    ],
+    [
+      "K",
+      "ann"
+    ],
+    [
+      "Kann",
+      "ad"
+    ],
+    [
+      "Kannad",
+      "a"
+    ],
+    [
+      "tool",
+      "_"
+    ],
+    [
+      "tool_",
+      "c"
+    ],
+    [
+      "tool_c",
+      "all"
+    ],
+    [
+      "i",
+      "g"
+    ],
+    [
+      "re",
+      "pare"
+    ],
+    [
+      "repare",
+      "d"
+    ],
+    [
+      "u",
+      "l"
+    ],
+    [
+      "n",
+      "ess"
+    ],
+    [
+      "repared",
+      "ness"
+    ],
+    [
+      "co",
+      "re"
+    ],
+    [
+      "at",
+      "e"
+    ],
+    [
+      "o",
+      "f"
+    ],
+    [
+      "a",
+      "in"
+    ],
+    [
+      "A",
+      "H"
+    ],
+    [
+      "AH",
+      "P"
+    ],
+    [
+      "p",
+      "e"
+    ],
+    [
+      "ric",
+      "t"
+    ],
+    [
+      "c",
+      "l"
+    ],
+    [
+      "i",
+      "er"
+    ],
+    [
+      "o",
+      "m"
+    ],
+    [
+      "ic",
+      "al"
+    ],
+    [
+      "c",
+      "on"
+    ],
+    [
+      "i",
+      "v"
+    ],
+    [
+      "a",
+      "b"
+    ],
+    [
+      "o",
+      "d"
+    ],
+    [
+      "e",
+      "x"
+    ],
+    [
+      "u",
+      "ct"
+    ],
+    [
+      "s",
+      "h"
+    ],
+    [
+      "ist",
+      "rict"
+    ],
+    [
+      "r",
+      "uct"
+    ],
+    [
+      "p",
+      "l"
+    ],
+    [
+      "u",
+      "st"
+    ],
+    [
+      "enc",
+      "e"
+    ],
+    [
+      "e",
+      "m"
+    ],
+    [
+      "ter",
+      "s"
+    ],
+    [
+      "p",
+      "os"
+    ],
+    [
+      "unit",
+      "s"
+    ],
+    [
+      "e",
+      "t"
+    ],
+    [
+      "in",
+      "e"
+    ],
+    [
+      "v",
+      "er"
+    ],
+    [
+      "un",
+      "ity"
+    ],
+    [
+      "ig",
+      "h"
+    ],
+    [
+      "a",
+      "k"
+    ],
+    [
+      "ri",
+      "or"
+    ],
+    [
+      "s",
+      "core"
+    ],
+    [
+      "U",
+      "d"
+    ],
+    [
+      "Ud",
+      "up"
+    ],
+    [
+      "Udup",
+      "i"
+    ],
+    [
+      "p",
+      "reparedness"
+    ],
+    [
+      "id",
+      "ence"
+    ],
+    [
+      "p",
+      "ro"
+    ],
+    [
+      "a",
+      "ge"
+    ],
+    [
+      "B",
+      "and"
+    ],
+    [
+      "ev",
+      "idence"
+    ],
+    [
+      "o",
+      "w"
+    ],
+    [
+      "i",
+      "es"
+    ],
+    [
+      "u",
+      "t"
+    ],
+    [
+      "in",
+      "a"
+    ],
+    [
+      "i",
+      "z"
+    ],
+    [
+      "D",
+      "ak"
+    ],
+    [
+      "Dak",
+      "sh"
+    ],
+    [
+      "Daksh",
+      "ina"
+    ],
+    [
+      "iv",
+      "e"
+    ],
+    [
+      "ust",
+      "er"
+    ],
+    [
+      "f",
+      "r"
+    ],
+    [
+      "d",
+      "istrict"
+    ],
+    [
+      "he",
+      "l"
+    ],
+    [
+      "rior",
+      "ity"
+    ],
+    [
+      "m",
+      "ent"
+    ],
+    [
+      "me",
+      "ters"
+    ],
+    [
+      "ruct",
+      "ure"
+    ],
+    [
+      "p",
+      "ara"
+    ],
+    [
+      "o",
+      "c"
+    ],
+    [
+      "a",
+      "p"
+    ],
+    [
+      "il",
+      "ity"
+    ],
+    [
+      "fr",
+      "ast"
+    ],
+    [
+      "frast",
+      "ructure"
+    ],
+    [
+      "para",
+      "meters"
+    ],
+    [
+      "t",
+      "r"
+    ],
+    [
+      "comm",
+      "unity"
+    ],
+    [
+      "en",
+      "s"
+    ],
+    [
+      "at",
+      "ed"
+    ],
+    [
+      "id",
+      "ent"
+    ],
+    [
+      "A",
+      "N"
+    ],
+    [
+      "q",
+      "u"
+    ],
+    [
+      "t",
+      "t"
+    ],
+    [
+      "it",
+      "h"
+    ],
+    [
+      "in",
+      "ter"
+    ],
+    [
+      "W",
+      "h"
+    ],
+    [
+      "v",
+      "ent"
+    ],
+    [
+      "C",
+      "o"
+    ],
+    [
+      "U",
+      "tt"
+    ],
+    [
+      "Utt",
+      "ara"
+    ],
+    [
+      "il",
+      "l"
+    ],
+    [
+      "ident",
+      "if"
+    ],
+    [
+      "c",
+      "h"
+    ],
+    [
+      "ast",
+      "al"
+    ],
+    [
+      "vent",
+      "ion"
+    ],
+    [
+      "AN",
+      "D"
+    ],
+    [
+      "I",
+      "n"
+    ],
+    [
+      "co",
+      "m"
+    ],
+    [
+      "ur",
+      "al"
+    ],
+    [
+      "w",
+      "ith"
+    ],
+    [
+      "d",
+      "e"
+    ],
+    [
+      "s",
+      "hel"
+    ],
+    [
+      "in",
+      "frastructure"
+    ],
+    [
+      "ab",
+      "ility"
+    ],
+    [
+      "inter",
+      "vention"
+    ],
+    [
+      "identif",
+      "ier"
+    ],
+    [
+      "s",
+      "ur"
+    ],
+    [
+      "i",
+      "m"
+    ],
+    [
+      "pos",
+      "ure"
+    ],
+    [
+      "re",
+      "s"
+    ],
+    [
+      "y",
+      "cl"
+    ],
+    [
+      "w",
+      "e"
+    ],
+    [
+      "l",
+      "o"
+    ],
+    [
+      "r",
+      "it"
+    ],
+    [
+      "ycl",
+      "on"
+    ],
+    [
+      "l",
+      "y"
+    ],
+    [
+      "enc",
+      "y"
+    ],
+    [
+      "g",
+      "re"
+    ],
+    [
+      "c",
+      "he"
+    ],
+    [
+      "C",
+      "l"
+    ],
+    [
+      "in",
+      "d"
+    ],
+    [
+      "p",
+      "er"
+    ],
+    [
+      "en",
+      "d"
+    ],
+    [
+      "k",
+      "m"
+    ],
+    [
+      "m",
+      "ar"
+    ],
+    [
+      "g",
+      "r"
+    ],
+    [
+      "Cl",
+      "uster"
+    ],
+    [
+      "s",
+      "pe"
+    ],
+    [
+      "ation",
+      "s"
+    ],
+    [
+      "ul",
+      "n"
+    ],
+    [
+      "uln",
+      "er"
+    ],
+    [
+      "al",
+      "th"
+    ],
+    [
+      "it",
+      "s"
+    ],
+    [
+      "y",
+      "n"
+    ],
+    [
+      "T",
+      "he"
+    ],
+    [
+      "l",
+      "e"
+    ],
+    [
+      "h",
+      "igh"
+    ],
+    [
+      "t",
+      "i"
+    ],
+    [
+      "u",
+      "th"
+    ],
+    [
+      "at",
+      "ive"
+    ],
+    [
+      "l",
+      "l"
+    ],
+    [
+      "t",
+      "y"
+    ],
+    [
+      "B",
+      "AND"
+    ],
+    [
+      "O",
+      "N"
+    ],
+    [
+      "T",
+      "E"
+    ],
+    [
+      "c",
+      "e"
+    ],
+    [
+      "i",
+      "o"
+    ],
+    [
+      "BAND",
+      "_"
+    ],
+    [
+      "T",
+      "I"
+    ],
+    [
+      "t",
+      "s"
+    ],
+    [
+      "co",
+      "astal"
+    ],
+    [
+      "U",
+      "ll"
+    ],
+    [
+      "Ull",
+      "al"
+    ],
+    [
+      "2",
+      "5"
+    ],
+    [
+      "ro",
+      "ad"
+    ],
+    [
+      "P",
+      "reparedness"
+    ],
+    [
+      "shel",
+      "ter"
+    ],
+    [
+      "iz",
+      "e"
+    ],
+    [
+      "re",
+      "c"
+    ],
+    [
+      "al",
+      "y"
+    ],
+    [
+      "6",
+      "0"
+    ],
+    [
+      "m",
+      "in"
+    ],
+    [
+      "u",
+      "e"
+    ],
+    [
+      "ex",
+      "posure"
+    ],
+    [
+      "R",
+      "I"
+    ],
+    [
+      "c",
+      "ess"
+    ],
+    [
+      "un",
+      "d"
+    ],
+    [
+      "alth",
+      "c"
+    ],
+    [
+      "althc",
+      "are"
+    ],
+    [
+      "p",
+      "riority"
+    ],
+    [
+      "T",
+      "ier"
+    ],
+    [
+      "rit",
+      "ical"
+    ],
+    [
+      "Wh",
+      "at"
+    ],
+    [
+      "comm",
+      "end"
+    ],
+    [
+      "ill",
+      "age"
+    ],
+    [
+      "or",
+      "m"
+    ],
+    [
+      "i",
+      "r"
+    ],
+    [
+      "f",
+      "o"
+    ],
+    [
+      "a",
+      "v"
+    ],
+    [
+      "ty",
+      "pe"
+    ],
+    [
+      "Co",
+      "mm"
+    ],
+    [
+      "unit",
+      "ies"
+    ],
+    [
+      "f",
+      "ro"
+    ],
+    [
+      "fro",
+      "m"
+    ],
+    [
+      "ass",
+      "ess"
+    ],
+    [
+      "assess",
+      "ment"
+    ],
+    [
+      "v",
+      "illage"
+    ],
+    [
+      "b",
+      "as"
+    ],
+    [
+      "m",
+      "od"
+    ],
+    [
+      "at",
+      "er"
+    ],
+    [
+      "yclon",
+      "e"
+    ],
+    [
+      "uth",
+      "or"
+    ],
+    [
+      "e",
+      "con"
+    ],
+    [
+      "re",
+      "commend"
+    ],
+    [
+      "T",
+      "all"
+    ],
+    [
+      "Tall",
+      "ur"
+    ],
+    [
+      "b",
+      "y"
+    ],
+    [
+      "h",
+      "er"
+    ],
+    [
+      "e",
+      "ct"
+    ],
+    [
+      "m",
+      "o"
+    ],
+    [
+      "A",
+      "L"
+    ],
+    [
+      "st",
+      "u"
+    ],
+    [
+      "a",
+      "g"
+    ],
+    [
+      "P",
+      "riority"
+    ],
+    [
+      "o",
+      "k"
+    ],
+    [
+      "S",
+      "core"
+    ],
+    [
+      "as",
+      "e"
+    ],
+    [
+      "B",
+      "en"
+    ],
+    [
+      "ri",
+      "mar"
+    ],
+    [
+      "rimar",
+      "y"
+    ],
+    [
+      "i",
+      "al"
+    ],
+    [
+      "el",
+      "ev"
+    ],
+    [
+      "uthor",
+      "it"
+    ],
+    [
+      "oc",
+      "io"
+    ],
+    [
+      "ocio",
+      "econ"
+    ],
+    [
+      "ocioecon",
+      "om"
+    ],
+    [
+      "ocioeconom",
+      "ic"
+    ],
+    [
+      "ulner",
+      "ability"
+    ],
+    [
+      "id",
+      "e"
+    ],
+    [
+      "pl",
+      "ain"
+    ],
+    [
+      "che",
+      "type"
+    ],
+    [
+      "er",
+      "ate"
+    ],
+    [
+      "H",
+      "igh"
+    ],
+    [
+      "st",
+      "ruct"
+    ],
+    [
+      "D",
+      "istrict"
+    ],
+    [
+      "mod",
+      "el"
+    ],
+    [
+      "g",
+      "ate"
+    ],
+    [
+      "o",
+      "ver"
+    ],
+    [
+      "an",
+      "s"
+    ],
+    [
+      "iz",
+      "ed"
+    ],
+    [
+      "E",
+      "x"
+    ],
+    [
+      "er",
+      "g"
+    ],
+    [
+      "re",
+      "v"
+    ],
+    [
+      "Ben",
+      "gre"
+    ],
+    [
+      "U",
+      "n"
+    ],
+    [
+      "el",
+      "ine"
+    ],
+    [
+      "score",
+      "_"
+    ],
+    [
+      "it",
+      "al"
+    ],
+    [
+      "the",
+      "s"
+    ],
+    [
+      "st",
+      "at"
+    ],
+    [
+      "recommend",
+      "ations"
+    ],
+    [
+      "os",
+      "p"
+    ],
+    [
+      "1",
+      "1"
+    ],
+    [
+      "ac",
+      "k"
+    ],
+    [
+      "w",
+      "ater"
+    ],
+    [
+      "or",
+      "d"
+    ],
+    [
+      "com",
+      "p"
+    ],
+    [
+      "a",
+      "me"
+    ],
+    [
+      "ig",
+      "n"
+    ],
+    [
+      "uthorit",
+      "ative"
+    ],
+    [
+      "bas",
+      "eline"
+    ],
+    [
+      "ac",
+      "cess"
+    ],
+    [
+      "M",
+      "od"
+    ],
+    [
+      "C",
+      "ritical"
+    ],
+    [
+      "ro",
+      "gate"
+    ],
+    [
+      "he",
+      "althcare"
+    ],
+    [
+      "f",
+      "er"
+    ],
+    [
+      "ens",
+      "us"
+    ],
+    [
+      "p",
+      "re"
+    ],
+    [
+      "A",
+      "r"
+    ],
+    [
+      "a",
+      "m"
+    ],
+    [
+      "if",
+      "ic"
+    ],
+    [
+      "L",
+      "ow"
+    ],
+    [
+      "2",
+      "0"
+    ],
+    [
+      "min",
+      "ist"
+    ],
+    [
+      "h",
+      "ic"
+    ],
+    [
+      "e",
+      "ar"
+    ],
+    [
+      "erg",
+      "ency"
+    ],
+    [
+      "yn",
+      "thes"
+    ],
+    [
+      "ge",
+      "t"
+    ],
+    [
+      "al",
+      "u"
+    ],
+    [
+      "sur",
+      "rogate"
+    ],
+    [
+      "cl",
+      "uster"
+    ],
+    [
+      "re",
+      "qu"
+    ],
+    [
+      "b",
+      "an"
+    ],
+    [
+      "ar",
+      "n"
+    ],
+    [
+      "ast",
+      "er"
+    ],
+    [
+      "rev",
+      "en"
+    ],
+    [
+      "reven",
+      "ue"
+    ],
+    [
+      "b",
+      "e"
+    ],
+    [
+      "I",
+      "N"
+    ],
+    [
+      "ation",
+      "al"
+    ],
+    [
+      "o",
+      "ur"
+    ],
+    [
+      "lo",
+      "ok"
+    ],
+    [
+      "em",
+      "ergency"
+    ],
+    [
+      "om",
+      "ain"
+    ],
+    [
+      "c",
+      "yclone"
+    ],
+    [
+      "at",
+      "es"
+    ],
+    [
+      "Mod",
+      "erate"
+    ],
+    [
+      "comm",
+      "unities"
+    ],
+    [
+      "v",
+      "ulnerability"
+    ],
+    [
+      "o",
+      "t"
+    ],
+    [
+      "an",
+      "aly"
+    ],
+    [
+      "C",
+      "ensus"
+    ],
+    [
+      "st",
+      "orm"
+    ],
+    [
+      "all",
+      "y"
+    ],
+    [
+      "re",
+      "n"
+    ],
+    [
+      "b",
+      "et"
+    ],
+    [
+      "bet",
+      "we"
+    ],
+    [
+      "betwe",
+      "en"
+    ],
+    [
+      "is",
+      "aster"
+    ],
+    [
+      "Comm",
+      "unity"
+    ],
+    [
+      "E",
+      "d"
+    ],
+    [
+      "Ed",
+      "mo"
+    ],
+    [
+      "Edmo",
+      "ge"
+    ],
+    [
+      "z",
+      "e"
+    ],
+    [
+      "E",
+      "C"
+    ],
+    [
+      "il",
+      "e"
+    ],
+    [
+      "o",
+      "th"
+    ],
+    [
+      "ev",
+      "er"
+    ],
+    [
+      "i",
+      "a"
+    ],
+    [
+      "6",
+      "1"
+    ],
+    [
+      "p",
+      "o"
+    ],
+    [
+      "per",
+      "ational"
+    ],
+    [
+      "pos",
+      "it"
+    ],
+    [
+      "1",
+      "0"
+    ],
+    [
+      "osp",
+      "ital"
+    ],
+    [
+      "c",
+      "ap"
+    ],
+    [
+      "iv",
+      "ity"
+    ],
+    [
+      "M",
+      "e"
+    ],
+    [
+      "f",
+      "ic"
+    ],
+    [
+      "d",
+      "at"
+    ],
+    [
+      "rec",
+      "ord"
+    ],
+    [
+      "v",
+      "ide"
+    ],
+    [
+      "TI",
+      "ON"
+    ],
+    [
+      "ac",
+      "ro"
+    ],
+    [
+      "f",
+      "all"
+    ],
+    [
+      "l",
+      "ine"
+    ],
+    [
+      "district",
+      "s"
+    ],
+    [
+      "c",
+      "a"
+    ],
+    [
+      "gr",
+      "ap"
+    ],
+    [
+      "grap",
+      "hic"
+    ],
+    [
+      "el",
+      "l"
+    ],
+    [
+      "2",
+      "4"
+    ],
+    [
+      "spe",
+      "c"
+    ],
+    [
+      "for",
+      "m"
+    ],
+    [
+      "m",
+      "at"
+    ],
+    [
+      "a",
+      "uthoritative"
+    ],
+    [
+      "4",
+      "0"
+    ],
+    [
+      "em",
+      "ent"
+    ],
+    [
+      "D",
+      "E"
+    ],
+    [
+      "A",
+      "TE"
+    ],
+    [
+      "R",
+      "ural"
+    ],
+    [
+      "look",
+      "up"
+    ],
+    [
+      "n",
+      "ame"
+    ],
+    [
+      "S",
+      "ynthes"
+    ],
+    [
+      "Synthes",
+      "ize"
+    ],
+    [
+      "Un",
+      "its"
+    ],
+    [
+      "o",
+      "g"
+    ],
+    [
+      "acro",
+      "ss"
+    ],
+    [
+      "th",
+      "re"
+    ],
+    [
+      "i",
+      "ed"
+    ],
+    [
+      "cl",
+      "ass"
+    ],
+    [
+      "er",
+      "y"
+    ],
+    [
+      "ac",
+      "t"
+    ],
+    [
+      "p",
+      "h"
+    ],
+    [
+      "ar",
+      "d"
+    ],
+    [
+      "u",
+      "c"
+    ],
+    [
+      "stu",
+      "d"
+    ],
+    [
+      "stud",
+      "y"
+    ],
+    [
+      "are",
+      "a"
+    ],
+    [
+      "p",
+      "or"
+    ],
+    [
+      "M",
+      "al"
+    ],
+    [
+      "Mal",
+      "pe"
+    ],
+    [
+      "s",
+      "u"
+    ],
+    [
+      "arn",
+      "ing"
+    ],
+    [
+      "ab",
+      "le"
+    ],
+    [
+      "if",
+      "y"
+    ],
+    [
+      "ul",
+      "ti"
+    ],
+    [
+      "d",
+      "omain"
+    ],
+    [
+      "m",
+      "ed"
+    ],
+    [
+      "ti",
+      "me"
+    ],
+    [
+      "b",
+      "ut"
+    ],
+    [
+      "at",
+      "ure"
+    ],
+    [
+      "if",
+      "ied"
+    ],
+    [
+      "S",
+      "t"
+    ],
+    [
+      "sur",
+      "ge"
+    ],
+    [
+      "b",
+      "ack"
+    ],
+    [
+      "on",
+      "g"
+    ],
+    [
+      "C",
+      "om"
+    ],
+    [
+      "us",
+      "ing"
+    ],
+    [
+      "o",
+      "graphic"
+    ],
+    [
+      "o",
+      "perational"
+    ],
+    [
+      "S",
+      "hel"
+    ],
+    [
+      "P",
+      "C"
+    ],
+    [
+      "score",
+      "s"
+    ],
+    [
+      "P",
+      "rimary"
+    ],
+    [
+      "h",
+      "ospital"
+    ],
+    [
+      "struct",
+      "ural"
+    ],
+    [
+      "uc",
+      "ca"
+    ],
+    [
+      "S",
+      "ocioeconomic"
+    ],
+    [
+      "s",
+      "ist"
+    ],
+    [
+      "i",
+      "re"
+    ],
+    [
+      "r",
+      "id"
+    ],
+    [
+      "R",
+      "e"
+    ],
+    [
+      "f",
+      "e"
+    ],
+    [
+      "intervention",
+      "s"
+    ],
+    [
+      "lookup",
+      "_"
+    ],
+    [
+      "lookup_",
+      "community"
+    ],
+    [
+      "qu",
+      "ery"
+    ],
+    [
+      "ar",
+      "chetype"
+    ],
+    [
+      "C",
+      "Y"
+    ],
+    [
+      "i",
+      "an"
+    ],
+    [
+      "e",
+      "a"
+    ],
+    [
+      "ific",
+      "ation"
+    ],
+    [
+      "8",
+      "7"
+    ],
+    [
+      "S",
+      "u"
+    ],
+    [
+      "er",
+      "n"
+    ],
+    [
+      "y",
+      "s"
+    ],
+    [
+      "por",
+      "t"
+    ],
+    [
+      "h",
+      "i"
+    ],
+    [
+      "H",
+      "e"
+    ],
+    [
+      "tr",
+      "av"
+    ],
+    [
+      "trav",
+      "el"
+    ],
+    [
+      "comp",
+      "ar"
+    ],
+    [
+      "sist",
+      "ency"
+    ],
+    [
+      "gr",
+      "ad"
+    ],
+    [
+      "ev",
+      "alu"
+    ],
+    [
+      "stat",
+      "ic"
+    ],
+    [
+      "s",
+      "up"
+    ],
+    [
+      "1",
+      "3"
+    ],
+    [
+      "f",
+      "fer"
+    ],
+    [
+      "tr",
+      "ans"
+    ],
+    [
+      "6",
+      "5"
+    ],
+    [
+      "an",
+      "k"
+    ],
+    [
+      "pro",
+      "vide"
+    ],
+    [
+      "CY",
+      "C"
+    ],
+    [
+      "CYC",
+      "L"
+    ],
+    [
+      "CYCL",
+      "ON"
+    ],
+    [
+      "CYCLON",
+      "E"
+    ],
+    [
+      "f",
+      "ac"
+    ],
+    [
+      "in",
+      "t"
+    ],
+    [
+      "x",
+      "im"
+    ],
+    [
+      "yn",
+      "am"
+    ],
+    [
+      "ynam",
+      "ic"
+    ],
+    [
+      "ind",
+      "ic"
+    ],
+    [
+      "c",
+      "ed"
+    ],
+    [
+      "ever",
+      "e"
+    ],
+    [
+      "d",
+      "ist"
+    ],
+    [
+      "spe",
+      "ed"
+    ],
+    [
+      "ph",
+      "ys"
+    ],
+    [
+      "phys",
+      "ical"
+    ],
+    [
+      "e",
+      "st"
+    ],
+    [
+      "s",
+      "p"
+    ],
+    [
+      "minist",
+      "r"
+    ],
+    [
+      "r",
+      "is"
+    ],
+    [
+      "M",
+      "an"
+    ],
+    [
+      "is",
+      "h"
+    ],
+    [
+      "or",
+      "s"
+    ],
+    [
+      "m",
+      "an"
+    ],
+    [
+      "i",
+      "or"
+    ],
+    [
+      "C",
+      "RI"
+    ],
+    [
+      "cap",
+      "ac"
+    ],
+    [
+      "capac",
+      "ity"
+    ],
+    [
+      "h",
+      "o"
+    ],
+    [
+      "d",
+      "r"
+    ],
+    [
+      "ion",
+      "s"
+    ],
+    [
+      "pl",
+      "at"
+    ],
+    [
+      "plat",
+      "form"
+    ],
+    [
+      "ist",
+      "ic"
+    ],
+    [
+      "fe",
+      "ature"
+    ],
+    [
+      "con",
+      "t"
+    ],
+    [
+      "U",
+      "r"
+    ],
+    [
+      "Ur",
+      "ban"
+    ],
+    [
+      "oth",
+      "ill"
+    ],
+    [
+      "d",
+      "em"
+    ],
+    [
+      "H",
+      "ow"
+    ],
+    [
+      "T",
+      "o"
+    ],
+    [
+      "record",
+      "s"
+    ],
+    [
+      "I",
+      "D"
+    ],
+    [
+      "S",
+      "om"
+    ],
+    [
+      "Som",
+      "es"
+    ],
+    [
+      "Somes",
+      "h"
+    ],
+    [
+      "Somesh",
+      "w"
+    ],
+    [
+      "Someshw",
+      "ara"
+    ],
+    [
+      "analy",
+      "ze"
+    ],
+    [
+      "ex",
+      "plain"
+    ],
+    [
+      "Su",
+      "mm"
+    ],
+    [
+      "Summ",
+      "ar"
+    ],
+    [
+      "Summar",
+      "ize"
+    ],
+    [
+      "i",
+      "p"
+    ],
+    [
+      "u",
+      "m"
+    ],
+    [
+      "a",
+      "ver"
+    ],
+    [
+      "Co",
+      "astal"
+    ],
+    [
+      "3",
+      "6"
+    ],
+    [
+      "ad",
+      "ministr"
+    ],
+    [
+      "c",
+      "k"
+    ],
+    [
+      "IN",
+      "TE"
+    ],
+    [
+      "INTE",
+      "L"
+    ],
+    [
+      "1",
+      "5"
+    ],
+    [
+      "we",
+      "at"
+    ],
+    [
+      "weat",
+      "her"
+    ],
+    [
+      "at",
+      "ing"
+    ],
+    [
+      "spec",
+      "ify"
+    ],
+    [
+      "con",
+      "n"
+    ],
+    [
+      "conn",
+      "ect"
+    ],
+    [
+      "connect",
+      "ivity"
+    ],
+    [
+      "Ex",
+      "posure"
+    ],
+    [
+      "compar",
+      "is"
+    ],
+    [
+      "comparis",
+      "on"
+    ],
+    [
+      "BAND_",
+      "1"
+    ],
+    [
+      "BAND_1",
+      "_"
+    ],
+    [
+      "BAND_1_",
+      "CRI"
+    ],
+    [
+      "BAND_1_CRI",
+      "TI"
+    ],
+    [
+      "BAND_1_CRITI",
+      "C"
+    ],
+    [
+      "BAND_1_CRITIC",
+      "AL"
+    ],
+    [
+      "il",
+      "i"
+    ],
+    [
+      "elev",
+      "ated"
+    ],
+    [
+      "b",
+      "o"
+    ],
+    [
+      "ign",
+      "ed"
+    ],
+    [
+      "ire",
+      "ct"
+    ],
+    [
+      "m",
+      "ulti"
+    ],
+    [
+      "Me",
+      "an"
+    ],
+    [
+      "d",
+      "ynamic"
+    ],
+    [
+      "cluster",
+      "ed"
+    ],
+    [
+      "P",
+      "le"
+    ],
+    [
+      "Ple",
+      "ase"
+    ],
+    [
+      "A",
+      "R"
+    ],
+    [
+      "c",
+      "al"
+    ],
+    [
+      "yclon",
+      "ic"
+    ],
+    [
+      "Ar",
+      "ab"
+    ],
+    [
+      "Arab",
+      "ian"
+    ],
+    [
+      "S",
+      "ea"
+    ],
+    [
+      "D",
+      "e"
+    ],
+    [
+      "in",
+      "to"
+    ],
+    [
+      "t",
+      "ier"
+    ],
+    [
+      "m",
+      "a"
+    ],
+    [
+      "p",
+      "rimary"
+    ],
+    [
+      "f",
+      "lo"
+    ],
+    [
+      "flo",
+      "od"
+    ],
+    [
+      "al",
+      "ong"
+    ],
+    [
+      "h",
+      "at"
+    ],
+    [
+      "el",
+      "t"
+    ],
+    [
+      "co",
+      "ver"
+    ],
+    [
+      "e",
+      "stu"
+    ],
+    [
+      "estu",
+      "ar"
+    ],
+    [
+      "25",
+      "3"
+    ],
+    [
+      "25",
+      "7"
+    ],
+    [
+      "or",
+      "ies"
+    ],
+    [
+      "g",
+      "over"
+    ],
+    [
+      "gover",
+      "n"
+    ],
+    [
+      "elev",
+      "ation"
+    ],
+    [
+      "d",
+      "isaster"
+    ],
+    [
+      "ulner",
+      "able"
+    ],
+    [
+      "u",
+      "ation"
+    ],
+    [
+      "A",
+      "n"
+    ],
+    [
+      "An",
+      "aly"
+    ],
+    [
+      "rit",
+      "er"
+    ],
+    [
+      "riter",
+      "ia"
+    ],
+    [
+      "med",
+      "ical"
+    ],
+    [
+      "In",
+      "frastructure"
+    ],
+    [
+      "shel",
+      "ters"
+    ],
+    [
+      "p",
+      "ucca"
+    ],
+    [
+      "d",
+      "istan"
+    ],
+    [
+      "a",
+      "u"
+    ],
+    [
+      "with",
+      "in"
+    ],
+    [
+      "s",
+      "ocioeconomic"
+    ],
+    [
+      "posit",
+      "e"
+    ],
+    [
+      "requ",
+      "ir"
+    ],
+    [
+      "requir",
+      "ing"
+    ],
+    [
+      "ar",
+      "get"
+    ],
+    [
+      "arget",
+      "ed"
+    ],
+    [
+      "m",
+      "ain"
+    ],
+    [
+      "an",
+      "ce"
+    ],
+    [
+      "m",
+      "ust"
+    ],
+    [
+      "or",
+      "rid"
+    ],
+    [
+      "0",
+      "6"
+    ],
+    [
+      "dat",
+      "a"
+    ],
+    [
+      "Ex",
+      "plain"
+    ],
+    [
+      "pl",
+      "ac"
+    ],
+    [
+      "ag",
+      "ing"
+    ],
+    [
+      "PC",
+      "11"
+    ],
+    [
+      "analyze",
+      "_"
+    ],
+    [
+      "analyze_",
+      "infrastructure"
+    ],
+    [
+      "analyze_infrastructure",
+      "_"
+    ],
+    [
+      "analyze_infrastructure_",
+      "and"
+    ],
+    [
+      "analyze_infrastructure_and",
+      "_"
+    ],
+    [
+      "analyze_infrastructure_and_",
+      "exposure"
+    ],
+    [
+      "explain",
+      "_"
+    ],
+    [
+      "explain_",
+      "preparedness"
+    ],
+    [
+      "explain_preparedness",
+      "_"
+    ],
+    [
+      "explain_preparedness_",
+      "assessment"
+    ],
+    [
+      "get",
+      "_"
+    ],
+    [
+      "get_",
+      "intervention"
+    ],
+    [
+      "get_intervention",
+      "_"
+    ],
+    [
+      "get_intervention_",
+      "recommendations"
+    ],
+    [
+      "com",
+      "pare"
+    ],
+    [
+      "pl",
+      "e"
+    ],
+    [
+      "ple",
+      "ase"
+    ],
+    [
+      "Ar",
+      "chetype"
+    ],
+    [
+      "S",
+      "EC"
+    ],
+    [
+      "SEC",
+      "TION"
+    ],
+    [
+      "o",
+      "p"
+    ],
+    [
+      "l",
+      "ow"
+    ],
+    [
+      "In",
+      "d"
+    ],
+    [
+      "pro",
+      "xim"
+    ],
+    [
+      "thre",
+      "sh"
+    ],
+    [
+      "thresh",
+      "ol"
+    ],
+    [
+      "threshol",
+      "d"
+    ],
+    [
+      "w",
+      "ind"
+    ],
+    [
+      "n",
+      "o"
+    ],
+    [
+      "ss",
+      "ion"
+    ],
+    [
+      "a",
+      "z"
+    ],
+    [
+      "az",
+      "ard"
+    ],
+    [
+      "administr",
+      "ative"
+    ],
+    [
+      "I",
+      "t"
+    ],
+    [
+      "ex",
+      "t"
+    ],
+    [
+      "l",
+      "i"
+    ],
+    [
+      "l",
+      "and"
+    ],
+    [
+      "s",
+      "e"
+    ],
+    [
+      "or",
+      "k"
+    ],
+    [
+      "p",
+      "rior"
+    ],
+    [
+      "ac",
+      "uation"
+    ],
+    [
+      "g",
+      "ine"
+    ],
+    [
+      "er",
+      "s"
+    ],
+    [
+      "ho",
+      "using"
+    ],
+    [
+      "C",
+      "R"
+    ],
+    [
+      "ed",
+      "i"
+    ],
+    [
+      "en",
+      "ing"
+    ],
+    [
+      "Z",
+      "E"
+    ],
+    [
+      "up",
+      "grad"
+    ],
+    [
+      "R",
+      "es"
+    ],
+    [
+      "ili",
+      "ence"
+    ],
+    [
+      "pro",
+      "b"
+    ],
+    [
+      "m",
+      "and"
+    ],
+    [
+      "v",
+      "is"
+    ],
+    [
+      "our",
+      "ced"
+    ],
+    [
+      "b",
+      "u"
+    ],
+    [
+      "bu",
+      "ffer"
+    ],
+    [
+      "de",
+      "fic"
+    ],
+    [
+      "ri",
+      "g"
+    ],
+    [
+      "0",
+      "4"
+    ],
+    [
+      "d",
+      "irect"
+    ],
+    [
+      "l",
+      "oc"
+    ],
+    [
+      "ur",
+      "ren"
+    ],
+    [
+      "urren",
+      "t"
+    ],
+    [
+      "trans",
+      "it"
+    ],
+    [
+      "e",
+      "ed"
+    ],
+    [
+      "K",
+      "od"
+    ],
+    [
+      "Kod",
+      "im"
+    ],
+    [
+      "Kodim",
+      "b"
+    ],
+    [
+      "Kodimb",
+      "al"
+    ],
+    [
+      "Kodimbal",
+      "a"
+    ],
+    [
+      "4",
+      "4"
+    ],
+    [
+      "S",
+      "ul"
+    ],
+    [
+      "Sul",
+      "y"
+    ],
+    [
+      "Suly",
+      "a"
+    ],
+    [
+      "T",
+      "P"
+    ],
+    [
+      "pro",
+      "f"
+    ],
+    [
+      "prof",
+      "ile"
+    ],
+    [
+      "y",
+      "o"
+    ],
+    [
+      "yo",
+      "u"
+    ],
+    [
+      "ch",
+      "ar"
+    ],
+    [
+      "ac",
+      "ter"
+    ],
+    [
+      "fo",
+      "ur"
+    ],
+    [
+      "s",
+      "evere"
+    ],
+    [
+      "ol",
+      "og"
+    ],
+    [
+      "ens",
+      "ity"
+    ],
+    [
+      "tier",
+      "s"
+    ],
+    [
+      "W",
+      "ind"
+    ],
+    [
+      "k",
+      "no"
+    ],
+    [
+      "kno",
+      "ts"
+    ],
+    [
+      "high",
+      "er"
+    ],
+    [
+      "W",
+      "est"
+    ],
+    [
+      "West",
+      "ern"
+    ],
+    [
+      "G",
+      "hat"
+    ],
+    [
+      "Ghat",
+      "s"
+    ],
+    [
+      "mar",
+      "ine"
+    ],
+    [
+      "ish",
+      "ing"
+    ],
+    [
+      "fo",
+      "re"
+    ],
+    [
+      "D",
+      "isaster"
+    ],
+    [
+      "w",
+      "ork"
+    ],
+    [
+      "d",
+      "er"
+    ],
+    [
+      "an",
+      "c"
+    ],
+    [
+      "e",
+      "f"
+    ],
+    [
+      "W",
+      "arning"
+    ],
+    [
+      "ur",
+      "pos"
+    ],
+    [
+      "urpos",
+      "e"
+    ],
+    [
+      "Shel",
+      "ters"
+    ],
+    [
+      "at",
+      "ors"
+    ],
+    [
+      "EC",
+      "I"
+    ],
+    [
+      "P",
+      "ro"
+    ],
+    [
+      "M",
+      "C"
+    ],
+    [
+      "s",
+      "ol"
+    ],
+    [
+      "i",
+      "b"
+    ],
+    [
+      "C",
+      "ent"
+    ],
+    [
+      "distan",
+      "ce"
+    ],
+    [
+      "C",
+      "on"
+    ],
+    [
+      "Con",
+      "sistency"
+    ],
+    [
+      "st",
+      "rict"
+    ],
+    [
+      "In",
+      "ter"
+    ],
+    [
+      "Comm",
+      "unities"
+    ],
+    [
+      "for",
+      "c"
+    ],
+    [
+      "BAND_",
+      "4"
+    ],
+    [
+      "BAND_4",
+      "_"
+    ],
+    [
+      "BAND_4_",
+      "A"
+    ],
+    [
+      "BAND_4_A",
+      "DE"
+    ],
+    [
+      "BAND_4_ADE",
+      "Q"
+    ],
+    [
+      "BAND_4_ADEQ",
+      "U"
+    ],
+    [
+      "BAND_4_ADEQU",
+      "ATE"
+    ],
+    [
+      "W",
+      "ell"
+    ],
+    [
+      "a",
+      "il"
+    ],
+    [
+      "M",
+      "L"
+    ],
+    [
+      "d",
+      "ic"
+    ],
+    [
+      "ot",
+      "e"
+    ],
+    [
+      "B",
+      "elt"
+    ],
+    [
+      "en",
+      "gine"
+    ],
+    [
+      "me",
+      "t"
+    ],
+    [
+      "ter",
+      "minist"
+    ],
+    [
+      "terminist",
+      "ic"
+    ],
+    [
+      "c",
+      "riteria"
+    ],
+    [
+      "con",
+      "struct"
+    ],
+    [
+      "ear",
+      "ch"
+    ],
+    [
+      "60",
+      "87"
+    ],
+    [
+      "6087",
+      "20"
+    ],
+    [
+      "Com",
+      "pare"
+    ],
+    [
+      "district",
+      "_"
+    ],
+    [
+      "A",
+      "ss"
+    ],
+    [
+      "Ass",
+      "igned"
+    ],
+    [
+      "N",
+      "eed"
+    ],
+    [
+      "ev",
+      "el"
+    ],
+    [
+      "char",
+      "acter"
+    ],
+    [
+      "fac",
+      "e"
+    ],
+    [
+      "g",
+      "al"
+    ],
+    [
+      "el",
+      "y"
+    ],
+    [
+      "t",
+      "im"
+    ],
+    [
+      "tim",
+      "es"
+    ],
+    [
+      "th",
+      "at"
+    ],
+    [
+      "ur",
+      "ban"
+    ],
+    [
+      "min",
+      "ut"
+    ],
+    [
+      "3",
+      "1"
+    ],
+    [
+      "5",
+      "0"
+    ],
+    [
+      "St",
+      "orm"
+    ],
+    [
+      "2",
+      "2"
+    ],
+    [
+      "y",
+      "st"
+    ],
+    [
+      "yst",
+      "em"
+    ],
+    [
+      "g",
+      "en"
+    ],
+    [
+      "h",
+      "azard"
+    ],
+    [
+      "w",
+      "her"
+    ],
+    [
+      "wher",
+      "e"
+    ],
+    [
+      "r",
+      "ain"
+    ],
+    [
+      "co",
+      "ast"
+    ],
+    [
+      "coast",
+      "line"
+    ],
+    [
+      "C",
+      "an"
+    ],
+    [
+      "36",
+      "9"
+    ],
+    [
+      "ul",
+      "t"
+    ],
+    [
+      "m",
+      "on"
+    ],
+    [
+      "E",
+      "ar"
+    ],
+    [
+      "Ear",
+      "ly"
+    ],
+    [
+      "C",
+      "yclone"
+    ],
+    [
+      "ev",
+      "acuation"
+    ],
+    [
+      "or",
+      "ing"
+    ],
+    [
+      "f",
+      "ive"
+    ],
+    [
+      "He",
+      "althcare"
+    ],
+    [
+      "d",
+      "ur"
+    ],
+    [
+      "k",
+      "ut"
+    ],
+    [
+      "kut",
+      "ch"
+    ],
+    [
+      "kutch",
+      "a"
+    ],
+    [
+      "road",
+      "s"
+    ],
+    [
+      "in",
+      "k"
+    ],
+    [
+      "ear",
+      "ly"
+    ],
+    [
+      "w",
+      "arning"
+    ],
+    [
+      "s",
+      "et"
+    ],
+    [
+      "p",
+      "a"
+    ],
+    [
+      "pa",
+      "ir"
+    ],
+    [
+      "we",
+      "igh"
+    ],
+    [
+      "at",
+      "io"
+    ],
+    [
+      "C",
+      "I"
+    ],
+    [
+      "BAND_",
+      "2"
+    ],
+    [
+      "BAND_2",
+      "_"
+    ],
+    [
+      "BAND_2_",
+      "S"
+    ],
+    [
+      "BAND_2_S",
+      "P"
+    ],
+    [
+      "BAND_2_SP",
+      "ECI"
+    ],
+    [
+      "BAND_2_SPECI",
+      "AL"
+    ],
+    [
+      "BAND_2_SPECIAL",
+      "I"
+    ],
+    [
+      "BAND_2_SPECIALI",
+      "ZE"
+    ],
+    [
+      "BAND_2_SPECIALIZE",
+      "D"
+    ],
+    [
+      "t",
+      "argeted"
+    ],
+    [
+      "main",
+      "t"
+    ],
+    [
+      "A",
+      "de"
+    ],
+    [
+      "Ade",
+      "qu"
+    ],
+    [
+      "Adequ",
+      "ate"
+    ],
+    [
+      "su",
+      "ch"
+    ],
+    [
+      "f",
+      "et"
+    ],
+    [
+      "und",
+      "ar"
+    ],
+    [
+      "pre",
+      "dic"
+    ],
+    [
+      "class",
+      "ification"
+    ],
+    [
+      "Res",
+      "ourced"
+    ],
+    [
+      "C",
+      "orrid"
+    ],
+    [
+      "Corrid",
+      "or"
+    ],
+    [
+      "13",
+      "0"
+    ],
+    [
+      "R",
+      "em"
+    ],
+    [
+      "Rem",
+      "ote"
+    ],
+    [
+      "F",
+      "o"
+    ],
+    [
+      "Fo",
+      "othill"
+    ],
+    [
+      "Socioeconomic",
+      "ally"
+    ],
+    [
+      "V",
+      "ulnerable"
+    ],
+    [
+      "Inter",
+      "ior"
+    ],
+    [
+      "1",
+      "61"
+    ],
+    [
+      "dem",
+      "ographic"
+    ],
+    [
+      "24",
+      "9"
+    ],
+    [
+      "o",
+      "re"
+    ],
+    [
+      "c",
+      "ritical"
+    ],
+    [
+      "de",
+      "terministic"
+    ],
+    [
+      "l",
+      "ive"
+    ],
+    [
+      "anc",
+      "y"
+    ],
+    [
+      "com",
+      "posite"
+    ],
+    [
+      "an",
+      "t"
+    ],
+    [
+      "d",
+      "o"
+    ],
+    [
+      "do",
+      "es"
+    ],
+    [
+      "res",
+      "ilience"
+    ],
+    [
+      "Wh",
+      "y"
+    ],
+    [
+      "n",
+      "e"
+    ],
+    [
+      "construct",
+      "ion"
+    ],
+    [
+      "r",
+      "ank"
+    ],
+    [
+      "c",
+      "urrent"
+    ],
+    [
+      "a",
+      "y"
+    ],
+    [
+      "2",
+      "8"
+    ],
+    [
+      "e",
+      "or"
+    ],
+    [
+      "eor",
+      "olog"
+    ],
+    [
+      "eorolog",
+      "ical"
+    ],
+    [
+      "dist",
+      "in"
+    ],
+    [
+      "distin",
+      "ct"
+    ],
+    [
+      "s",
+      "ystem"
+    ],
+    [
+      "ri",
+      "ver"
+    ],
+    [
+      "ris",
+      "es"
+    ],
+    [
+      "c",
+      "ent"
+    ],
+    [
+      "estuar",
+      "ine"
+    ],
+    [
+      "ens",
+      "it"
+    ],
+    [
+      "c",
+      "ial"
+    ],
+    [
+      "f",
+      "ishing"
+    ]
+  ]
+}

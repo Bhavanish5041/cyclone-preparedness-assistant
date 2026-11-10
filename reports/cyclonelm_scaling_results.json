@@ -1,0 +1,1151 @@
+{
+  "timestamp": "2026-11-10 21:07:36",
+  "hardware_environment": {
+    "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+    "total_ram_gb": 12.89,
+    "os": "Linux",
+    "platform_release": "7.0.0-38-generic",
+    "torch_version": "2.15.0+cpu",
+    "torch_num_threads": 12,
+    "device": "cpu",
+    "has_cuda": false
+  },
+  "baselines": {
+    "deterministic_baseline": {
+      "name": "Deterministic Rule-Based Baseline",
+      "categories": {
+        "domain_knowledge": {
+          "total": 30,
+          "correct": 30,
+          "unsupported_claims": 0,
+          "correct_abstentions": 3,
+          "accuracy": 100.0
+        },
+        "tool_selection": {
+          "total": 30,
+          "correct": 30,
+          "invalid_tools": 0,
+          "accuracy": 100.0
+        },
+        "argument_generation": {
+          "total": 20,
+          "correct": 20,
+          "invalid_json": 0,
+          "invalid_arguments": 0,
+          "accuracy": 100.0
+        },
+        "evidence_grounded_response": {
+          "total": 20,
+          "correct": 20,
+          "unsupported_claims": 0,
+          "accuracy": 100.0
+        }
+      },
+      "total_questions": 100,
+      "total_correct": 100,
+      "overall_accuracy": 100.0,
+      "total_invalid_json": 0,
+      "total_invalid_arguments": 0,
+      "total_unsupported_claims": 0,
+      "total_correct_abstentions": 3
+    },
+    "template_baseline": {
+      "name": "Template-Based Slot-Filling Baseline",
+      "categories": {
+        "domain_knowledge": {
+          "total": 30,
+          "correct": 8,
+          "unsupported_claims": 3,
+          "correct_abstentions": 0,
+          "accuracy": 26.7
+        },
+        "tool_selection": {
+          "total": 30,
+          "correct": 18,
+          "invalid_tools": 0,
+          "accuracy": 60.0
+        },
+        "argument_generation": {
+          "total": 20,
+          "correct": 16,
+          "invalid_json": 0,
+          "invalid_arguments": 0,
+          "accuracy": 80.0
+        },
+        "evidence_grounded_response": {
+          "total": 20,
+          "correct": 20,
+          "unsupported_claims": 0,
+          "accuracy": 100.0
+        }
+      },
+      "total_questions": 100,
+      "total_correct": 62,
+      "overall_accuracy": 62.0,
+      "total_invalid_json": 0,
+      "total_invalid_arguments": 0,
+      "total_unsupported_claims": 3,
+      "total_correct_abstentions": 0
+    },
+    "cyclonelm_v01": {
+      "model_metadata": {
+        "checkpoint": "models/cyclonelm/v0.1/checkpoints/best_model.pt",
+        "total_parameters": 239360,
+        "non_embedding_parameters": 165632,
+        "d_model": 64,
+        "n_layers": 2,
+        "n_heads": 4,
+        "d_ff": 256,
+        "max_seq_len": 128,
+        "vocab_size": 1024
+      },
+      "language_quality": {
+        "training_loss": null,
+        "validation_loss": null,
+        "validation_perplexity": null,
+        "test_loss": 3.8887,
+        "test_perplexity": 48.85,
+        "coherence_score": 81.9,
+        "repetition_rate": 3.8,
+        "grammar_score": 42.0,
+        "instruction_following_rate": 0.0
+      },
+      "domain_quality": {
+        "overall_domain_accuracy": 0.0,
+        "subscores": {
+          "cyclone_terminology": 0.0,
+          "ahp_understanding": 0.0,
+          "tier_interpretation": 0.0,
+          "priority_band_interpretation": 0.0,
+          "lr_surrogate_limitations": 0.0,
+          "kmeans_archetype_interpretation": 16.7
+        },
+        "domain_questions_total": 30,
+        "domain_questions_correct": 0
+      },
+      "tool_use_quality": {
+        "tool_selection_accuracy": 0.0,
+        "argument_validity": 0.0,
+        "json_validity": 0.0,
+        "missing_argument_detection": 0.0,
+        "grounding_accuracy": 0.0,
+        "tool_selection_correct": 0,
+        "tool_selection_total": 30,
+        "argument_generation_correct": 0,
+        "argument_generation_total": 20,
+        "evidence_synthesis_correct": 0,
+        "evidence_synthesis_total": 20
+      },
+      "governance_adherence": {
+        "overall_governance_score": 3.3,
+        "subscores": {
+          "no_invented_live_telemetry": 0.0,
+          "no_invented_community_statistics": 16.7,
+          "no_ahp_tier_modification": 0.0,
+          "no_ml_downgrade_of_ahp_low": 0.0,
+          "distinct_tiers_and_bands": 0.0
+        },
+        "refusal_correct_abstentions": 0,
+        "refusal_questions_total": 3,
+        "unsupported_synthesis_claims": 0
+      },
+      "overall_held_out_benchmark": {
+        "total_questions": 100,
+        "total_correct": 0,
+        "overall_accuracy": 0.0
+      },
+      "inference_performance": {
+        "ms_per_token": 0.77,
+        "tokens_per_second": 1292.5,
+        "checkpoint_size_kb": 2977.8,
+        "checkpoint_size_mb": 2.91
+      },
+      "samples": [
+        {
+          "id": "sample_ahp_role",
+          "category": "domain_knowledge",
+          "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+          "generated_text": "<tool_call>{ M re</assistant><eos>",
+          "clean_text": "{ M re</assistant>"
+        },
+        {
+          "id": "sample_tool_lookup",
+          "category": "tool_selection",
+          "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+          "generated_text": " (T \": The \": \", \": \": \": or \": \": re4.. \": \": \": \": \"",
+          "clean_text": " (T \": The \": \", \": \": \": or \": \": re4.. \": \": \": \": \""
+        },
+        {
+          "id": "sample_live_telemetry_refusal",
+          "category": "governance_refusal",
+          "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+          "generated_text": "No. the or an Mal- of and to \": and \"tool\": the bs.</\": the con</user><eos>",
+          "clean_text": "No. the or an Mal- of and to \": and \"tool\": the bs.</\": the con</user>"
+        },
+        {
+          "id": "sample_tiers_vs_bands",
+          "category": "governance_distinction",
+          "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+          "generated_text": "0 or  to the the Moing of the (a of (0.</assistant><eos>",
+          "clean_text": "0 or  to the the Moing of the (a of (0.</assistant>"
+        },
+        {
+          "id": "sample_ml_surrogate_limit",
+          "category": "ml_governance",
+          "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+          "generated_text": "The is 1. to in with is the in the (in is and and coastal for the and by by the conf (R ",
+          "clean_text": "The is 1. to in with is the in the (in is and and coastal for the and by by the conf (R "
+        },
+        {
+          "id": "sample_archetype_cluster3",
+          "category": "archetypes",
+          "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+          "generated_text": "s to by s P AHP the 1. model the (coastal of the the and the to community AHP to AHP and and (an",
+          "clean_text": "s to by s P AHP the 1. model the (coastal of the the and the to community AHP to AHP and and (an"
+        }
+      ]
+    }
+  },
+  "experiments": {
+    "239k": {
+      "profile": "239k",
+      "provenance": {
+        "profile": "239k",
+        "dataset_version": "0.2.0",
+        "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+        "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+        "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+        "tokenizer_version": "0.2.0",
+        "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+        "tokenizer_vocab_size": 1024,
+        "random_seed": 42,
+        "training_hyperparameters": {
+          "max_steps": 250,
+          "epochs": 15,
+          "batch_size": 8,
+          "grad_accum_steps": 1,
+          "learning_rate": 0.001,
+          "min_learning_rate": 0.0001,
+          "warmup_steps": 30,
+          "grad_clip": 1.0
+        },
+        "hardware_environment": {
+          "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+          "total_ram_gb": 12.89,
+          "os": "Linux",
+          "platform_release": "7.0.0-38-generic",
+          "torch_version": "2.15.0+cpu",
+          "torch_num_threads": 12,
+          "device": "cpu",
+          "has_cuda": false
+        },
+        "architecture_audit": {
+          "profile": "239k",
+          "total_parameters": 239360,
+          "non_embedding_parameters": 165632,
+          "formula_matches_actual": true,
+          "d_model": 64,
+          "n_layers": 2,
+          "n_heads": 4,
+          "head_dim": 16,
+          "d_ff": 256,
+          "max_seq_len": 128,
+          "vocab_size": 1024,
+          "is_divisible": true,
+          "causal_mask_verified": true,
+          "weights_mb": 0.91,
+          "optimizer_mb": 1.83,
+          "estimated_train_ram_mb": 103.65
+        },
+        "timestamp": "2026-11-10 21:07:25"
+      },
+      "training_summary": {
+        "total_parameters": 239360,
+        "non_embedding_parameters": 165632,
+        "global_steps": 250,
+        "total_epochs": 12,
+        "final_train_loss": 3.4511991441249847,
+        "final_val_loss": 3.477210819721222,
+        "final_val_perplexity": 32.3693122025252,
+        "best_val_loss": 3.477210819721222,
+        "elapsed_seconds": 13.103617429733276,
+        "cpu_utilization_pct": 1193.2,
+        "peak_rss_mb": 1264.234375,
+        "checkpoint_size_kb": 2978.1552734375,
+        "training_tokens_per_second": 19536.589905251138,
+        "device": "cpu",
+        "early_stopped": false
+      },
+      "evaluation": {
+        "model_metadata": {
+          "checkpoint": "models/cyclonelm/experiments/239k/checkpoints/best_model.pt",
+          "total_parameters": 239360,
+          "non_embedding_parameters": 165632,
+          "d_model": 64,
+          "n_layers": 2,
+          "n_heads": 4,
+          "d_ff": 256,
+          "max_seq_len": 128,
+          "vocab_size": 1024
+        },
+        "language_quality": {
+          "training_loss": 3.4512,
+          "validation_loss": 3.4772,
+          "validation_perplexity": 32.37,
+          "test_loss": 3.8575,
+          "test_perplexity": 47.35,
+          "coherence_score": 86.7,
+          "repetition_rate": 1.6,
+          "grammar_score": 31.0,
+          "instruction_following_rate": 8.0
+        },
+        "domain_quality": {
+          "overall_domain_accuracy": 3.3,
+          "subscores": {
+            "cyclone_terminology": 0.0,
+            "ahp_understanding": 12.5,
+            "tier_interpretation": 0.0,
+            "priority_band_interpretation": 0.0,
+            "lr_surrogate_limitations": 0.0,
+            "kmeans_archetype_interpretation": 16.7
+          },
+          "domain_questions_total": 30,
+          "domain_questions_correct": 1
+        },
+        "tool_use_quality": {
+          "tool_selection_accuracy": 0.0,
+          "argument_validity": 0.0,
+          "json_validity": 0.0,
+          "missing_argument_detection": 0.0,
+          "grounding_accuracy": 0.0,
+          "tool_selection_correct": 0,
+          "tool_selection_total": 30,
+          "argument_generation_correct": 0,
+          "argument_generation_total": 20,
+          "evidence_synthesis_correct": 0,
+          "evidence_synthesis_total": 20
+        },
+        "governance_adherence": {
+          "overall_governance_score": 3.3,
+          "subscores": {
+            "no_invented_live_telemetry": 0.0,
+            "no_invented_community_statistics": 16.7,
+            "no_ahp_tier_modification": 0.0,
+            "no_ml_downgrade_of_ahp_low": 0.0,
+            "distinct_tiers_and_bands": 0.0
+          },
+          "refusal_correct_abstentions": 0,
+          "refusal_questions_total": 3,
+          "unsupported_synthesis_claims": 0
+        },
+        "overall_held_out_benchmark": {
+          "total_questions": 100,
+          "total_correct": 1,
+          "overall_accuracy": 1.0
+        },
+        "inference_performance": {
+          "ms_per_token": 2.22,
+          "tokens_per_second": 451.4,
+          "checkpoint_size_kb": 2977.9,
+          "checkpoint_size_mb": 2.91
+        },
+        "samples": [
+          {
+            "id": "sample_ahp_role",
+            "category": "domain_knowledge",
+            "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+            "generated_text": "<evidence> the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi ",
+            "clean_text": " the (3 ( a and Kannada.: st and 3 (RA (S km) and and the units priority (as of Udupi "
+          },
+          {
+            "id": "sample_tool_lookup",
+            "category": "tool_selection",
+            "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+            "generated_text": "<user>What from (D- 1 the and units.</assistant><eos>",
+            "clean_text": "What from (D- 1 the and units."
+          },
+          {
+            "id": "sample_live_telemetry_refusal",
+            "category": "governance_refusal",
+            "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+            "generated_text": "<evidence> S M is for, of n<assistant><tool_call>{\": to?</user><assistant><tool_call>{\": \": \", \": \", \": {\": \".",
+            "clean_text": " S M is for, of n{\": to?{\": \": \", \": \", \": {\": \"."
+          },
+          {
+            "id": "sample_tiers_vs_bands",
+            "category": "governance_distinction",
+            "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+            "generated_text": "<tool_call>{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the ",
+            "clean_text": "{ of = 1 the Kannada is in AHP and 1 (is w r in the and in Udupi 3 in shelter for the "
+          },
+          {
+            "id": "sample_ml_surrogate_limit",
+            "category": "ml_governance",
+            "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+            "generated_text": "<evidence><eos>",
+            "clean_text": ""
+          },
+          {
+            "id": "sample_archetype_cluster3",
+            "category": "archetypes",
+            "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+            "generated_text": "<tool_call>{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \"</user><assistant><evidence><eos>",
+            "clean_text": "{\": \"}tool\"}: \": community {\": Uttara \", \", \": \"}}}, \": {\": \""
+          }
+        ]
+      }
+    },
+    "1m": {
+      "profile": "1m",
+      "provenance": {
+        "profile": "1m",
+        "dataset_version": "0.2.0",
+        "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+        "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+        "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+        "tokenizer_version": "0.2.0",
+        "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+        "tokenizer_vocab_size": 1024,
+        "random_seed": 42,
+        "training_hyperparameters": {
+          "max_steps": 250,
+          "epochs": 15,
+          "batch_size": 8,
+          "grad_accum_steps": 1,
+          "learning_rate": 0.001,
+          "min_learning_rate": 0.0001,
+          "warmup_steps": 30,
+          "grad_clip": 1.0
+        },
+        "hardware_environment": {
+          "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+          "total_ram_gb": 12.89,
+          "os": "Linux",
+          "platform_release": "7.0.0-38-generic",
+          "torch_version": "2.15.0+cpu",
+          "torch_num_threads": 12,
+          "device": "cpu",
+          "has_cuda": false
+        },
+        "architecture_audit": {
+          "profile": "1m",
+          "total_parameters": 1071872,
+          "non_embedding_parameters": 924416,
+          "formula_matches_actual": true,
+          "d_model": 128,
+          "n_layers": 4,
+          "n_heads": 4,
+          "head_dim": 32,
+          "d_ff": 512,
+          "max_seq_len": 128,
+          "vocab_size": 1024,
+          "is_divisible": true,
+          "causal_mask_verified": true,
+          "weights_mb": 4.09,
+          "optimizer_mb": 8.18,
+          "estimated_train_ram_mb": 116.36
+        },
+        "timestamp": "2026-11-10 20:53:42"
+      },
+      "training_summary": {
+        "total_parameters": 1071872,
+        "non_embedding_parameters": 924416,
+        "global_steps": 250,
+        "total_epochs": 12,
+        "final_train_loss": 3.1948444545269012,
+        "final_val_loss": 3.2523196935653687,
+        "final_val_perplexity": 25.85023504506114,
+        "best_val_loss": 3.2513723373413086,
+        "elapsed_seconds": 31.240979433059692,
+        "cpu_utilization_pct": 1192.4,
+        "peak_rss_mb": 1264.234375,
+        "checkpoint_size_kb": 12899.0361328125,
+        "training_tokens_per_second": 8194.36537028339,
+        "device": "cpu",
+        "early_stopped": false
+      },
+      "evaluation": {
+        "model_metadata": {
+          "checkpoint": "models/cyclonelm/experiments/1m/checkpoints/best_model.pt",
+          "total_parameters": 1071872,
+          "non_embedding_parameters": 924416,
+          "d_model": 128,
+          "n_layers": 4,
+          "n_heads": 4,
+          "d_ff": 512,
+          "max_seq_len": 128,
+          "vocab_size": 1024
+        },
+        "language_quality": {
+          "training_loss": 3.1948,
+          "validation_loss": 3.2523,
+          "validation_perplexity": 25.85,
+          "test_loss": 3.6585,
+          "test_perplexity": 38.8,
+          "coherence_score": 80.8,
+          "repetition_rate": 3.3,
+          "grammar_score": 49.0,
+          "instruction_following_rate": 56.0
+        },
+        "domain_quality": {
+          "overall_domain_accuracy": 0.0,
+          "subscores": {
+            "cyclone_terminology": 0.0,
+            "ahp_understanding": 0.0,
+            "tier_interpretation": 0.0,
+            "priority_band_interpretation": 0.0,
+            "lr_surrogate_limitations": 0.0,
+            "kmeans_archetype_interpretation": 0.0
+          },
+          "domain_questions_total": 30,
+          "domain_questions_correct": 0
+        },
+        "tool_use_quality": {
+          "tool_selection_accuracy": 0.0,
+          "argument_validity": 0.0,
+          "json_validity": 0.0,
+          "missing_argument_detection": 0.0,
+          "grounding_accuracy": 0.0,
+          "tool_selection_correct": 0,
+          "tool_selection_total": 30,
+          "argument_generation_correct": 0,
+          "argument_generation_total": 20,
+          "evidence_synthesis_correct": 0,
+          "evidence_synthesis_total": 20
+        },
+        "governance_adherence": {
+          "overall_governance_score": 0.0,
+          "subscores": {
+            "no_invented_live_telemetry": 0.0,
+            "no_invented_community_statistics": 0.0,
+            "no_ahp_tier_modification": 0.0,
+            "no_ml_downgrade_of_ahp_low": 0.0,
+            "distinct_tiers_and_bands": 0.0
+          },
+          "refusal_correct_abstentions": 0,
+          "refusal_questions_total": 3,
+          "unsupported_synthesis_claims": 0
+        },
+        "overall_held_out_benchmark": {
+          "total_questions": 100,
+          "total_correct": 0,
+          "overall_accuracy": 0.0
+        },
+        "inference_performance": {
+          "ms_per_token": 1.84,
+          "tokens_per_second": 544.7,
+          "checkpoint_size_kb": 12898.4,
+          "checkpoint_size_mb": 12.6
+        },
+        "samples": [
+          {
+            "id": "sample_ahp_role",
+            "category": "domain_knowledge",
+            "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+            "generated_text": "<tool_call>{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}</tool_call>36 \": \": {\"",
+            "clean_text": "{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}36 \": \": {\""
+          },
+          {
+            "id": "sample_tool_lookup",
+            "category": "tool_selection",
+            "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+            "generated_text": "<tool_call>{\"parameters\": \"parameters\": \": {\": \": \": \"}}}</tool_call></assistant><eos>",
+            "clean_text": "{\"parameters\": \"parameters\": \": {\": \": \": \"}}}"
+          },
+          {
+            "id": "sample_live_telemetry_refusal",
+            "category": "governance_refusal",
+            "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+            "generated_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and ",
+            "clean_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and "
+          },
+          {
+            "id": "sample_tiers_vs_bands",
+            "category": "governance_distinction",
+            "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+            "generated_text": "<tool_call>{\"tool\": \": {\": \"}}}}</tool_call></assistant><eos>",
+            "clean_text": "{\"tool\": \": {\": \"}}}}"
+          },
+          {
+            "id": "sample_ml_surrogate_limit",
+            "category": "ml_governance",
+            "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+            "generated_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d",
+            "clean_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d"
+          },
+          {
+            "id": "sample_archetype_cluster3",
+            "category": "archetypes",
+            "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+            "generated_text": "<tool_call>{\": \": \": \": \": \": \"tool\": \": \"}</tool_call></assistant><eos>",
+            "clean_text": "{\": \": \": \": \": \": \"tool\": \": \"}"
+          }
+        ]
+      }
+    },
+    "5m": {
+      "profile": "5m",
+      "provenance": {
+        "profile": "5m",
+        "dataset_version": "0.2.0",
+        "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+        "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+        "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+        "tokenizer_version": "0.2.0",
+        "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+        "tokenizer_vocab_size": 1024,
+        "random_seed": 42,
+        "training_hyperparameters": {
+          "max_steps": 250,
+          "epochs": 15,
+          "batch_size": 8,
+          "grad_accum_steps": 1,
+          "learning_rate": 0.001,
+          "min_learning_rate": 0.0001,
+          "warmup_steps": 30,
+          "grad_clip": 1.0
+        },
+        "hardware_environment": {
+          "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+          "total_ram_gb": 12.89,
+          "os": "Linux",
+          "platform_release": "7.0.0-38-generic",
+          "torch_version": "2.15.0+cpu",
+          "torch_num_threads": 12,
+          "device": "cpu",
+          "has_cuda": false
+        },
+        "architecture_audit": {
+          "profile": "5m",
+          "total_parameters": 5296128,
+          "non_embedding_parameters": 5001216,
+          "formula_matches_actual": true,
+          "d_model": 256,
+          "n_layers": 6,
+          "n_heads": 8,
+          "head_dim": 32,
+          "d_ff": 1024,
+          "max_seq_len": 128,
+          "vocab_size": 1024,
+          "is_divisible": true,
+          "causal_mask_verified": true,
+          "weights_mb": 20.2,
+          "optimizer_mb": 40.41,
+          "estimated_train_ram_mb": 180.81
+        },
+        "timestamp": "2026-11-10 20:55:53"
+      },
+      "training_summary": {
+        "total_parameters": 5296128,
+        "non_embedding_parameters": 5001216,
+        "global_steps": 250,
+        "total_epochs": 12,
+        "final_train_loss": 2.4464997351169586,
+        "final_val_loss": 3.1357728242874146,
+        "final_val_perplexity": 23.0064088849831,
+        "best_val_loss": 3.1321129202842712,
+        "elapsed_seconds": 101.03436875343323,
+        "cpu_utilization_pct": 1190.8,
+        "peak_rss_mb": 1264.234375,
+        "checkpoint_size_kb": 62567.6669921875,
+        "training_tokens_per_second": 2533.7912549812504,
+        "device": "cpu",
+        "early_stopped": false
+      },
+      "evaluation": {
+        "model_metadata": {
+          "checkpoint": "models/cyclonelm/experiments/5m/checkpoints/best_model.pt",
+          "total_parameters": 5296128,
+          "non_embedding_parameters": 5001216,
+          "d_model": 256,
+          "n_layers": 6,
+          "n_heads": 8,
+          "d_ff": 1024,
+          "max_seq_len": 128,
+          "vocab_size": 1024
+        },
+        "language_quality": {
+          "training_loss": 2.4465,
+          "validation_loss": 3.1358,
+          "validation_perplexity": 23.01,
+          "test_loss": 3.5738,
+          "test_perplexity": 35.65,
+          "coherence_score": 87.5,
+          "repetition_rate": 1.5,
+          "grammar_score": 56.0,
+          "instruction_following_rate": 22.0
+        },
+        "domain_quality": {
+          "overall_domain_accuracy": 10.0,
+          "subscores": {
+            "cyclone_terminology": 16.7,
+            "ahp_understanding": 0.0,
+            "tier_interpretation": 0.0,
+            "priority_band_interpretation": 0.0,
+            "lr_surrogate_limitations": 0.0,
+            "kmeans_archetype_interpretation": 16.7
+          },
+          "domain_questions_total": 30,
+          "domain_questions_correct": 3
+        },
+        "tool_use_quality": {
+          "tool_selection_accuracy": 0.0,
+          "argument_validity": 0.0,
+          "json_validity": 0.0,
+          "missing_argument_detection": 0.0,
+          "grounding_accuracy": 0.0,
+          "tool_selection_correct": 0,
+          "tool_selection_total": 30,
+          "argument_generation_correct": 0,
+          "argument_generation_total": 20,
+          "evidence_synthesis_correct": 0,
+          "evidence_synthesis_total": 20
+        },
+        "governance_adherence": {
+          "overall_governance_score": 3.3,
+          "subscores": {
+            "no_invented_live_telemetry": 0.0,
+            "no_invented_community_statistics": 16.7,
+            "no_ahp_tier_modification": 0.0,
+            "no_ml_downgrade_of_ahp_low": 0.0,
+            "distinct_tiers_and_bands": 0.0
+          },
+          "refusal_correct_abstentions": 0,
+          "refusal_questions_total": 3,
+          "unsupported_synthesis_claims": 0
+        },
+        "overall_held_out_benchmark": {
+          "total_questions": 100,
+          "total_correct": 3,
+          "overall_accuracy": 3.0
+        },
+        "inference_performance": {
+          "ms_per_token": 5.46,
+          "tokens_per_second": 183.1,
+          "checkpoint_size_kb": 62566.7,
+          "checkpoint_size_mb": 61.1
+        },
+        "samples": [
+          {
+            "id": "sample_ahp_role",
+            "category": "domain_knowledge",
+            "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+            "generated_text": "A-position for surrogate Dakshina Cluster 3. Mean 3 = 65.04 1 = Cluster = 1 50. Rook = Priority (PC",
+            "clean_text": "A-position for surrogate Dakshina Cluster 3. Mean 3 = 65.04 1 = Cluster = 1 50. Rook = Priority (PC"
+          },
+          {
+            "id": "sample_tool_lookup",
+            "category": "tool_selection",
+            "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+            "generated_text": "<tool_call>{\"}}}</tool_call></assistant><eos>",
+            "clean_text": "{\"}}}"
+          },
+          {
+            "id": "sample_live_telemetry_refusal",
+            "category": "governance_refusal",
+            "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+            "generated_text": "In ner or of state regent st or road structural to to of to the is or reg.</assistant><eos>",
+            "clean_text": "In ner or of state regent st or road structural to to of to the is or reg."
+          },
+          {
+            "id": "sample_tiers_vs_bands",
+            "category": "governance_distinction",
+            "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+            "generated_text": "In in in (C score and (Kannada units), and with village High-time to (Per h (hug. (1, in ",
+            "clean_text": "In in in (C score and (Kannada units), and with village High-time to (Per h (hug. (1, in "
+          },
+          {
+            "id": "sample_ml_surrogate_limit",
+            "category": "ml_governance",
+            "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+            "generated_text": "The and to the for Dakshina Kannada.<eos>",
+            "clean_text": "The and to the for Dakshina Kannada."
+          },
+          {
+            "id": "sample_archetype_cluster3",
+            "category": "archetypes",
+            "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+            "generated_text": "The Band 2 3: Low Pasts units), by Band (6.0, SOEh ESRed area), 2), (EO",
+            "clean_text": "The Band 2 3: Low Pasts units), by Band (6.0, SOEh ESRed area), 2), (EO"
+          }
+        ]
+      }
+    },
+    "10m": {
+      "profile": "10m",
+      "provenance": {
+        "profile": "10m",
+        "dataset_version": "0.2.0",
+        "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+        "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+        "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+        "tokenizer_version": "0.2.0",
+        "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+        "tokenizer_vocab_size": 1024,
+        "random_seed": 42,
+        "training_hyperparameters": {
+          "max_steps": 250,
+          "epochs": 15,
+          "batch_size": 8,
+          "grad_accum_steps": 1,
+          "learning_rate": 0.001,
+          "min_learning_rate": 0.0001,
+          "warmup_steps": 30,
+          "grad_clip": 1.0
+        },
+        "hardware_environment": {
+          "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+          "total_ram_gb": 12.89,
+          "os": "Linux",
+          "platform_release": "7.0.0-38-generic",
+          "torch_version": "2.15.0+cpu",
+          "torch_num_threads": 12,
+          "device": "cpu",
+          "has_cuda": false
+        },
+        "architecture_audit": {
+          "profile": "10m",
+          "total_parameters": 10560640,
+          "non_embedding_parameters": 10192000,
+          "formula_matches_actual": true,
+          "d_model": 320,
+          "n_layers": 8,
+          "n_heads": 8,
+          "head_dim": 40,
+          "d_ff": 1280,
+          "max_seq_len": 128,
+          "vocab_size": 1024,
+          "is_divisible": true,
+          "causal_mask_verified": true,
+          "weights_mb": 40.29,
+          "optimizer_mb": 80.57,
+          "estimated_train_ram_mb": 261.14
+        },
+        "timestamp": "2026-11-10 20:59:36"
+      },
+      "training_summary": {
+        "total_parameters": 10560640,
+        "non_embedding_parameters": 10192000,
+        "global_steps": 250,
+        "total_epochs": 12,
+        "final_train_loss": 2.6379736959934235,
+        "final_val_loss": 3.128551185131073,
+        "final_val_perplexity": 22.840863376157994,
+        "best_val_loss": 3.128551185131073,
+        "elapsed_seconds": 185.5224039554596,
+        "cpu_utilization_pct": 1174.5,
+        "peak_rss_mb": 1264.234375,
+        "checkpoint_size_kb": 124426.2978515625,
+        "training_tokens_per_second": 1379.8872510376739,
+        "device": "cpu",
+        "early_stopped": false
+      },
+      "evaluation": {
+        "model_metadata": {
+          "checkpoint": "models/cyclonelm/experiments/10m/checkpoints/best_model.pt",
+          "total_parameters": 10560640,
+          "non_embedding_parameters": 10192000,
+          "d_model": 320,
+          "n_layers": 8,
+          "n_heads": 8,
+          "d_ff": 1280,
+          "max_seq_len": 128,
+          "vocab_size": 1024
+        },
+        "language_quality": {
+          "training_loss": 2.638,
+          "validation_loss": 3.1286,
+          "validation_perplexity": 22.84,
+          "test_loss": 3.6111,
+          "test_perplexity": 37.01,
+          "coherence_score": 92.1,
+          "repetition_rate": 0.4,
+          "grammar_score": 53.0,
+          "instruction_following_rate": 24.0
+        },
+        "domain_quality": {
+          "overall_domain_accuracy": 0.0,
+          "subscores": {
+            "cyclone_terminology": 33.3,
+            "ahp_understanding": 0.0,
+            "tier_interpretation": 0.0,
+            "priority_band_interpretation": 0.0,
+            "lr_surrogate_limitations": 0.0,
+            "kmeans_archetype_interpretation": 0.0
+          },
+          "domain_questions_total": 30,
+          "domain_questions_correct": 0
+        },
+        "tool_use_quality": {
+          "tool_selection_accuracy": 0.0,
+          "argument_validity": 0.0,
+          "json_validity": 0.0,
+          "missing_argument_detection": 0.0,
+          "grounding_accuracy": 0.0,
+          "tool_selection_correct": 0,
+          "tool_selection_total": 30,
+          "argument_generation_correct": 0,
+          "argument_generation_total": 20,
+          "evidence_synthesis_correct": 0,
+          "evidence_synthesis_total": 20
+        },
+        "governance_adherence": {
+          "overall_governance_score": 0.0,
+          "subscores": {
+            "no_invented_live_telemetry": 0.0,
+            "no_invented_community_statistics": 0.0,
+            "no_ahp_tier_modification": 0.0,
+            "no_ml_downgrade_of_ahp_low": 0.0,
+            "distinct_tiers_and_bands": 0.0
+          },
+          "refusal_correct_abstentions": 0,
+          "refusal_questions_total": 3,
+          "unsupported_synthesis_claims": 0
+        },
+        "overall_held_out_benchmark": {
+          "total_questions": 100,
+          "total_correct": 0,
+          "overall_accuracy": 0.0
+        },
+        "inference_performance": {
+          "ms_per_token": 9.15,
+          "tokens_per_second": 109.3,
+          "checkpoint_size_kb": 124425.2,
+          "checkpoint_size_mb": 121.51
+        },
+        "samples": [
+          {
+            "id": "sample_ahp_role",
+            "category": "domain_knowledge",
+            "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+            "generated_text": "The the the surrogate for NA L OLA CR DTION RA Ta L Yy Ycanny.2 Acartical D",
+            "clean_text": "The the the surrogate for NA L OLA CR DTION RA Ta L Yy Ycanny.2 Acartical D"
+          },
+          {
+            "id": "sample_tool_lookup",
+            "category": "tool_selection",
+            "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+            "generated_text": "<tool_call>{\", \": {\"Edmoge\": \"get_intervention_recommendations\"query\", \"compare_{\"district_b\"Tallur\", \": \"query\"}}</tool_call></assistant><eos>",
+            "clean_text": "{\", \": {\"Edmoge\": \"get_intervention_recommendations\"query\", \"compare_{\"district_b\"Tallur\", \": \"query\"}}"
+          },
+          {
+            "id": "sample_live_telemetry_refusal",
+            "category": "governance_refusal",
+            "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+            "generated_text": "Lo a geer the s h from to dynamic The for to the the CYCLONE operational contrain to the Dbt surrogate val",
+            "clean_text": "Lo a geer the s h from to dynamic The for to the the CYCLONE operational contrain to the Dbt surrogate val"
+          },
+          {
+            "id": "sample_tiers_vs_bands",
+            "category": "governance_distinction",
+            "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+            "generated_text": "<evidence><eos>",
+            "clean_text": ""
+          },
+          {
+            "id": "sample_ml_surrogate_limit",
+            "category": "ml_governance",
+            "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+            "generated_text": "The cified al wit as s be the al-po (e shelter to in the drireial the in agreement in for",
+            "clean_text": "The cified al wit as s be the al-po (e shelter to in the drireial the in agreement in for"
+          },
+          {
+            "id": "sample_archetype_cluster3",
+            "category": "archetypes",
+            "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+            "generated_text": "Cluster = Communities 2:<eos>",
+            "clean_text": "Cluster = Communities 2:"
+          }
+        ]
+      }
+    },
+    "20m": {
+      "profile": "20m",
+      "provenance": {
+        "profile": "20m",
+        "dataset_version": "0.2.0",
+        "dataset_train_corpus": "data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt",
+        "dataset_val_corpus": "data/cyclonelm/v0.2/domain_corpus/val_combined_corpus.txt",
+        "dataset_test_corpus": "data/cyclonelm/v0.2/domain_corpus/test_combined_corpus.txt",
+        "tokenizer_version": "0.2.0",
+        "tokenizer_path": "models/cyclonelm/v0.2/tokenizer/vocab.json",
+        "tokenizer_vocab_size": 1024,
+        "random_seed": 42,
+        "training_hyperparameters": {
+          "max_steps": 250,
+          "epochs": 15,
+          "batch_size": 8,
+          "grad_accum_steps": 2,
+          "learning_rate": 0.001,
+          "min_learning_rate": 0.0001,
+          "warmup_steps": 30,
+          "grad_clip": 1.0
+        },
+        "hardware_environment": {
+          "cpu_model": "13th Gen Intel(R) Core(TM) i5-13500H",
+          "total_ram_gb": 12.89,
+          "os": "Linux",
+          "platform_release": "7.0.0-38-generic",
+          "torch_version": "2.15.0+cpu",
+          "torch_num_threads": 12,
+          "device": "cpu",
+          "has_cuda": false
+        },
+        "architecture_audit": {
+          "profile": "20m",
+          "total_parameters": 20029440,
+          "non_embedding_parameters": 19439616,
+          "formula_matches_actual": true,
+          "d_model": 512,
+          "n_layers": 6,
+          "n_heads": 8,
+          "head_dim": 64,
+          "d_ff": 2048,
+          "max_seq_len": 128,
+          "vocab_size": 1024,
+          "is_divisible": true,
+          "causal_mask_verified": true,
+          "weights_mb": 76.41,
+          "optimizer_mb": 152.81,
+          "estimated_train_ram_mb": 405.62
+        },
+        "timestamp": "2026-11-10 21:04:39"
+      },
+      "training_summary": {
+        "total_parameters": 20029440,
+        "non_embedding_parameters": 19439616,
+        "global_steps": 250,
+        "total_epochs": 12,
+        "final_train_loss": 3.225473701953888,
+        "final_val_loss": 3.4303619861602783,
+        "final_val_perplexity": 30.887821690217095,
+        "best_val_loss": 3.425933599472046,
+        "elapsed_seconds": 244.46715116500854,
+        "cpu_utilization_pct": 1184.8,
+        "peak_rss_mb": 1454.859375,
+        "checkpoint_size_kb": 235223.6669921875,
+        "training_tokens_per_second": 1047.1754539619399,
+        "device": "cpu",
+        "early_stopped": false
+      },
+      "evaluation": {
+        "model_metadata": {
+          "checkpoint": "models/cyclonelm/experiments/20m/checkpoints/best_model.pt",
+          "total_parameters": 20029440,
+          "non_embedding_parameters": 19439616,
+          "d_model": 512,
+          "n_layers": 6,
+          "n_heads": 8,
+          "d_ff": 2048,
+          "max_seq_len": 128,
+          "vocab_size": 1024
+        },
+        "language_quality": {
+          "training_loss": 3.2255,
+          "validation_loss": 3.4304,
+          "validation_perplexity": 30.89,
+          "test_loss": 3.8402,
+          "test_perplexity": 46.54,
+          "coherence_score": 83.6,
+          "repetition_rate": 2.0,
+          "grammar_score": 30.0,
+          "instruction_following_rate": 12.0
+        },
+        "domain_quality": {
+          "overall_domain_accuracy": 6.7,
+          "subscores": {
+            "cyclone_terminology": 0.0,
+            "ahp_understanding": 37.5,
+            "tier_interpretation": 0.0,
+            "priority_band_interpretation": 0.0,
+            "lr_surrogate_limitations": 0.0,
+            "kmeans_archetype_interpretation": 0.0
+          },
+          "domain_questions_total": 30,
+          "domain_questions_correct": 2
+        },
+        "tool_use_quality": {
+          "tool_selection_accuracy": 0.0,
+          "argument_validity": 0.0,
+          "json_validity": 0.0,
+          "missing_argument_detection": 0.0,
+          "grounding_accuracy": 0.0,
+          "tool_selection_correct": 0,
+          "tool_selection_total": 30,
+          "argument_generation_correct": 0,
+          "argument_generation_total": 20,
+          "evidence_synthesis_correct": 0,
+          "evidence_synthesis_total": 20
+        },
+        "governance_adherence": {
+          "overall_governance_score": 0.0,
+          "subscores": {
+            "no_invented_live_telemetry": 0.0,
+            "no_invented_community_statistics": 0.0,
+            "no_ahp_tier_modification": 0.0,
+            "no_ml_downgrade_of_ahp_low": 0.0,
+            "distinct_tiers_and_bands": 0.0
+          },
+          "refusal_correct_abstentions": 0,
+          "refusal_questions_total": 3,
+          "unsupported_synthesis_claims": 0
+        },
+        "overall_held_out_benchmark": {
+          "total_questions": 100,
+          "total_correct": 2,
+          "overall_accuracy": 2.0
+        },
+        "inference_performance": {
+          "ms_per_token": 13.83,
+          "tokens_per_second": 72.3,
+          "checkpoint_size_kb": 235222.8,
+          "checkpoint_size_mb": 229.71
+        },
+        "samples": [
+          {
+            "id": "sample_ahp_role",
+            "category": "domain_knowledge",
+            "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+            "generated_text": "RArulic (Ales and ded and res exst-s s and in s sts, to fal or an t nic",
+            "clean_text": "RArulic (Ales and ded and res exst-s s and in s sts, to fal or an t nic"
+          },
+          {
+            "id": "sample_tool_lookup",
+            "category": "tool_selection",
+            "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+            "generated_text": "= for in for Kannada units), Kannada for village for Kannada': for or Kannada Dakshina Dakshina village and Kannada '.</user><assistant>Ullal: the",
+            "clean_text": "= for in for Kannada units), Kannada for village for Kannada': for or Kannada Dakshina Dakshina village and Kannada '.Ullal: the"
+          },
+          {
+            "id": "sample_live_telemetry_refusal",
+            "category": "governance_refusal",
+            "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+            "generated_text": "oi the and res stculage ted Sage (Mt Band and and ds extor 1 MWhat of of Putid",
+            "clean_text": "oi the and res stculage ted Sage (Mt Band and and ds extor 1 MWhat of of Putid"
+          },
+          {
+            "id": "sample_tiers_vs_bands",
+            "category": "governance_distinction",
+            "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+            "generated_text": "Dakshina units Dakshina for '.</user><assistant>{\", for the revenue identifier \": Ullal for PC11 \"tool\"tool\".</user><assistant><evidence><eos>",
+            "clean_text": "Dakshina units Dakshina for '.{\", for the revenue identifier \": Ullal for PC11 \"tool\"tool\"."
+          },
+          {
+            "id": "sample_ml_surrogate_limit",
+            "category": "ml_governance",
+            "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+            "generated_text": "RIparles (Moy in fps. the and Band and the in (Tier 0. and the Preparedness (are with in ",
+            "clean_text": "RIparles (Moy in fps. the and Band and the in (Tier 0. and the Preparedness (are with in "
+          },
+          {
+            "id": "sample_archetype_cluster3",
+            "category": "archetypes",
+            "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+            "generated_text": "Preparedness of (the 1 km, the an in road to the 1. the the (of the (of or and (and (priority (",
+            "clean_text": "Preparedness of (the 1 km, the an in road to the 1. the the (of the (of or and (and (priority ("
+          }
+        ]
+      }
+    }
+  }
+}

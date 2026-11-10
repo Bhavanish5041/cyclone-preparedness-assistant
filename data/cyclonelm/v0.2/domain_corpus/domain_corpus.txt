@@ -1,0 +1,89 @@
+=== SECTION 1: CYCLONE METEOROLOGY AND ARABIAN SEA DYNAMICS ===
+Tropical cyclones are warm-core, non-frontal synoptic-scale cyclonic storms developing over tropical oceans characterized by low atmospheric surface pressure, organized cyclonic circulation, and intense convective precipitation. In the North Indian Ocean (NIO) basin, cyclogenesis occurs across the Bay of Bengal and the Arabian Sea. While the Bay of Bengal historically accounts for approximately four times more storms than the Arabian Sea, recent thermodynamic trends indicate that rapid sea-surface warming (sea surface temperatures frequently exceeding the 28.0°C threshold) and enhanced atmospheric mid-tropospheric moisture have amplified both the frequency and rapid intensification of severe storms in the Arabian Sea.
+The India Meteorological Department (IMD) classifies cyclonic disturbances into eight distinct intensity tiers based on maximum sustained surface wind speeds (3-minute average):
+1. Low Pressure Area: Wind speed less than 31 km/h (< 17 knots).
+2. Depression: Wind speed between 31 and 49 km/h (17 to 27 knots).
+3. Deep Depression: Wind speed between 50 and 61 km/h (28 to 33 knots).
+4. Cyclonic Storm: Wind speed between 62 and 87 km/h (34 to 47 knots).
+5. Severe Cyclonic Storm (SCS): Wind speed between 88 and 117 km/h (48 to 63 knots).
+6. Very Severe Cyclonic Storm (VSCS): Wind speed between 118 and 166 km/h (64 to 89 knots).
+7. Extremely Severe Cyclonic Storm (ESCS): Wind speed between 167 and 221 km/h (90 to 119 knots).
+8. Super Cyclonic Storm (SuCS): Wind speed of 222 km/h or higher (>= 120 knots).
+Severe cyclonic systems impacting western India generate primary physical hazards including astronomical storm surge amplification, high-energy wave erosion, intense coastal backwater flooding where rivers meet the sea, and torrential rainfall inducing flash floods along the Western Ghats escarpment.
+
+=== SECTION 2: COASTAL KARNATAKA GEOGRAPHY AND HAZARDS ===
+The Coastal Karnataka maritime belt spans approximately 320 kilometers along the eastern Arabian Sea coastline, bordered eastward by the Western Ghats. Administratively, the study area covers 1,879 distinct revenue units across three districts:
+1. Dakshina Kannada (South Canara): Comprises 369 administrative units. It encompasses the highly populated and industrialized Mangaluru urban center and major estuarine confluences (Netravati and Gurupura rivers). High coastal population densities, extensive commercial port installations, and sand-spit habitations like Bengre and Ullal face extreme marine exposure.
+2. Udupi: Comprises 253 administrative units. Characterized by low barrier beaches, estuarine rivers (Swarna, Sita, Gangolli), active fishing harbors (Malpe), and agricultural-aquacultural lowlands subject to saline intrusion and storm-surge flooding.
+3. Uttara Kannada (North Canara): Comprises 1,257 administrative units. Features a distinctive, rugged rias-type coastline with rocky promontories, mangrove-lined estuaries (Sharavathi, Aghanashini, Gangavali, Kali), and dense Western Ghats forested slopes extending almost to the water's edge, causing rural geographic isolation.
+Across all three districts, physical exposure is governed by low elevation (< 5.0 meters above MSL), proximity to tidal estuaries, and high seasonal rainfall exceeding 3,500 mm annually.
+
+=== SECTION 3: DISASTER RISK REDUCTION AND EARLY WARNING SYSTEMS ===
+Disaster Risk Reduction (DRR) in the CYCLONE INTEL framework aligns with Priority 1 (Understanding disaster risk) and Priority 4 (Enhancing disaster preparedness for effective response) of the Sendai Framework for Disaster Risk Reduction 2015-2030.
+Early Warning Systems (EWS) operationalized by the IMD follow a structured four-stage alert protocol:
+- Stage 1: Pre-Cyclone Watch (issued 72 hours prior to cyclonic development, alerting national and state maritime administrations).
+- Stage 2: Cyclone Alert / Yellow Message (issued 48 hours prior to expected adverse weather, designating vulnerable coastal stretches).
+- Stage 3: Cyclone Warning / Orange Message (issued 24 hours prior to landfall, specifying expected points of landfall and tidal surges).
+- Stage 4: Post-Landfall Outlook / Red Message (issued 12 hours prior to landfall, projecting interior track wind damage and flash flooding).
+Multi-Purpose Cyclone Shelters (MPCS) serve as primary community evacuation nodes. Engineered to withstand wind loads up to 250 km/h, they are positioned above historical 100-year flood lines and equipped with independent rainwater harvesting, emergency backup generators, and dual-gender sanitation facilities.
+
+=== SECTION 4: MULTI-CRITERIA DECISION ANALYSIS AND AHP METHODOLOGY ===
+The Analytic Hierarchy Process (AHP), formulated by Thomas L. Saaty, is a mathematically grounded Multi-Criteria Decision Analysis (MCDA) framework. In CYCLONE INTEL, AHP provides the sole authoritative baseline for community preparedness scoring across five core domain scores:
+1. Healthcare Accessibility (`score_medical`): Proximity and travel time to functional Primary Health Centers (PHCs), Community Health Centers (CHCs), and emergency hospitals.
+2. Evacuation & Shelter Infrastructure (`score_shelters`): Density, capacity, accessibility, and structural condition of designated cyclone shelters.
+3. Infrastructure Sensitivity (`score_infrastructure`): Local housing durability (pucca versus kutcha structures), road connectivity (has_pucca_road, major district roads), and drinking water network access.
+4. Hazard Exposure & Early Warning (`score_early_warning`): Coastal setback distance, elevation, historical cyclone incidence, distance to rainfall gauges, and gauge coverage density within 20 km.
+5. Socioeconomic Vulnerability (`score_socioeconomic`): Demographic concentration of vulnerable groups (scheduled castes, scheduled tribes, children, and elderly) and dependence on artisanal fisheries.
+AHP generates reciprocal pairwise comparison matrices synthesized into priority weights. Mathematical consistency is verified via the Consistency Ratio (CR):
+CI = (lambda_max - n) / (n - 1), and CR = CI / RI.
+All expert matrices governing CYCLONE INTEL satisfy the strict consistency constraint CR < 0.10.
+Authoritative AHP Preparedness Tiers:
+- High Preparedness Tier: Composite Score >= 60.0.
+- Moderate Preparedness Tier: Composite Score between 40.0 and 59.99.
+- Low Preparedness Tier: Composite Score < 40.0.
+
+=== SECTION 5: OPERATIONAL PRIORITY BANDS AND RESOURCE ALLOCATION ===
+District Disaster Management Authorities (DDMAs) manage emergency preparedness through four operational Priority Bands:
+- Band 1 (Critical Intervention / BAND_1_CRITICAL): Communities requiring immediate capital intervention, priority evacuation asset pre-positioning, and structural reinforcement.
+- Band 2 (Priority Strengthening / BAND_2_SPECIALIZED): Communities requiring targeted domain upgrades (e.g. backup generators at shelters or access road elevation).
+- Band 3 (Targeted Resilience / BAND_3_MODERATE): Moderately prepared units requiring routine maintenance and communication drills.
+- Band 4 (Adequate Resilience / BAND_4_ADEQUATE): Well-prepared communities requiring periodic baseline monitoring.
+GOVERNANCE MANDATE:
+AHP Preparedness Tiers and Operational Priority Bands are conceptually distinct dimensions.
+AHP Tiers evaluate structural and socioeconomic preparedness (the state of the unit).
+Priority Bands evaluate operational resource allocation urgency (the response action required).
+A unit with Moderate AHP preparedness may be elevated to Band 1 Critical if a single-point failure (such as zero bridge access during high tide) threatens life safety.
+
+=== SECTION 6: MACHINE LEARNING SURROGATE MODEL DEMARCATION ===
+The platform integrates a Multinomial Logistic Regression model trained across 26 static features as an empirical surrogate of the authoritative AHP baseline.
+SCIENTIFIC DEMARCATION PRINCIPLES:
+1. Empirical Classification Surrogate: The ML model approximates AHP decision boundaries. It is NOT a physical hazard prediction model, storm surge flood model, or casualty forecast.
+2. Uncalibrated Class Likelihoods: Model outputs (prob_low, prob_medium, prob_high) represent statistical classification membership likelihoods within the static feature space. They must NEVER be communicated as cyclone strike probabilities or storm risk percentages.
+3. Boundary Stability Screening: The surrogate identifies 87 borderline communities where static feature distributions lie close to the 40.0 or 60.0 AHP thresholds.
+4. NON-DOWNGRADING SAFETY INVARIANT: The ML surrogate model is strictly prohibited from downgrading an authoritative AHP Low preparedness classification. If AHP classifies a unit as Low Preparedness (< 40.0), operational policy mandates Band 1 Critical status, regardless of whether the statistical surrogate predicts Moderate or High.
+
+=== SECTION 7: K-MEANS VULNERABILITY ARCHETYPES ===
+Unsupervised K-Means clustering was executed on the contiguous southern coastal districts of Dakshina Kannada and Udupi (N=622 assigned units) to identify structural vulnerability archetypes:
+- Cluster 0: Urban & Peri-Urban Well-Resourced Corridor (130 units). Dense population and high road and healthcare access, but elevated aggregate infrastructure and utility sensitivity.
+- Cluster 1: Remote Foothill & Healthcare-Isolated Communities (82 units). Located in the Western Ghats foothills; low marine hazard exposure, but severe travel buffers to emergency healthcare (> 60 minutes) and isolated transport links.
+- Cluster 2: Socioeconomically Vulnerable Rural Interior (161 units). Rural inland habitations characterized by elevated demographic vulnerability, higher shares of kutcha housing, and limited coping capacity.
+- Cluster 3: High-Exposure Coastal Rural Belt (249 units). Direct Arabian Sea shoreline exposure (< 1.5 km), extreme storm surge and coastal erosion vulnerability, and critical multi-purpose cyclone shelter deficits.
+GEOGRAPHIC SCOPE & UTTARA KANNADA FALLBACK ENGINE:
+The 1,257 units in Uttara Kannada were intentionally not forced into the 4-cluster model due to differing geomorphology and administrative scale. Instead, an independent multi-trigger domain-deficit fallback engine evaluates transparent threshold triggers (e.g. healthcare travel time > 60 min, shelter deficit, kutcha roof ratio) to formulate actionable advisories.
+
+=== SECTION 8: REGIONAL DISTRICT RISK PROFILES ===
+Authoritative baseline metrics across the 1,879 administrative units in Coastal Karnataka show clear regional differentiation:
+1. Dakshina Kannada (369 units): Mean AHP preparedness score is 61.06 (High preparedness average), supported by high hospital density and road connectivity around Mangaluru, but vulnerable along coastal sand spits.
+2. Udupi (253 units): Mean AHP preparedness score is 65.04 (Highest regional average), with robust primary healthcare distribution and multi-purpose shelter coverage across its central coastal plain.
+3. Uttara Kannada (1,257 units): Mean AHP preparedness score is 50.06 (Moderate preparedness average), reflecting geographic dispersion, estuarine river barriers, and extended travel times in rural forested taluks.
+All numerical community-specific figures are authoritative only when retrieved from deterministic tools, never from model memory.
+
+=== SECTION 9: SCIENTIFIC UNCERTAINTY AND ZERO-FABRICATION MANDATE ===
+Decision support requires explicit demarcation of analytical boundaries:
+1. Temporal Baseline Limitations: Demographic and housing data are anchored in Census 2011, supplemented by MoHFW directories and SRTM topographic elevation models.
+2. Ground Verification Mandate: Macro-level analytical outputs must be verified by local DDMA task forces before committing capital funds or executing evacuation plans.
+3. ZERO HALLUCINATION POLICY FOR DYNAMIC DATA:
+   The CYCLONE INTEL platform strictly prohibits fabricating real-time operational parameters:
+   - Current meteorological parameters (live wind speed, barometric pressure, real-time radar tracks) must come from live IMD bulletins, NOT from model synthesis.
+   - Real-time emergency shelter occupancy, hospital bed availability, and road flood blockages are dynamic operational data unrecorded in the static platform.
+   When dynamic data is queried, the system must explicitly state that dynamic real-time data is unrecorded and direct the user to official district emergency operation centers (EOC).

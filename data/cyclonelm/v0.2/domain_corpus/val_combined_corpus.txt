@@ -1,0 +1,91 @@
+<user>What happens if a revenue village has zero recorded Primary Health Centres within 15 km?</user><assistant>When a revenue unit has no PHC or CHC within 15 km, its raw healthcare proximity metric receives a severe penalty, lowering score_medical towards zero and pulling down the composite AHP score.</assistant>
+
+<user>Are AHP criteria weights identical across all three coastal districts in CYCLONE INTEL?</user><assistant>Yes, CYCLONE INTEL uses a standardized regional pairwise priority matrix for Coastal Karnataka to maintain scientific parity across Dakshina Kannada, Udupi, and Uttara Kannada.</assistant>
+
+<user>Why does Udupi have zero communities in Band 1 Critical in baseline analysis?</user><assistant>Udupi maintains a high district mean preparedness score of 65.04 with dense primary healthcare and extensive multi-purpose shelter coverage across its 253 coastal units, resulting in 0 units falling below the AHP Low 40.0 threshold.</assistant>
+
+<user>What is the relationship between overall_priority_rank and band_rank?</user><assistant>overall_priority_rank (1 to 1,879) orders all revenue units across Coastal Karnataka by operational urgency. band_rank provides the relative rank within a specific priority band (e.g., 1st among Band 1 units).</assistant>
+
+<user>Does the surrogate model predict cyclone casualties or infrastructure damage estimates?</user><assistant>No. The surrogate model predicts solely the preparedness tier classification (Low, Medium, High). It has no capability to estimate casualties, structural damage costs, or physical wind impact.</assistant>
+
+<user>How are probability outputs calibrated in the surrogate model?</user><assistant>The model uses standard multinomial softmax normalization over linear logits. However, because features are static census and GIS metrics, the outputs are uncalibrated class likelihoods and not Bayesian posterior probabilities.</assistant>
+
+<user>Can a village belonging to Cluster 0 be classified as AHP Low Preparedness?</user><assistant>No, empirically all 130 units in Cluster 0 have composite AHP scores well above 60.0 due to high healthcare density, tap water, and pucca road infrastructure around Mangaluru and Udupi towns.</assistant>
+
+<user>Are K-Means archetypes predictive of disaster timing or storm landfall points?</user><assistant>No. K-Means archetypes are static structural descriptors of vulnerability profiles based on Census and GIS baselines. They do not predict when, where, or if a cyclone will make landfall.</assistant>
+
+<user>Is power currently cut off in Malpe fishing harbour due to squally winds?</user><assistant>I cannot provide real-time electrical grid or utility outage telemetry. Current power transmission status must be verified through the local electricity supply company (MESCOM) or local disaster control room.</assistant>
+
+<user>Can the model output be cited as legal proof of cyclone insurance damage?</user><assistant>No. CYCLONE INTEL models structural preparedness and relative operational priority. It does not assess post-disaster insurance loss or legal liability, which require statutory surveyor damage inspections.</assistant>
+
+<user>Run a district comparison between Dakshina Kannada and Uttara Kannada.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Dakshina Kannada", "district_b": "Uttara Kannada"}}</tool_call></assistant>
+
+<user>Contrast the priority band distributions of Udupi and Dakshina Kannada.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Udupi", "district_b": "Dakshina Kannada"}}</tool_call></assistant>
+
+<user>Compare mean preparedness scores between Uttara Kannada and Udupi.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Uttara Kannada", "district_b": "Udupi"}}</tool_call></assistant>
+
+<user>Filter communities in Dakshina Kannada classified under Band 1 Critical priority.</user><assistant><tool_call>{"tool": "filter_and_rank_communities", "parameters": {"district": "Dakshina Kannada", "priority_band": "BAND_1_CRITICAL"}}</tool_call></assistant>
+
+<user>List the top 5 most vulnerable communities in Uttara Kannada sorted by preparedness score.</user><assistant><tool_call>{"tool": "filter_and_rank_communities", "parameters": {"district": "Uttara Kannada", "ascending": true, "limit": 5}}</tool_call></assistant>
+
+<user>Give me the healthcare travel buffer.</user><assistant>Please provide the village name or Census PC11 code so I can inspect its geodesic distance and travel time to the nearest PHC and apex hospital.</assistant>
+
+<user>Show me the AHP score.</user><assistant>Please specify which revenue unit or village you would like to retrieve the AHP preparedness score for.</assistant>
+
+<user>Summarize filter results for Band 1 Critical communities in Dakshina Kannada.</user><assistant><evidence>
+District: Dakshina Kannada, Filter: BAND_1_CRITICAL
+Total Matching: 2
+Units: Kodimbala (AHP: 38.44, Rank: 116), Sulya (TP) (AHP: 39.31, Rank: 137)
+</evidence>
+
+Filtering Dakshina Kannada for Band 1 Critical priority returns exactly 2 revenue units: Kodimbala (AHP score 38.44, rank 116) and Sulya TP (AHP score 39.31, rank 137). Both units fall below the 40.0 Low Preparedness threshold and mandate urgent intervention.</assistant>
+
+<user>Synthesize the assessment for Someshwara in Dakshina Kannada.</user><assistant><evidence>
+Community: Someshwara, District: Dakshina Kannada
+AHP Score: 62.15 (Tier: High), Priority: BAND_4_ADEQUATE, Coast Distance: 1.2 km
+</evidence>
+
+Someshwara in Dakshina Kannada records an authoritative AHP Preparedness Score of 62.15, placing it in the High Preparedness Tier and Band 4 Adequate priority. Despite coastal proximity of 1.2 km, its solid healthcare and road connectivity ensure strong baseline coping capacity.</assistant>
+
+<user>Summarize district comparison evidence between Dakshina Kannada and Uttara Kannada.</user><assistant><evidence>
+Dakshina Kannada: 369 units, Mean AHP = 61.06, Band 1 = 0.5%
+Uttara Kannada: 1257 units, Mean AHP = 50.06, Band 1 = 12.2%
+</evidence>
+
+Dakshina Kannada shows significantly higher average preparedness (61.06) with only 0.5% Band 1 units, compared to Uttara Kannada's 50.06 mean score and 12.2% Band 1 critical share, driven by Uttara Kannada's rugged topography and isolated settlements.</assistant>
+
+<user>Run a district comparison between Dakshina Kannada and Uttara Kannada.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Dakshina Kannada", "district_b": "Uttara Kannada"}}</tool_call></assistant>
+
+<user>Contrast the priority band distributions of Udupi and Dakshina Kannada.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Udupi", "district_b": "Dakshina Kannada"}}</tool_call></assistant>
+
+<user>Compare mean preparedness scores between Uttara Kannada and Udupi.</user><assistant><tool_call>{"tool": "compare_districts", "parameters": {"district_a": "Uttara Kannada", "district_b": "Udupi"}}</tool_call></assistant>
+
+<user>Filter communities in Dakshina Kannada classified under Band 1 Critical priority.</user><assistant><tool_call>{"tool": "filter_and_rank_communities", "parameters": {"district": "Dakshina Kannada", "priority_band": "BAND_1_CRITICAL"}}</tool_call></assistant>
+
+<user>List the top 5 most vulnerable communities in Uttara Kannada sorted by preparedness score.</user><assistant><tool_call>{"tool": "filter_and_rank_communities", "parameters": {"district": "Uttara Kannada", "ascending": true, "limit": 5}}</tool_call></assistant>
+
+<user>Give me the healthcare travel buffer.</user><assistant>Please provide the village name or Census PC11 code so I can inspect its geodesic distance and travel time to the nearest PHC and apex hospital.</assistant>
+
+<user>Show me the AHP score.</user><assistant>Please specify which revenue unit or village you would like to retrieve the AHP preparedness score for.</assistant>
+
+<user>Summarize filter results for Band 1 Critical communities in Dakshina Kannada.</user><assistant><evidence>
+District: Dakshina Kannada, Filter: BAND_1_CRITICAL
+Total Matching: 2
+Units: Kodimbala (AHP: 38.44, Rank: 116), Sulya (TP) (AHP: 39.31, Rank: 137)
+</evidence>
+
+Filtering Dakshina Kannada for Band 1 Critical priority returns exactly 2 revenue units: Kodimbala (AHP score 38.44, rank 116) and Sulya TP (AHP score 39.31, rank 137). Both units fall below the 40.0 Low Preparedness threshold and mandate urgent intervention.</assistant>
+
+<user>Synthesize the assessment for Someshwara in Dakshina Kannada.</user><assistant><evidence>
+Community: Someshwara, District: Dakshina Kannada
+AHP Score: 62.15 (Tier: High), Priority: BAND_4_ADEQUATE, Coast Distance: 1.2 km
+</evidence>
+
+Someshwara in Dakshina Kannada records an authoritative AHP Preparedness Score of 62.15, placing it in the High Preparedness Tier and Band 4 Adequate priority. Despite coastal proximity of 1.2 km, its solid healthcare and road connectivity ensure strong baseline coping capacity.</assistant>
+
+<user>Summarize district comparison evidence between Dakshina Kannada and Uttara Kannada.</user><assistant><evidence>
+Dakshina Kannada: 369 units, Mean AHP = 61.06, Band 1 = 0.5%
+Uttara Kannada: 1257 units, Mean AHP = 50.06, Band 1 = 12.2%
+</evidence>
+
+Dakshina Kannada shows significantly higher average preparedness (61.06) with only 0.5% Band 1 units, compared to Uttara Kannada's 50.06 mean score and 12.2% Band 1 critical share, driven by Uttara Kannada's rugged topography and isolated settlements.</assistant>

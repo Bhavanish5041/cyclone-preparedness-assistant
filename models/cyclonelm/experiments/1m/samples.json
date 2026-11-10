@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sample_ahp_role",
+    "category": "domain_knowledge",
+    "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+    "generated_text": "<tool_call>{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}</tool_call>36 \": \": {\"",
+    "clean_text": "{\": for \": \"tool\": \": \"identifier\"parameters\": \": \"parameters\": \": \"}}36 \": \": {\""
+  },
+  {
+    "id": "sample_tool_lookup",
+    "category": "tool_selection",
+    "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+    "generated_text": "<tool_call>{\"parameters\": \"parameters\": \": {\": \": \": \"}}}</tool_call></assistant><eos>",
+    "clean_text": "{\"parameters\": \"parameters\": \": {\": \": \": \"}}}"
+  },
+  {
+    "id": "sample_live_telemetry_refusal",
+    "category": "governance_refusal",
+    "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+    "generated_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and ",
+    "clean_text": "ats all to be t resente and and a in ping a s. and pate, in the a by is and "
+  },
+  {
+    "id": "sample_tiers_vs_bands",
+    "category": "governance_distinction",
+    "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+    "generated_text": "<tool_call>{\"tool\": \": {\": \"}}}}</tool_call></assistant><eos>",
+    "clean_text": "{\"tool\": \": {\": \"}}}}"
+  },
+  {
+    "id": "sample_ml_surrogate_limit",
+    "category": "ml_governance",
+    "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+    "generated_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d",
+    "clean_text": "Oal-ad: and and reletmules ds. AHP Band lains ored shelter ny or and the a a an d"
+  },
+  {
+    "id": "sample_archetype_cluster3",
+    "category": "archetypes",
+    "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+    "generated_text": "<tool_call>{\": \": \": \": \": \": \"tool\": \": \"}</tool_call></assistant><eos>",
+    "clean_text": "{\": \": \": \": \": \": \"tool\": \": \"}"
+  }
+]

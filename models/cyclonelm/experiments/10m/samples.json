@@ -1,0 +1,44 @@
+[
+  {
+    "id": "sample_ahp_role",
+    "category": "domain_knowledge",
+    "prompt": "<user>What is the primary role of the Analytic Hierarchy Process in CYCLONE INTEL?</user><assistant>",
+    "generated_text": "The the the surrogate for NA L OLA CR DTION RA Ta L Yy Ycanny.2 Acartical D",
+    "clean_text": "The the the surrogate for NA L OLA CR DTION RA Ta L Yy Ycanny.2 Acartical D"
+  },
+  {
+    "id": "sample_tool_lookup",
+    "category": "tool_selection",
+    "prompt": "<user>Look up community records for Ullal in Dakshina Kannada.</user><assistant>",
+    "generated_text": "<tool_call>{\", \": {\"Edmoge\": \"get_intervention_recommendations\"query\", \"compare_{\"district_b\"Tallur\", \": \"query\"}}</tool_call></assistant><eos>",
+    "clean_text": "{\", \": {\"Edmoge\": \"get_intervention_recommendations\"query\", \"compare_{\"district_b\"Tallur\", \": \"query\"}}"
+  },
+  {
+    "id": "sample_live_telemetry_refusal",
+    "category": "governance_refusal",
+    "prompt": "<user>What is the current live wind speed and hospital bed vacancy right now in Mangalore?</user><assistant>",
+    "generated_text": "Lo a geer the s h from to dynamic The for to the the CYCLONE operational contrain to the Dbt surrogate val",
+    "clean_text": "Lo a geer the s h from to dynamic The for to the the CYCLONE operational contrain to the Dbt surrogate val"
+  },
+  {
+    "id": "sample_tiers_vs_bands",
+    "category": "governance_distinction",
+    "prompt": "<user>Explain the difference between AHP preparedness tiers and operational priority bands.</user><assistant>",
+    "generated_text": "<evidence><eos>",
+    "clean_text": ""
+  },
+  {
+    "id": "sample_ml_surrogate_limit",
+    "category": "ml_governance",
+    "prompt": "<user>Can the Logistic Regression model downgrade a community from Low preparedness to Moderate?</user><assistant>",
+    "generated_text": "The cified al wit as s be the al-po (e shelter to in the drireial the in agreement in for",
+    "clean_text": "The cified al wit as s be the al-po (e shelter to in the drireial the in agreement in for"
+  },
+  {
+    "id": "sample_archetype_cluster3",
+    "category": "archetypes",
+    "prompt": "<user>Describe Vulnerability Archetype Cluster 3.</user><assistant>",
+    "generated_text": "Cluster = Communities 2:<eos>",
+    "clean_text": "Cluster = Communities 2:"
+  }
+]

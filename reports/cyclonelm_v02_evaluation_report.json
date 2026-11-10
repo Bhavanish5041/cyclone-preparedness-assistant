@@ -1,0 +1,129 @@
+{
+  "benchmark_version": "0.2.0",
+  "total_held_out_questions": 100,
+  "suite_path": "data/cyclonelm/v0.2/held_out_eval/held_out_100.jsonl",
+  "categories_breakdown": {
+    "domain_knowledge": 30,
+    "tool_selection": 30,
+    "argument_generation": 20,
+    "evidence_grounded_response": 20
+  },
+  "baselines": {
+    "deterministic_baseline": {
+      "name": "Deterministic Rule-Based Baseline",
+      "categories": {
+        "domain_knowledge": {
+          "total": 30,
+          "correct": 30,
+          "unsupported_claims": 0,
+          "correct_abstentions": 3,
+          "accuracy": 100.0
+        },
+        "tool_selection": {
+          "total": 30,
+          "correct": 30,
+          "invalid_tools": 0,
+          "accuracy": 100.0
+        },
+        "argument_generation": {
+          "total": 20,
+          "correct": 20,
+          "invalid_json": 0,
+          "invalid_arguments": 0,
+          "accuracy": 100.0
+        },
+        "evidence_grounded_response": {
+          "total": 20,
+          "correct": 20,
+          "unsupported_claims": 0,
+          "accuracy": 100.0
+        }
+      },
+      "total_questions": 100,
+      "total_correct": 100,
+      "overall_accuracy": 100.0,
+      "total_invalid_json": 0,
+      "total_invalid_arguments": 0,
+      "total_unsupported_claims": 0,
+      "total_correct_abstentions": 3
+    },
+    "template_baseline": {
+      "name": "Template-Based Slot-Filling Baseline",
+      "categories": {
+        "domain_knowledge": {
+          "total": 30,
+          "correct": 8,
+          "unsupported_claims": 3,
+          "correct_abstentions": 0,
+          "accuracy": 26.7
+        },
+        "tool_selection": {
+          "total": 30,
+          "correct": 18,
+          "invalid_tools": 0,
+          "accuracy": 60.0
+        },
+        "argument_generation": {
+          "total": 20,
+          "correct": 16,
+          "invalid_json": 0,
+          "invalid_arguments": 0,
+          "accuracy": 80.0
+        },
+        "evidence_grounded_response": {
+          "total": 20,
+          "correct": 20,
+          "unsupported_claims": 0,
+          "accuracy": 100.0
+        }
+      },
+      "total_questions": 100,
+      "total_correct": 62,
+      "overall_accuracy": 62.0,
+      "total_invalid_json": 0,
+      "total_invalid_arguments": 0,
+      "total_unsupported_claims": 3,
+      "total_correct_abstentions": 0
+    }
+  },
+  "comparative_summary": {
+    "overall_accuracy": {
+      "deterministic_baseline": "100.0%",
+      "template_baseline": "62.0%"
+    },
+    "domain_knowledge_accuracy": {
+      "deterministic_baseline": "100.0%",
+      "template_baseline": "26.7%"
+    },
+    "tool_selection_accuracy": {
+      "deterministic_baseline": "100.0%",
+      "template_baseline": "60.0%"
+    },
+    "argument_generation_accuracy": {
+      "deterministic_baseline": "100.0%",
+      "template_baseline": "80.0%"
+    },
+    "evidence_grounded_response_accuracy": {
+      "deterministic_baseline": "100.0%",
+      "template_baseline": "100.0%"
+    },
+    "safety_and_validity": {
+      "total_invalid_json": {
+        "deterministic_baseline": 0,
+        "template_baseline": 0
+      },
+      "total_invalid_arguments": {
+        "deterministic_baseline": 0,
+        "template_baseline": 0
+      },
+      "total_unsupported_claims": {
+        "deterministic_baseline": 0,
+        "template_baseline": 3
+      },
+      "total_correct_abstentions": {
+        "deterministic_baseline": 3,
+        "template_baseline": 0
+      }
+    }
+  }
+}

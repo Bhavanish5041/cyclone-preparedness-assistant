@@ -1,0 +1,1032 @@
+{
+  "vocab_size": 1024,
+  "special_tokens_count": 16,
+  "merges_count": 906,
+  "categories": {
+    "common_english": {
+      "example_count": 5,
+      "total_words": 51,
+      "total_tokens": 154,
+      "avg_tokens_per_word": 3.02,
+      "avg_chars_per_token": 2.23,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "The quick brown fox jumps over the lazy dog.",
+          "token_count": 30,
+          "word_count": 9,
+          "tokens_per_word": 3.33,
+          "chars_per_token": 1.47,
+          "tokens": [
+            "The",
+            " ",
+            "qu",
+            "ic",
+            "k",
+            " ",
+            "b",
+            "ro",
+            "w",
+            "n",
+            " ",
+            "fo",
+            "x",
+            " ",
+            "j",
+            "um",
+            "p",
+            "s",
+            " ",
+            "over",
+            " ",
+            "the",
+            " ",
+            "l",
+            "az",
+            "y",
+            " ",
+            "d",
+            "og",
+            "."
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "How can I help you prepare for the upcoming storm season?",
+          "token_count": 29,
+          "word_count": 11,
+          "tokens_per_word": 2.64,
+          "chars_per_token": 1.97,
+          "tokens": [
+            "How",
+            " ",
+            "c",
+            "an",
+            " ",
+            "I",
+            " ",
+            "hel",
+            "p",
+            " ",
+            "you",
+            " ",
+            "p",
+            "repare",
+            " ",
+            "for",
+            " ",
+            "the",
+            " ",
+            "up",
+            "com",
+            "ing",
+            " ",
+            "storm",
+            " ",
+            "se",
+            "as",
+            "on",
+            "?"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Disaster management requires coordination between local hospitals and emergency shelters.",
+          "token_count": 29,
+          "word_count": 10,
+          "tokens_per_word": 2.9,
+          "chars_per_token": 3.07,
+          "tokens": [
+            "Disaster",
+            " ",
+            "man",
+            "age",
+            "ment",
+            " ",
+            "requ",
+            "i",
+            "res",
+            " ",
+            "co",
+            "ord",
+            "in",
+            "ation",
+            " ",
+            "between",
+            " ",
+            "loc",
+            "al",
+            " ",
+            "hospital",
+            "s",
+            " ",
+            "and",
+            " ",
+            "emergency",
+            " ",
+            "shelters",
+            "."
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Please provide a clear and simple explanation of the safety protocol.",
+          "token_count": 34,
+          "word_count": 11,
+          "tokens_per_word": 3.09,
+          "chars_per_token": 2.03,
+          "tokens": [
+            "Please",
+            " ",
+            "provide",
+            " ",
+            "a",
+            " ",
+            "cl",
+            "ear",
+            " ",
+            "and",
+            " ",
+            "s",
+            "im",
+            "ple",
+            " ",
+            "ex",
+            "pl",
+            "an",
+            "ation",
+            " ",
+            "of",
+            " ",
+            "the",
+            " ",
+            "s",
+            "a",
+            "fet",
+            "y",
+            " ",
+            "pro",
+            "to",
+            "co",
+            "l",
+            "."
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Residents living along the coastline must follow evacuation instructions immediately.",
+          "token_count": 32,
+          "word_count": 10,
+          "tokens_per_word": 3.2,
+          "chars_per_token": 2.66,
+          "tokens": [
+            "Res",
+            "ident",
+            "s",
+            " ",
+            "l",
+            "iv",
+            "ing",
+            " ",
+            "along",
+            " ",
+            "the",
+            " ",
+            "coastline",
+            " ",
+            "must",
+            " ",
+            "f",
+            "ol",
+            "low",
+            " ",
+            "evacuation",
+            " ",
+            "in",
+            "struct",
+            "ions",
+            " ",
+            "i",
+            "mm",
+            "edi",
+            "at",
+            "ely",
+            "."
+          ],
+          "unk_count": 0
+        }
+      ]
+    },
+    "cyclone_terminology": {
+      "example_count": 7,
+      "total_words": 29,
+      "total_tokens": 95,
+      "avg_tokens_per_word": 3.28,
+      "avg_chars_per_token": 2.29,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "Very Severe Cyclonic Storm",
+          "token_count": 10,
+          "word_count": 4,
+          "tokens_per_word": 2.5,
+          "chars_per_token": 2.6,
+          "tokens": [
+            "V",
+            "ery",
+            " ",
+            "S",
+            "evere",
+            " ",
+            "C",
+            "yclonic",
+            " ",
+            "Storm"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Extremely Severe Cyclonic Storm",
+          "token_count": 13,
+          "word_count": 4,
+          "tokens_per_word": 3.25,
+          "chars_per_token": 2.38,
+          "tokens": [
+            "Ex",
+            "t",
+            "re",
+            "m",
+            "ely",
+            " ",
+            "S",
+            "evere",
+            " ",
+            "C",
+            "yclonic",
+            " ",
+            "Storm"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Super Cyclonic Storm",
+          "token_count": 8,
+          "word_count": 3,
+          "tokens_per_word": 2.67,
+          "chars_per_token": 2.5,
+          "tokens": [
+            "S",
+            "up",
+            "er",
+            " ",
+            "C",
+            "yclonic",
+            " ",
+            "Storm"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Maximum Sustained Surface Wind Speed",
+          "token_count": 19,
+          "word_count": 5,
+          "tokens_per_word": 3.8,
+          "chars_per_token": 1.89,
+          "tokens": [
+            "M",
+            "a",
+            "xim",
+            "um",
+            " ",
+            "S",
+            "ust",
+            "ain",
+            "ed",
+            " ",
+            "S",
+            "ur",
+            "face",
+            " ",
+            "Wind",
+            " ",
+            "S",
+            "pe",
+            "ed"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Analytic Hierarchy Process",
+          "token_count": 12,
+          "word_count": 3,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 2.17,
+          "tokens": [
+            "Analy",
+            "t",
+            "ic",
+            " ",
+            "H",
+            "ier",
+            "ar",
+            "ch",
+            "y",
+            " ",
+            "Pro",
+            "cess"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Consistency Ratio strictly less than 0.10",
+          "token_count": 17,
+          "word_count": 6,
+          "tokens_per_word": 2.83,
+          "chars_per_token": 2.41,
+          "tokens": [
+            "Consistency",
+            " ",
+            "R",
+            "atio",
+            " ",
+            "strict",
+            "ly",
+            " ",
+            "l",
+            "ess",
+            " ",
+            "th",
+            "an",
+            " ",
+            "0",
+            ".",
+            "10"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Multimodal early warning dissemination",
+          "token_count": 16,
+          "word_count": 4,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 2.38,
+          "tokens": [
+            "M",
+            "ul",
+            "tim",
+            "od",
+            "al",
+            " ",
+            "early",
+            " ",
+            "warning",
+            " ",
+            "d",
+            "i",
+            "ss",
+            "em",
+            "in",
+            "ation"
+          ],
+          "unk_count": 0
+        }
+      ]
+    },
+    "numerical_values": {
+      "example_count": 12,
+      "total_words": 15,
+      "total_tokens": 42,
+      "avg_tokens_per_word": 2.8,
+      "avg_chars_per_token": 1.45,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "61.06",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.67,
+          "tokens": [
+            "61",
+            ".",
+            "06"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "65.04",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.67,
+          "tokens": [
+            "65",
+            ".",
+            "04"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "50.06",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.67,
+          "tokens": [
+            "50",
+            ".",
+            "06"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "1,879",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 1.25,
+          "tokens": [
+            "1",
+            ",",
+            "87",
+            "9"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "622",
+          "token_count": 2,
+          "word_count": 1,
+          "tokens_per_word": 2.0,
+          "chars_per_token": 1.5,
+          "tokens": [
+            "6",
+            "22"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "118 to 166 km/h",
+          "token_count": 12,
+          "word_count": 4,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.25,
+          "tokens": [
+            "11",
+            "8",
+            " ",
+            "to",
+            " ",
+            "1",
+            "6",
+            "6",
+            " ",
+            "km",
+            "/",
+            "h"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "0.10",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.33,
+          "tokens": [
+            "0",
+            ".",
+            "10"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "40.0",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.33,
+          "tokens": [
+            "40",
+            ".",
+            "0"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "59.99",
+          "token_count": 5,
+          "word_count": 1,
+          "tokens_per_word": 5.0,
+          "chars_per_token": 1.0,
+          "tokens": [
+            "5",
+            "9",
+            ".",
+            "9",
+            "9"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "1257",
+          "token_count": 2,
+          "word_count": 1,
+          "tokens_per_word": 2.0,
+          "chars_per_token": 2.0,
+          "tokens": [
+            "1",
+            "257"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "369",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 3.0,
+          "tokens": [
+            "369"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "253",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 3.0,
+          "tokens": [
+            "253"
+          ],
+          "unk_count": 0
+        }
+      ]
+    },
+    "json_syntax": {
+      "example_count": 5,
+      "total_words": 21,
+      "total_tokens": 106,
+      "avg_tokens_per_word": 5.05,
+      "avg_chars_per_token": 2.28,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "{\"tool\": \"lookup_community\", \"parameters\": {\"query\": \"Ullal\", \"district\": \"Dakshina Kannada\"}}",
+          "token_count": 39,
+          "word_count": 8,
+          "tokens_per_word": 4.88,
+          "chars_per_token": 2.41,
+          "tokens": [
+            "{",
+            "\"",
+            "tool",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "lookup_community",
+            "\"",
+            ",",
+            " ",
+            "\"",
+            "parameters",
+            "\"",
+            ":",
+            " ",
+            "{",
+            "\"",
+            "query",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "Ullal",
+            "\"",
+            ",",
+            " ",
+            "\"",
+            "district",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "Dakshina",
+            " ",
+            "Kannada",
+            "\"",
+            "}",
+            "}"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "{\"district_a\": \"Dakshina Kannada\", \"district_b\": \"Udupi\"}",
+          "token_count": 24,
+          "word_count": 5,
+          "tokens_per_word": 4.8,
+          "chars_per_token": 2.38,
+          "tokens": [
+            "{",
+            "\"",
+            "district_",
+            "a",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "Dakshina",
+            " ",
+            "Kannada",
+            "\"",
+            ",",
+            " ",
+            "\"",
+            "district_",
+            "b",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "Udupi",
+            "\"",
+            "}"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "{\"identifier\": \"Tallur\"}",
+          "token_count": 10,
+          "word_count": 2,
+          "tokens_per_word": 5.0,
+          "chars_per_token": 2.4,
+          "tokens": [
+            "{",
+            "\"",
+            "identifier",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "Tallur",
+            "\"",
+            "}"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "{\"priority_band\": \"BAND_1_CRITICAL\", \"limit\": 5}",
+          "token_count": 23,
+          "word_count": 4,
+          "tokens_per_word": 5.75,
+          "chars_per_token": 2.09,
+          "tokens": [
+            "{",
+            "\"",
+            "priority",
+            "_",
+            "b",
+            "and",
+            "\"",
+            ":",
+            " ",
+            "\"",
+            "BAND_1_CRITICAL",
+            "\"",
+            ",",
+            " ",
+            "\"",
+            "l",
+            "im",
+            "it",
+            "\"",
+            ":",
+            " ",
+            "5",
+            "}"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "{\"archetype_id\": 3}",
+          "token_count": 10,
+          "word_count": 2,
+          "tokens_per_word": 5.0,
+          "chars_per_token": 1.9,
+          "tokens": [
+            "{",
+            "\"",
+            "archetype",
+            "_",
+            "id",
+            "\"",
+            ":",
+            " ",
+            "3",
+            "}"
+          ],
+          "unk_count": 0
+        }
+      ]
+    },
+    "community_names": {
+      "example_count": 13,
+      "total_words": 13,
+      "total_tokens": 36,
+      "avg_tokens_per_word": 2.77,
+      "avg_chars_per_token": 2.42,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "Ullal",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 5.0,
+          "tokens": [
+            "Ullal"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Tallur",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 6.0,
+          "tokens": [
+            "Tallur"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Bengre",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 6.0,
+          "tokens": [
+            "Bengre"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Edmoge",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 6.0,
+          "tokens": [
+            "Edmoge"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Malpe",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 5.0,
+          "tokens": [
+            "Malpe"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Someshwara",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 10.0,
+          "tokens": [
+            "Someshwara"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Paduvari",
+          "token_count": 6,
+          "word_count": 1,
+          "tokens_per_word": 6.0,
+          "chars_per_token": 1.33,
+          "tokens": [
+            "P",
+            "ad",
+            "u",
+            "v",
+            "ar",
+            "i"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Hebri",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 1.67,
+          "tokens": [
+            "He",
+            "b",
+            "ri"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Bhatkal",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 1.75,
+          "tokens": [
+            "B",
+            "hat",
+            "k",
+            "al"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Kundapura",
+          "token_count": 5,
+          "word_count": 1,
+          "tokens_per_word": 5.0,
+          "chars_per_token": 1.8,
+          "tokens": [
+            "K",
+            "und",
+            "ap",
+            "ur",
+            "a"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Mangaluru",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 2.25,
+          "tokens": [
+            "Man",
+            "gal",
+            "ur",
+            "u"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Karwar",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 1.5,
+          "tokens": [
+            "K",
+            "ar",
+            "w",
+            "ar"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "Kumta",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 1.25,
+          "tokens": [
+            "K",
+            "um",
+            "t",
+            "a"
+          ],
+          "unk_count": 0
+        }
+      ]
+    },
+    "tool_schemas": {
+      "example_count": 7,
+      "total_words": 7,
+      "total_tokens": 20,
+      "avg_tokens_per_word": 2.86,
+      "avg_chars_per_token": 9.45,
+      "unk_count": 0,
+      "unk_rate": 0.0,
+      "examples": [
+        {
+          "text": "lookup_community",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 16.0,
+          "tokens": [
+            "lookup_community"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "analyze_infrastructure_and_exposure",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 35.0,
+          "tokens": [
+            "analyze_infrastructure_and_exposure"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "explain_preparedness_assessment",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 31.0,
+          "tokens": [
+            "explain_preparedness_assessment"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "get_intervention_recommendations",
+          "token_count": 1,
+          "word_count": 1,
+          "tokens_per_word": 1.0,
+          "chars_per_token": 32.0,
+          "tokens": [
+            "get_intervention_recommendations"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "compare_districts",
+          "token_count": 3,
+          "word_count": 1,
+          "tokens_per_word": 3.0,
+          "chars_per_token": 5.67,
+          "tokens": [
+            "compare",
+            "_",
+            "districts"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "filter_and_rank_communities",
+          "token_count": 9,
+          "word_count": 1,
+          "tokens_per_word": 9.0,
+          "chars_per_token": 3.0,
+          "tokens": [
+            "f",
+            "il",
+            "ter",
+            "_",
+            "and",
+            "_",
+            "rank",
+            "_",
+            "communities"
+          ],
+          "unk_count": 0
+        },
+        {
+          "text": "explain_vulnerability_archetype",
+          "token_count": 4,
+          "word_count": 1,
+          "tokens_per_word": 4.0,
+          "chars_per_token": 7.75,
+          "tokens": [
+            "explain_",
+            "vulnerability",
+            "_",
+            "archetype"
+          ],
+          "unk_count": 0
+        }
+      ]
+    }
+  },
+  "overall": {
+    "total_words": 136,
+    "total_tokens": 453,
+    "total_chars": 1141,
+    "overall_avg_tokens_per_word": 3.33,
+    "overall_avg_chars_per_token": 2.52,
+    "total_unk": 0,
+    "unk_rate": 0.0
+  },
+  "corpus_coverage": {
+    "corpus_total_tokens": 23358,
+    "corpus_unique_tokens_used": 829,
+    "vocab_utilization_percent": 81.0,
+    "corpus_unk_tokens": 0,
+    "corpus_unk_rate": 0.0
+  }
+}

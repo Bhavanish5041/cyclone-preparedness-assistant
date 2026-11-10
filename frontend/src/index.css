@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-roast text-ivory font-sans min-h-screen;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-ivory;
+  }
+}
+
+/* Tabular figures for numerical metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Warm espresso scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #120D0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30221B;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #493326;
+}
+
+/* Leaflet GIS dark espresso styling */
+.leaflet-container {
+  background-color: #120D0A !important;
+  font-family: inherit;
+}
+
+.leaflet-bar a {
+  background-color: #211713 !important;
+  color: #A98F7C !important;
+  border-color: #30221B !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #30221B !important;
+  color: #E9DCCB !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #211713 !important;
+  color: #E9DCCB !important;
+  border: 1px solid #493326;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.7) !important;
+}
+
+.leaflet-popup-tip {
+  background: #211713 !important;
+}

@@ -25,3 +25,18 @@ data/raw/
 
 # OS files
 .DS_Store
+
+# Node / Frontend
+node_modules/
+dist/
+*.tsbuildinfo
+.npm/
+
+# Model Checkpoints & Large Binaries (>50-100MB GitHub limit)
+# Note: Tokenizers (vocab.json), configs (config.yaml), metadata (provenance.json),
+# evaluation reports (*.json), and training summaries are tracked.
+*.pt
+*.pth
+*.bin
+*.onnx
+

@@ -105,8 +105,12 @@ class ChatRequest(BaseModel):
     @classmethod
     def populate_history_alias(cls, data: Any) -> Any:
         if isinstance(data, dict):
+            if "query" in data and ("message" not in data or not data.get("message")):
+                data["message"] = data.pop("query")
             if "history" in data and ("conversation_history" not in data or not data.get("conversation_history")):
                 data["conversation_history"] = data.pop("history")
+            if "context_community_id" in data and ("community_identifier" not in data or not data.get("community_identifier")):
+                data["community_identifier"] = data.pop("context_community_id")
         return data
 
     @field_validator("message")

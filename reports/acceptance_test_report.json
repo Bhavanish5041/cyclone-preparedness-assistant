@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-11-10T05:21:35.021Z",
+  "pagesTested": [
+    "/",
+    "/map",
+    "/communities",
+    "/communities/Tallur",
+    "/districts",
+    "/analytics",
+    "/assistant"
+  ],
+  "analyticalChecks": {
+    "tallur": {
+      "score7434": true,
+      "tierHigh": true,
+      "bandAdequate": true,
+      "rank1833": true,
+      "coast168": true
+    },
+    "mapMarkerInteraction": true
+  },
+  "assistantChecks": {
+    "toolExecuted": true,
+    "ahpReconciliation": true
+  },
+  "consoleErrors": [],
+  "failedRequests": [],
+  "screenshots": [
+    {
+      "viewport": "desktop",
+      "page": "01_command_center_dashboard",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/01_command_center_dashboard.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "02_geospatial_intelligence_map",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/02_geospatial_intelligence_map.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "03_community_explorer",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/03_community_explorer.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "04_tallur_community_dossier",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/04_tallur_community_dossier.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "05_district_intelligence",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/05_district_intelligence.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "06_analytics_and_models",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/06_analytics_and_models.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "07_decision_assistant",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/07_decision_assistant.png"
+    },
+    {
+      "viewport": "desktop",
+      "page": "07_assistant_live_interaction",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/desktop/07_assistant_live_interaction.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "01_command_center_dashboard",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/01_command_center_dashboard.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "02_geospatial_intelligence_map",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/02_geospatial_intelligence_map.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "03_community_explorer",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/03_community_explorer.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "04_tallur_community_dossier",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/04_tallur_community_dossier.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "05_district_intelligence",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/05_district_intelligence.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "06_analytics_and_models",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/06_analytics_and_models.png"
+    },
+    {
+      "viewport": "tablet",
+      "page": "07_decision_assistant",
+      "path": "/home/bhavanish/cyclone-preparedness-assistant/reports/acceptance_screenshots/tablet/07_decision_assistant.png"
+    }
+  ],
+  "passed": true
+}

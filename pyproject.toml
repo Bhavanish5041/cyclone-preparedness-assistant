@@ -14,6 +14,7 @@ dependencies = [
 
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-ra -q"
+addopts = "-ra -q --ignore=tests/cyclonelm"
 testpaths = ["tests"]
+norecursedirs = ["tests/cyclonelm", ".*", "build", "dist", "*.egg", "node_modules"]
 pythonpath = [".", "src"]

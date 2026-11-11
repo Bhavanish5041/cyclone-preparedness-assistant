@@ -1,6 +1,6 @@
 # CYCLONE INTEL: Model Quality & Invariance Verification Report
 
-**Timestamp (UTC):** `2026-11-11T02:50:29.681696+00:00`  
+**Timestamp (UTC):** `2026-11-11T04:03:24.286693+00:00`  
 **Pipeline Status:** `PASSED ✅`  
 **Total Evaluation Samples:** `130`  
 
@@ -47,27 +47,27 @@
 ## 3. Disaggregated Latency & Resource Utilization
 
 ### A. Deterministic Pipeline Latency (Intent Parsing + Extraction + Refusal Gate)
-- **Mean Latency:** `20.41 ms`
-- **Median Latency:** `18.0 ms`
-- **95th Percentile Latency (p95):** `49.4 ms`
-- **Min / Max Latency:** `0.0 ms` / `70.24 ms`
+- **Mean Latency:** `29.02 ms`
+- **Median Latency:** `22.62 ms`
+- **95th Percentile Latency (p95):** `64.43 ms`
+- **Min / Max Latency:** `0.0 ms` / `139.17 ms`
 
 ### B. Deterministic Tool Execution Latency (AHP Scoring & Spatial Assessment)
-- **Mean Execution Latency:** `2.14 ms`
-- **Median Execution Latency:** `2.03 ms`
-- **95th Percentile Latency (p95):** `3.32 ms`
+- **Mean Execution Latency:** `4.0 ms`
+- **Median Execution Latency:** `3.99 ms`
+- **95th Percentile Latency (p95):** `4.3 ms`
 
 ### C. Actual Qwen2.5-0.5B Inference Latency (Local Ollama Engine)
 - **Model:** `qwen2.5:0.5b-instruct`
-- **Mean Generation Latency:** `484.43 ms` (~0.48s)
-- **Median Generation Latency:** `441.79 ms`
-- **95th Percentile Latency (p95):** `586.31` ms
-- **Throughput:** ~`59.18 tokens/sec` on CPU
+- **Mean Generation Latency:** `1592.07 ms` (~1.59s)
+- **Median Generation Latency:** `1259.54 ms`
+- **95th Percentile Latency (p95):** `2637.2` ms
+- **Throughput:** ~`16.96 tokens/sec` on CPU
 
 ### D. Memory Consumption
-- **Initial Process Resident Memory (RSS):** `870.97 MB`
-- **Final Process Resident Memory (RSS):** `879.25 MB`
-- **Net Memory Delta:** `8.28 MB`
+- **Initial Process Resident Memory (RSS):** `713.88 MB`
+- **Final Process Resident Memory (RSS):** `713.88 MB`
+- **Net Memory Delta:** `0.0 MB`
 
 ---
 

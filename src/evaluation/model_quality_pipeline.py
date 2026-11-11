@@ -43,8 +43,8 @@ from src.assistant.decision_support import DecisionSupportService
 from src.assistant.llm.client import OllamaClient
 from src.assistant.llm.schemas import ChatRequest, ConversationStatus, QwenIntentParse
 from src.assistant.tools.registry import get_default_registry
-from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
-from src.cyclonelm.classification.refusal_gate import RefusalGate
+from src.assistant.tools.argument_extractor import ArgumentExtractor
+from src.assistant.safety.refusal_gate import RefusalGate
 from src.models.load_registered_model import load_registered_model
 
 logger = logging.getLogger("model_quality_pipeline")

@@ -46,8 +46,8 @@ from src.assistant.tools.regional import (
     FilterAndRankCommunitiesTool,
 )
 from src.assistant.tools.registry import ToolRegistry, get_default_registry
-from src.cyclonelm.classification.argument_extractor import ArgumentExtractor
-from src.cyclonelm.classification.refusal_gate import RefusalGate
+from src.assistant.tools.argument_extractor import ArgumentExtractor
+from src.assistant.safety.refusal_gate import RefusalGate
 from src.models.load_registered_model import RegisteredModelContainer, load_registered_model
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures" / "model_test_dataset.json"

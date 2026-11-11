@@ -45,6 +45,10 @@ from src.assistant.tools.regional import (
     FilterAndRankCommunitiesInput,
     FilterAndRankCommunitiesTool,
 )
+from src.assistant.tools.argument_extractor import (
+    ArgumentExtractor,
+    ExtractionResult,
+)
 from src.assistant.tools.registry import (
     ToolRegistry,
     get_default_registry,

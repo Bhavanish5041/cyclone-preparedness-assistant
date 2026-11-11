@@ -1,0 +1,67 @@
+# Local isolated test compose configuration
+# Runs on non-conflicting ports (8088, 8002) without disrupting host production services
+
+services:
+  frontend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: cyclone-assistant-frontend:latest
+    container_name: cyclone-frontend-test
+    restart: "no"
+    ports:
+      - "8088:80"
+    networks:
+      - cyclone-test-net
+    depends_on:
+      api-test:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+  api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: cyclone-assistant-api:latest
+    container_name: cyclone-api-test
+    restart: "no"
+    ports:
+      - "8002:8000"
+    environment:
+      - WANDB_MODEL_ARTIFACT=village-preparedness-classifier:v0
+      - WANDB_CACHE_DIR=/app/.wandb_artifacts_cache
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - MONITORING_REPORTS_DIR=/app/reports/model_monitoring
+      - PYTHONUNBUFFERED=1
+    extra_hosts:
+      - "host.docker.internal:172.18.0.1"
+    networks:
+      cyclone-test-net:
+        aliases:
+          - api
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+networks:
+  cyclone-test-net:
+    name: cyclone_test_internal_net
+    driver: bridge

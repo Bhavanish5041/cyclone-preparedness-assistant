@@ -448,6 +448,14 @@ def load_registered_model(
     cached_encoder = target_cache_dir / "label_encoder.joblib"
     cached_meta = target_cache_dir / "logistic_regression_metadata.json"
 
+    # Local baseline models directory for offline operation
+    local_pipeline = DEFAULT_MODEL_DIR / "logistic_regression_tier.joblib"
+    local_encoder = DEFAULT_MODEL_DIR / "label_encoder.joblib"
+    local_meta = DEFAULT_MODEL_DIR / "logistic_regression_metadata.json"
+
+    download_dir = None
+    version_label = None
+
     if cached_pipeline.exists() and cached_encoder.exists() and cached_meta.exists():
         logger.info(f"Using locally cached artifact from {target_cache_dir}")
         download_dir = target_cache_dir
@@ -458,22 +466,33 @@ def load_registered_model(
             try:
                 wandb_api = wandb.Api()
             except Exception as e:
-                raise WandbRetrievalError(
-                    f"Failed to initialize W&B API client and artifact was not found in cache. "
-                    f"Ensure you are authenticated with `wandb login` or WANDB_API_KEY is set: {e}"
-                )
+                if local_pipeline.exists() and local_encoder.exists() and local_meta.exists() and cache_dir is None:
+                    logger.info(f"W&B API unavailable ({e}). Using local verified model artifact from {DEFAULT_MODEL_DIR}")
+                    download_dir = DEFAULT_MODEL_DIR
+                    version_label = artifact_address.split(":")[-1] if ":" in artifact_address else "local-production"
+                else:
+                    raise WandbRetrievalError(
+                        f"Failed to initialize W&B API client and artifact was not found in cache. "
+                        f"Ensure you are authenticated with `wandb login` or WANDB_API_KEY is set: {e}"
+                    )
 
-        logger.info(f"Retrieving model artifact '{full_path}' from W&B...")
-        try:
-            artifact = wandb_api.artifact(full_path, type="model")
-            target_cache_dir.mkdir(parents=True, exist_ok=True)
-            artifact.download(root=str(target_cache_dir))
-            download_dir = target_cache_dir
-            version_label = getattr(artifact, "version", artifact_address.split(":")[-1])
-        except Exception as e:
-            raise WandbRetrievalError(
-                f"Failed to retrieve registered model artifact '{full_path}' from W&B: {e}"
-            )
+        if download_dir is None:
+            logger.info(f"Retrieving model artifact '{full_path}' from W&B...")
+            try:
+                artifact = wandb_api.artifact(full_path, type="model")
+                target_cache_dir.mkdir(parents=True, exist_ok=True)
+                artifact.download(root=str(target_cache_dir))
+                download_dir = target_cache_dir
+                version_label = getattr(artifact, "version", artifact_address.split(":")[-1])
+            except Exception as e:
+                if local_pipeline.exists() and local_encoder.exists() and local_meta.exists() and cache_dir is None and api is None:
+                    logger.info(f"W&B download failed ({e}). Using local verified model artifact from {DEFAULT_MODEL_DIR}")
+                    download_dir = DEFAULT_MODEL_DIR
+                    version_label = artifact_address.split(":")[-1] if ":" in artifact_address else "local-production"
+                else:
+                    raise WandbRetrievalError(
+                        f"Failed to retrieve registered model artifact '{full_path}' from W&B: {e}"
+                    )
 
     # Verify required files exist
     pipeline_file = download_dir / "logistic_regression_tier.joblib"

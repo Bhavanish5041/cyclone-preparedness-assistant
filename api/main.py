@@ -31,6 +31,7 @@ from api.dependencies import (
     get_service,
     get_service_singleton,
 )
+from api.middleware.request_id import RequestIDMiddleware
 from api.routers import (
     analytics_router,
     assistant_router,
@@ -39,6 +40,7 @@ from api.routers import (
     districts_router,
     health_router,
     maps_router,
+    models_router,
     simulation_router,
 )
 from src.assistant.decision_support import DecisionSupportService
@@ -103,6 +105,7 @@ else:
         "https://cyclone-preparedness-assistant.onrender.com",
     ]
 
+app.add_middleware(RequestIDMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins if allowed_origins else ["*"],
@@ -142,13 +145,26 @@ def root():
     return RedirectResponse(url="/docs")
 
 
-# Direct health endpoint for container healthchecks
+# Direct health and readiness endpoints for container healthchecks
 @app.get("/health", include_in_schema=False)
 def root_health(request: Request):
     service = get_service(request)
     return {
         "status": "healthy",
         "total_units": len(service.ranked_df),
+        "version": "2.0.0",
+    }
+
+
+@app.get("/ready", include_in_schema=False)
+def root_ready(request: Request):
+    service = get_service(request)
+    model = get_model(request)
+    ready = len(service.ranked_df) > 0 and model is not None
+    return {
+        "ready": ready,
+        "dataset_loaded": len(service.ranked_df) > 0,
+        "model_loaded": model is not None,
         "version": "2.0.0",
     }
 
@@ -161,5 +177,6 @@ app.include_router(districts_router, prefix=api_prefix)
 app.include_router(communities_router, prefix=api_prefix)
 app.include_router(maps_router, prefix=api_prefix)
 app.include_router(analytics_router, prefix=api_prefix)
+app.include_router(models_router, prefix=api_prefix)
 app.include_router(simulation_router, prefix=api_prefix)
 app.include_router(assistant_router, prefix=api_prefix)

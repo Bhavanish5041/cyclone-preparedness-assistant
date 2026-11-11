@@ -33,6 +33,7 @@ COPY docker/requirements-api.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code, processed data, local baseline models, and seed cache
+COPY api/ /app/api/
 COPY src/ /app/src/
 COPY data/processed/ /app/data/processed/
 COPY models/ /app/models/
@@ -56,4 +57,4 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
 STOPSIGNAL SIGTERM
 
 # Start Uvicorn production server
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-graceful-shutdown", "15"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-graceful-shutdown", "15"]

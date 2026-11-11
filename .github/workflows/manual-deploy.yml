@@ -1,0 +1,87 @@
+name: Controlled Production Deployment (Manual Approval)
+
+# Strict manual trigger only — never runs automatically on push or PR
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Target deployment environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+      confirm_deployment:
+        description: "Explicit safety confirmation (type 'YES-DEPLOY')"
+        required: true
+        default: ""
+        type: string
+      deploy_commit_sha:
+        description: "Git Commit SHA or tag to deploy (default: HEAD)"
+        required: false
+        default: "HEAD"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment-lock
+  cancel-in-progress: false
+
+jobs:
+  pre-deployment-gate:
+    name: Pre-Deployment Verification & Safety Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify explicit user confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm_deployment }}" != "YES-DEPLOY" ]; then
+            echo "CRITICAL: Deployment aborted. You must enter 'YES-DEPLOY' to trigger deployment."
+            exit 1
+          fi
+          echo "Explicit deployment confirmation received for environment: ${{ github.event.inputs.target_environment }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.deploy_commit_sha }}
+          lfs: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify Model Registry and Artifact Integrity
+        run: |
+          python scripts/model_registry_cli.py validate
+
+      - name: Run Model Quality Gates
+        run: |
+          pytest tests/test_model_quality_gates.py
+
+  deploy-action:
+    name: Execute Controlled Cutover
+    needs: pre-deployment-gate
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.target_environment }}
+    steps:
+      - name: Log Deployment Action
+        run: |
+          echo "=========================================================="
+          echo "DEPLOYMENT AUTHORIZED"
+          echo "Environment: ${{ github.event.inputs.target_environment }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Target Commit: ${{ github.event.inputs.deploy_commit_sha }}"
+          echo "Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "=========================================================="
+          echo "For local host deployment, cutover instructions and rollback"
+          echo "procedures are documented in docs/server_operations.md."

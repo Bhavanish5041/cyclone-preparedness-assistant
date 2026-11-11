@@ -851,7 +851,56 @@ class ToolCallingOrchestrator:
                 cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
                 cleaned = re.sub(r"\s*```$", "", cleaned)
             parsed = json.loads(cleaned)
-            return QwenIntentParse.model_validate(parsed)
+            parse_obj = QwenIntentParse.model_validate(parsed)
+
+            # Sanity validation for 0.5B model intent resolution:
+            # 1. If compare_districts was selected, verify that the query or arguments actually refer to two districts
+            if "compare_districts" in parse_obj.intents:
+                valid_districts = {"dakshina kannada", "udupi", "uttara kannada"}
+                districts_in_query = [d for d in valid_districts if d in query.lower()]
+                da = str(parse_obj.arguments.get("district_a", "")).lower()
+                db = str(parse_obj.arguments.get("district_b", "")).lower()
+                if len(districts_in_query) < 2 and (da not in valid_districts or db not in valid_districts):
+                    parse_obj.intents = [t for t in parse_obj.intents if t != "compare_districts"]
+
+            # 2. Check for community match in village index
+            words = re.findall(r"\b[A-Za-z]{3,}\b", query)
+            detected_comm = None
+            for w in words:
+                if w.lower() in self.argument_extractor.village_index:
+                    detected_comm = w
+                    break
+            if not detected_comm and community_hint and community_hint.lower() in self.argument_extractor.village_index:
+                detected_comm = community_hint
+
+            if detected_comm:
+                # If query contains a registered community, ensure valid community tool is present
+                if not parse_obj.intents:
+                    if any(w in query.lower() for w in ["where", "locate", "lookup", "look up", "find"]):
+                        parse_obj.intents = ["lookup_community"]
+                    elif any(w in query.lower() for w in ["infrastructure", "road", "exposure", "shelter"]):
+                        parse_obj.intents = ["analyze_infrastructure_and_exposure"]
+                    elif any(w in query.lower() for w in ["intervention", "recommend", "policy", "advisory"]):
+                        parse_obj.intents = ["get_intervention_recommendations"]
+                    else:
+                        parse_obj.intents = ["explain_preparedness_assessment"]
+                    parse_obj.needs_clarification = False
+                    parse_obj.clarification_question = None
+
+                if "identifier" not in parse_obj.arguments or not parse_obj.arguments["identifier"]:
+                    parse_obj.arguments["identifier"] = detected_comm
+                elif parse_obj.arguments["identifier"].lower() not in self.argument_extractor.village_index:
+                    parse_obj.arguments["identifier"] = detected_comm
+
+            # 3. If no village is detected and query is out of scope (cookies, python, recipe, etc.)
+            else:
+                out_of_scope_keywords = ["recipe", "cookie", "cake", "python", "script", "code", "movie", "book", "cricket", "world cup", "relativity"]
+                if any(w in query.lower() for w in out_of_scope_keywords):
+                    parse_obj.intents = []
+                    parse_obj.needs_clarification = True
+                    parse_obj.clarification_question = "Query is outside the scope of coastal Karnataka cyclone preparedness intelligence."
+
+            return parse_obj
         except Exception as exc:
             logger.warning(f"Qwen intent parsing failed ({exc}); falling back to deterministic parser.")
             return self._deterministic_intent_parse(query, community_hint)

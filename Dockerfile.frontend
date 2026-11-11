@@ -1,0 +1,30 @@
+# ==============================================================================
+# React + Vite Frontend Production Container
+# Cyclone Preparedness Decision Support System
+# ==============================================================================
+
+FROM nginx:alpine
+
+LABEL maintainer="Cyclone Preparedness Team"
+LABEL description="Nginx web server and reverse proxy for React SPA"
+
+# Copy pre-built production frontend assets
+COPY frontend/dist /usr/share/nginx/html
+
+# Copy container-optimized Nginx reverse proxy configuration
+COPY deployment/nginx/nginx.container.conf /etc/nginx/nginx.conf
+
+# Security permissions for nginx non-root execution
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid /var/cache/nginx /usr/share/nginx/html
+
+# Expose HTTP port 80
+EXPOSE 80
+
+# Healthcheck
+HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 \
+    CMD wget -q --spider http://localhost:80/ || exit 1
+
+STOPSIGNAL SIGQUIT
+
+CMD ["nginx", "-g", "daemon off;"]

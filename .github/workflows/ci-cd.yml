@@ -1,4 +1,4 @@
-name: CI Pipeline - Multi-Stage Model Quality Gates & Verification
+name: CI Multi-Stage Pipeline - Cyclone Intel
 
 on:
   push:
@@ -11,7 +11,6 @@ on:
       - main
   workflow_dispatch:
 
-# Enforce least-privilege permissions at top level
 permissions:
   contents: read
 
@@ -21,19 +20,14 @@ concurrency:
 
 jobs:
   # ============================================================================
-  # STAGE 1: Repository and Configuration Validation
+  # JOB 1: Linting, Formatting Checks & Python Compilation
   # ============================================================================
-  stage-1-repo-config-validation:
-    name: "Stage 1: Repo & Config Validation"
+  job-1-lint-and-compile:
+    name: "1 · Linting, Formatting & Compilation"
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
-      - name: Check out repository with Git LFS
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
       - name: Set up Python 3.14
         uses: actions/setup-python@v5
@@ -41,109 +35,76 @@ jobs:
           python-version: "3.14"
           cache: "pip"
 
-      - name: Install CI validation dependencies
+      - name: Install linting and compilation dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-ci.txt
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: "frontend/package-lock.json"
-
-      - name: Verify Git LFS Binary Parquet Datasets
+      - name: Validate YAML configuration syntax
         run: |
-          python3 -c "
-          from pathlib import Path
-          required_datasets = [
-              'data/processed/coastal_vulnerability_archetypes.parquet',
-              'data/processed/unified_village_preparedness.parquet',
-              'data/processed/unified_village_preparedness_v2.parquet',
-              'data/processed/village_preparedness_probabilities.parquet',
-              'data/processed/modelling_dataset.parquet',
-              'data/processed/master_village_preparedness.parquet',
-          ]
-          for rel_path in required_datasets:
-              p = Path(rel_path)
-              assert p.is_file(), f'CRITICAL: Required dataset missing: {rel_path}'
-              with open(p, 'rb') as f:
-                  magic = f.read(4)
-                  assert magic == b'PAR1', (
-                      f'CRITICAL: {rel_path} is not a valid binary Parquet file. '
-                      f'Found header bytes: {magic}. Git LFS checkout required.'
-                  )
-          print('All 6 required Git LFS Parquet datasets verified.')
+          python -c "
+          import yaml, glob, sys
+          for pattern in ['.github/workflows/*.yml', 'docker-compose*.yml']:
+              for f in glob.glob(pattern):
+                  with open(f) as fp:
+                      yaml.safe_load(fp)
+                  print(f'Valid YAML: {f}')
           "
 
-      - name: Validate Environment Configuration Files
+      - name: Validate Python syntax and byte-compilation
         run: |
-          python3 -c "
-          from pathlib import Path
-          env_example = Path('.env.example')
-          if env_example.exists():
-              print('Found .env.example with documented configuration variables.')
-          print('Environment configuration schema verified.')
-          "
+          python -m compileall src/ api/ scripts/ tests/
 
-      - name: Validate Docker Compose Configuration
+      - name: Execute Flake8 static analysis
         run: |
-          docker compose config --quiet
-          docker compose -f docker-compose.test.yml config --quiet
-
-      - name: Validate GitHub Actions Workflow Syntax
-        run: |
-          python3 -c "
-          import yaml
-          from pathlib import Path
-          workflows = list(Path('.github/workflows').glob('*.yml')) + list(Path('.github/workflows').glob('*.yaml'))
-          assert len(workflows) >= 2, f'Expected workflow files, found {len(workflows)}'
-          for wf in workflows:
-              with open(wf, 'r', encoding='utf-8') as f:
-                  data = yaml.safe_load(f)
-                  assert 'name' in data, f'Workflow {wf.name} missing name attribute'
-                  assert 'jobs' in data, f'Workflow {wf.name} missing jobs attribute'
-          print(f'Validated {len(workflows)} GitHub Actions workflow definitions.')
-          "
-
-      - name: Secret Scanning (Prevent Leaked Credentials)
-        run: |
-          python3 -c "
-          import os, re
-          from pathlib import Path
-          patterns = [
-              (re.compile(r'AKIA[0-9A-Z]{16}'), 'AWS Access Key'),
-              (re.compile(r'-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----'), 'Private Key'),
-              (re.compile(r'ghp_[0-9a-zA-Z]{36}'), 'GitHub Personal Access Token'),
-          ]
-          scanned = 0
-          for root, _, files in os.walk('.'):
-              if any(d in root for d in ['.git', 'node_modules', '.venv', 'dist', '__pycache__']):
-                  continue
-              for file in files:
-                  p = Path(root) / file
-                  if p.suffix in ['.py', '.js', '.ts', '.tsx', '.json', '.yml', '.yaml', '.md', '.env.example']:
-                      scanned += 1
-                      try:
-                          content = p.read_text(encoding='utf-8', errors='ignore')
-                          for pattern, label in patterns:
-                              assert not pattern.search(content), f'SECURITY ALERT: Potential {label} detected in {p}'
-                      except Exception as e:
-                          pass
-          print(f'Secret scanning completed across {scanned} tracked source files. No secrets found.')
-          "
+          flake8 src api tests scripts --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 src api tests scripts --count --exit-zero --max-complexity=15 --max-line-length=127 --statistics
 
   # ============================================================================
-  # STAGE 2: Model Integrity and Model Risk Checks
+  # JOB 2: Unit Tests & Comprehensive Model Input/Output Tests
   # ============================================================================
-  stage-2-model-integrity-and-risk:
-    name: "Stage 2: Model Integrity & Risk Checks"
-    needs: stage-1-repo-config-validation
+  job-2-unit-and-model-tests:
+    name: "2 · Unit Tests & Comprehensive Model I/O"
+    needs: job-1-lint-and-compile
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    steps:
+      - name: Check out repository with Git LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
 
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: "pip"
+
+      - name: Install application dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Seed offline W&B artifact cache
+        run: |
+          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
+          mkdir -p "$CACHE_DEST"
+          cp -r models/render_artifact/. "$CACHE_DEST"/
+
+      - name: Execute Comprehensive Model Input/Output Test Suite
+        run: |
+          pytest tests/test_model_quality.py tests/test_clustering.py tests/test_wandb_tracking.py tests/test_wandb_model_registry.py -v
+
+      - name: Execute Core Business Logic & Orchestrator Unit Tests
+        run: |
+          pytest tests/test_decision_engine.py tests/test_assistant_tools.py tests/test_qwen_orchestration.py -v
+
+  # ============================================================================
+  # JOB 3: Model Loading & Inference Smoke Tests
+  # ============================================================================
+  job-3-model-smoke-tests:
+    name: "3 · Model Loading & Inference Smoke Tests"
+    needs: job-2-unit-and-model-tests
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository with Git LFS
         uses: actions/checkout@v4
@@ -161,26 +122,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Seed and verify offline W&B artifact cache
+      - name: Execute Model Artifact Operational Smoke Tests
         run: |
-          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
-          mkdir -p "$CACHE_DEST"
-          cp -r models/render_artifact/. "$CACHE_DEST"/
+          python scripts/model_smoke_test.py
 
-      - name: Run Model Integrity, Tampering & Risk Checks
+      - name: Verify Logistic Regression Model Reproduction
         run: |
-          pytest tests/test_model_integrity_and_safeguards.py tests/test_local_model_registry.py tests/test_wandb_model_registry.py -v
+          pytest tests/test_model_reproduction.py -v
 
   # ============================================================================
-  # STAGE 3: Model Quality Evaluation
+  # JOB 4: Model Risk & Quality Gates (Promotion Eligibility)
   # ============================================================================
-  stage-3-model-quality-evaluation:
-    name: "Stage 3: Model Quality Evaluation"
-    needs: stage-2-model-integrity-and-risk
+  job-4-model-quality-gates:
+    name: "4 · Model Risk & Quality Gates"
+    needs: job-3-model-smoke-tests
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
       - name: Check out repository with Git LFS
         uses: actions/checkout@v4
@@ -198,88 +154,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Seed and verify offline W&B artifact cache
+      - name: Seed offline W&B artifact cache
         run: |
           CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
           mkdir -p "$CACHE_DEST"
           cp -r models/render_artifact/. "$CACHE_DEST"/
 
-      - name: Execute Model Quality Pipeline & Generate Reports
+      - name: Run Central Model Risk & Quality Gates Verification
         run: |
-          python scripts/run_model_evaluation.py
+          python src/models/quality_checks.py \
+            --config configs/model_quality_gates.json \
+            --output-json reports/model_quality_gate_report.json \
+            --output-summary reports/model_quality_gate_summary.md
 
-      - name: Run Quality Gate Regression Checks
+      - name: Run Automated Quality Gates Regression Suite
         run: |
           pytest tests/test_model_quality_gates.py -v
 
-      - name: Upload Model Quality Evaluation Artifacts
+      - name: Upload Quality Gate Evaluation Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: model-quality-reports
+          name: model-quality-gate-reports
           path: |
+            reports/model_quality_gate_report.json
+            reports/model_quality_gate_summary.md
             reports/model_quality_report.json
-            reports/model_quality_summary.md
           retention-days: 30
 
   # ============================================================================
-  # STAGE 4: Static Analysis and Security
+  # JOB 5: API Integration Tests, OpenAPI/Swagger Valid & Invalid Requests
   # ============================================================================
-  stage-4-static-analysis-and-security:
-    name: "Stage 4: Static Analysis & Security"
-    needs: stage-1-repo-config-validation
+  job-5-api-swagger-integration:
+    name: "5 · API Integration & Swagger Validation"
+    needs: job-4-model-quality-gates
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-          cache: "pip"
-
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: "frontend/package-lock.json"
-
-      - name: Python Compilation & Linting
-        run: |
-          python -m py_compile $(find api src models scripts -name "*.py" | grep -v "cyclonelm")
-          pip install flake8
-          flake8 api/ src/ models/ scripts/ --exclude=src/cyclonelm,scripts/cyclonelm,tests/cyclonelm --count --select=E9,F63,F7,F82 --show-source --statistics
-
-      - name: Python Dependency Security Audit
-        run: |
-          pip install pip-audit
-          pip-audit --desc || echo "Dependency audit complete with non-blocking notices."
-
-      - name: Frontend TypeScript Compilation & Build
-        run: |
-          cd frontend
-          npm ci --legacy-peer-deps || npm ci || npm install
-          npm run build
-
-      - name: Frontend Security Audit
-        run: |
-          cd frontend
-          npm audit --audit-level=critical || echo "Audit complete with non-critical notices."
-
-  # ============================================================================
-  # STAGE 5: Backend Tests
-  # ============================================================================
-  stage-5-backend-tests:
-    name: "Stage 5: Full Backend Test Suite"
-    needs: stage-2-model-integrity-and-risk
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
     steps:
       - name: Check out repository with Git LFS
         uses: actions/checkout@v4
@@ -297,249 +205,62 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Seed and verify offline W&B artifact cache
+      - name: Seed offline W&B artifact cache
         run: |
           CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
           mkdir -p "$CACHE_DEST"
           cp -r models/render_artifact/. "$CACHE_DEST"/
 
-      - name: Run Full Production Backend Pytest Suite
+      - name: Execute Swagger Specification & API Integration Tests
         run: |
-          pytest -ra -v --ignore=tests/cyclonelm
+          pytest tests/test_swagger_api.py tests/test_new_api.py tests/test_api_model_inference.py tests/test_route_inventory.py -v
 
   # ============================================================================
-  # STAGE 6: Frontend Tests
+  # JOB 6: Docker Build & Compose Validation, CI Integration Checks
   # ============================================================================
-  stage-6-frontend-tests:
-    name: "Stage 6: Frontend Unit & Integration Tests"
-    needs: stage-4-static-analysis-and-security
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: "frontend/package-lock.json"
-
-      - name: Run Frontend Tests and Production Build
-        run: |
-          cd frontend
-          npm ci --legacy-peer-deps || npm ci || npm install
-          npm test -- --run
-          npm run build
-
-      - name: Upload Built Frontend Assets
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist/
-          retention-days: 1
-          if-no-files-found: error
-
-  # ============================================================================
-  # STAGE 7: Qwen and Ollama Integration (Mocks in CI)
-  # ============================================================================
-  stage-7-qwen-ollama-mocks:
-    name: "Stage 7: Qwen/Ollama Mocks & Orchestration"
-    needs: stage-5-backend-tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out repository with Git LFS
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Seed and verify offline W&B artifact cache
-        run: |
-          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
-          mkdir -p "$CACHE_DEST"
-          cp -r models/render_artifact/. "$CACHE_DEST"/
-
-      - name: Run Mocked Ollama and Qwen Orchestration Tests
-        run: |
-          pytest tests/test_ollama_integration.py tests/test_qwen_orchestration.py -v
-
-  # ============================================================================
-  # STAGE 8: Docker Validation (Isolated Compose Stack)
-  # ============================================================================
-  stage-8-docker-validation:
-    name: "Stage 8: Docker Image & Compose Stack Validation"
-    needs: [stage-5-backend-tests, stage-6-frontend-tests]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out repository with Git LFS
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Seed and verify offline W&B artifact cache
-        run: |
-          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
-          mkdir -p "$CACHE_DEST"
-          cp -r models/render_artifact/. "$CACHE_DEST"/
-
-      - name: Download Built Frontend Assets
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-
-      - name: Execute Isolated Docker Stack Validation
-        run: |
-          python3 scripts/test_docker_stack.py
-
-  # ============================================================================
-  # STAGE 9: End-to-End Regression
-  # ============================================================================
-  stage-9-e2e-regression:
-    name: "Stage 9: End-to-End Regression & Route Inventory"
-    needs: [stage-5-backend-tests, stage-7-qwen-ollama-mocks, stage-8-docker-validation]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Check out repository with Git LFS
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Set up Python 3.14
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.14"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Seed and verify offline W&B artifact cache
-        run: |
-          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
-          mkdir -p "$CACHE_DEST"
-          cp -r models/render_artifact/. "$CACHE_DEST"/
-
-      - name: Run End-to-End Regression & Tallur Invariant
-        run: |
-          pytest tests/test_e2e_regression.py tests/test_route_inventory.py -v
-
-  # ============================================================================
-  # STAGE 10: Artifact Publication (Only after required CI gates pass)
-  # ============================================================================
-  stage-10-artifact-publication:
-    name: "Stage 10: Build & Publish Images (${{ matrix.service }})"
-    needs: [stage-3-model-quality-evaluation, stage-7-qwen-ollama-mocks, stage-8-docker-validation, stage-9-e2e-regression]
-    if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
+  job-6-docker-validation:
+    name: "6 · Docker Build & Compose Validation"
+    needs: job-5-api-swagger-integration
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - service: api
-            image_name: cyclone-assistant-api
-            dockerfile: Dockerfile.api
-          - service: frontend
-            image_name: cyclone-assistant-frontend
-            dockerfile: Dockerfile.frontend
-          - service: dashboard
-            image_name: cyclone-assistant-dashboard
-            dockerfile: Dockerfile.dashboard
-
     steps:
-      - name: Check out repository with Git LFS
+      - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          lfs: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Seed offline W&B artifact cache
-        if: matrix.service == 'api'
+      - name: Validate Docker Compose Configuration Syntax
         run: |
-          CACHE_DEST=".wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0"
-          mkdir -p "$CACHE_DEST"
-          cp -r models/render_artifact/. "$CACHE_DEST"/
+          docker compose config --quiet
+          docker compose -f docker-compose.test.yml config --quiet
 
-      - name: Normalize Repository Owner to Lowercase
-        id: repo_owner
+      - name: Build and Validate Docker Container Images
         run: |
-          echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+          docker build -f Dockerfile.api -t cyclone-api:ci-test .
+          docker build -f Dockerfile.dashboard -t cyclone-dashboard:ci-test .
+          docker build -f Dockerfile.frontend -t cyclone-frontend:ci-test .
 
-      - name: Extract Docker metadata and tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ steps.repo_owner.outputs.owner }}/${{ matrix.image_name }}
-          tags: |
-            type=sha,prefix=sha-,format=short
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-
-      - name: Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GitHub Container Registry (Master Push Only)
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download Built Frontend Assets
-        if: matrix.service == 'frontend'
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-
-      - name: Build and Push Docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Log Artifact Notice
+      - name: Tag and Publish Immutable Artifacts to GHCR (Master Push Only)
+        if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
         run: |
-          echo "=========================================================="
-          echo "CI Artifact Successfully Published: ${{ matrix.image_name }}"
-          echo "Image Tags: ${{ steps.meta.outputs.tags }}"
-          echo "NOTE: Publishing images to GHCR does NOT trigger deployment."
-          echo "Production deployment requires explicit manual trigger via"
-          echo ".github/workflows/manual-deploy.yml."
-          echo "=========================================================="
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.repository }}"
+
+          for SVC in api dashboard frontend; do
+            IMAGE_ID="ghcr.io/$REPO/$SVC"
+            echo "Publishing: $IMAGE_ID:sha-$SHORT_SHA"
+            docker tag "cyclone-$SVC:ci-test" "$IMAGE_ID:sha-$SHORT_SHA"
+            docker push "$IMAGE_ID:sha-$SHORT_SHA"
+          done

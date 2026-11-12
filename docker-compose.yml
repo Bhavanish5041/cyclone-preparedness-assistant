@@ -1,9 +1,11 @@
+name: cyclone-prod
+
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    image: cyclone-assistant-frontend:latest
+    image: ${FRONTEND_IMAGE:-cyclone-assistant-frontend:latest}
     container_name: cyclone-frontend
     restart: unless-stopped
     ports:
@@ -29,7 +31,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    image: cyclone-assistant-api:latest
+    image: ${API_IMAGE:-cyclone-assistant-api:latest}
     container_name: cyclone-api
     restart: unless-stopped
     ports:
@@ -65,7 +67,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dashboard
-    image: cyclone-assistant-dashboard:latest
+    image: ${DASHBOARD_IMAGE:-cyclone-assistant-dashboard:latest}
     container_name: cyclone-dashboard
     restart: unless-stopped
     ports:

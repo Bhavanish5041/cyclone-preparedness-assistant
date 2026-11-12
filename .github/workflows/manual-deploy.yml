@@ -1,52 +1,87 @@
-name: Controlled Production Deployment (Manual Approval)
+name: CD Pipeline - Controlled Production Deployment (Self-Hosted Runner)
 
-# Strict manual trigger only — never runs automatically on push or PR
+# Strict manual trigger only — NEVER runs automatically on push or pull request.
+# Security Policy: Untrusted PR code is NEVER permitted to execute on the self-hosted runner.
 on:
   workflow_dispatch:
     inputs:
       target_environment:
         description: "Target deployment environment"
         required: true
-        default: "staging"
+        default: "production"
         type: choice
         options:
-          - staging
           - production
-      confirm_deployment:
-        description: "Explicit safety confirmation (type 'YES-DEPLOY')"
+          - staging
+          - simulation
+      image_tag:
+        description: "Exact Docker image tag to deploy (e.g., sha-7d0e09a or latest)"
         required: true
-        default: ""
+        default: "latest"
         type: string
-      deploy_commit_sha:
-        description: "Git Commit SHA or tag to deploy (default: HEAD)"
+      git_commit_sha:
+        description: "Git Commit SHA or release tag to deploy (default: HEAD)"
         required: false
         default: "HEAD"
         type: string
+      services:
+        description: "Services to deploy ('auto' detects changed services only)"
+        required: true
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - all
+          - api
+          - frontend
+          - dashboard
+      confirm_deployment:
+        description: "Explicit safety confirmation phrase (must type 'CONFIRM-DEPLOY')"
+        required: true
+        default: ""
+        type: string
+      public_tunnel_url:
+        description: "Optional public Cloudflare Tunnel URL (e.g. https://...trycloudflare.com) for pre/post smoke tests"
+        required: false
+        default: ""
+        type: string
+      enable_smoke_tests:
+        description: "Execute automated post-deployment smoke tests if tunnel URL provided"
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
-  group: production-deployment-lock
+  group: cyclone-deployment-lock
   cancel-in-progress: false
 
 jobs:
-  pre-deployment-gate:
-    name: Pre-Deployment Verification & Safety Gate
+  # ============================================================================
+  # 1. Pre-Deployment Verification & Safety Gates (GitHub-Hosted Runner)
+  # ============================================================================
+  pre-deployment-verification:
+    name: "Pre-Deployment Verification & Safety Gate"
     runs-on: ubuntu-latest
     steps:
-      - name: Verify explicit user confirmation
+      - name: Verify explicit confirmation token
         run: |
-          if [ "${{ github.event.inputs.confirm_deployment }}" != "YES-DEPLOY" ]; then
-            echo "CRITICAL: Deployment aborted. You must enter 'YES-DEPLOY' to trigger deployment."
+          if [ "${{ github.event.inputs.confirm_deployment }}" != "CONFIRM-DEPLOY" ]; then
+            echo "CRITICAL: Deployment aborted. You must enter 'CONFIRM-DEPLOY' to trigger deployment."
             exit 1
           fi
-          echo "Explicit deployment confirmation received for environment: ${{ github.event.inputs.target_environment }}"
+          echo "Explicit confirmation received. Target: ${{ github.event.inputs.target_environment }}"
+          echo "Selected Image Tag: ${{ github.event.inputs.image_tag }}"
+          echo "Selected Commit SHA: ${{ github.event.inputs.git_commit_sha }}"
+          echo "Target Services: ${{ github.event.inputs.services }}"
 
-      - name: Checkout repository
+      - name: Checkout target commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.deploy_commit_sha }}
+          ref: ${{ github.event.inputs.git_commit_sha }}
           lfs: true
 
       - name: Set up Python
@@ -63,25 +98,123 @@ jobs:
         run: |
           python scripts/model_registry_cli.py validate
 
-      - name: Run Model Quality Gates
+      - name: Run Model Quality Gates Regression
         run: |
-          pytest tests/test_model_quality_gates.py
+          pytest tests/test_model_quality_gates.py -v
 
-  deploy-action:
-    name: Execute Controlled Cutover
-    needs: pre-deployment-gate
+      - name: Optional Pre-Deployment Target Health Check
+        if: ${{ github.event.inputs.public_tunnel_url != '' }}
+        run: |
+          TARGET="${{ github.event.inputs.public_tunnel_url }}"
+          echo "Probing active target: $TARGET/health"
+          curl -f -s --max-time 15 "$TARGET/health" || echo "Notice: Target currently unreachable or tunnel renewing."
+
+  # ============================================================================
+  # 2. Production Release Approval Gate (GitHub Environment Protection Rule)
+  # ============================================================================
+  production-release-gate:
+    name: "Production Release Gate (Manual Approval)"
+    needs: pre-deployment-verification
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.target_environment }}
     steps:
-      - name: Log Deployment Action
+      - name: Log Deployment Authorization
         run: |
           echo "=========================================================="
-          echo "DEPLOYMENT AUTHORIZED"
+          echo "DEPLOYMENT AUTHORIZED & APPROVED"
           echo "Environment: ${{ github.event.inputs.target_environment }}"
-          echo "Triggered by: ${{ github.actor }}"
-          echo "Target Commit: ${{ github.event.inputs.deploy_commit_sha }}"
+          echo "Approved by: ${{ github.actor }}"
+          echo "Target Commit: ${{ github.event.inputs.git_commit_sha }}"
+          echo "Target Image Tag: ${{ github.event.inputs.image_tag }}"
+          echo "Services Selection: ${{ github.event.inputs.services }}"
           echo "Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           echo "=========================================================="
-          echo "For local host deployment, cutover instructions and rollback"
-          echo "procedures are documented in docs/server_operations.md."
+
+  # ============================================================================
+  # 3. Direct Laptop Deployment via Self-Hosted Runner
+  # ============================================================================
+  deploy-to-laptop:
+    name: "Deploy Services to Ubuntu Laptop (Self-Hosted Runner)"
+    needs: production-release-gate
+    environment:
+      name: ${{ github.event.inputs.target_environment }}
+    runs-on: [self-hosted, linux, cyclone-runner]
+    # Security Boundary: Restrict execution strictly to dispatch on authorized repository
+    if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'Bhavanish5041/cyclone-preparedness-assistant' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.git_commit_sha }}
+          lfs: false
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Execute Automated Zero-Downtime Deployment with Rollback Guard
+        run: |
+          SIM_FLAG=""
+          if [ "${{ github.event.inputs.target_environment }}" = "simulation" ]; then
+            SIM_FLAG="--simulate"
+          fi
+
+          python3 scripts/deploy_production.py \
+            --image-tag "${{ github.event.inputs.image_tag }}" \
+            --commit-sha "${{ github.event.inputs.git_commit_sha }}" \
+            --repo-owner "${{ github.repository_owner }}" \
+            --services "${{ github.event.inputs.services }}" \
+            --health-timeout 60 \
+            $SIM_FLAG
+
+      - name: Execute Local Post-Deployment Validation Suite
+        if: ${{ github.event.inputs.target_environment != 'simulation' }}
+        run: |
+          python3 scripts/validate_deployment.py --proxy-url http://127.0.0.1 --api-url http://127.0.0.1:8000
+
+      - name: Upload Deployment Audit Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-audit-log-${{ github.run_id }}
+          path: logs/deployment.log
+          retention-days: 30
+
+  # ============================================================================
+  # 4. Post-Deployment Smoke Tests via Public Cloudflare Tunnel (GitHub-Hosted)
+  # ============================================================================
+  post-deployment-smoke-tests:
+    name: "Post-Deployment Remote Smoke Tests"
+    needs: deploy-to-laptop
+    if: ${{ github.event.inputs.public_tunnel_url != '' && github.event.inputs.enable_smoke_tests == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Remote Smoke Tests Against Cloudflare Tunnel
+        run: |
+          TARGET="${{ github.event.inputs.public_tunnel_url }}"
+          echo "Executing remote smoke tests against $TARGET..."
+          python3 -c "
+          import urllib.request, json, sys
+          endpoints = [
+              '$TARGET/health',
+              '$TARGET/ready',
+              '$TARGET/api/health',
+              '$TARGET/api/dashboard/overview',
+              '$TARGET/api/communities?search=Tallur',
+              '$TARGET/api/districts',
+          ]
+          for ep in endpoints:
+              try:
+                  req = urllib.request.Request(ep, headers={'User-Agent': 'DeploymentSmokeTest/1.0'})
+                  with urllib.request.urlopen(req, timeout=20) as resp:
+                      assert resp.status == 200, f'Endpoint {ep} returned {resp.status}'
+                      print(f'PASS: [200] {ep}')
+              except Exception as e:
+                  print(f'FAIL: {ep} -> {e}')
+                  sys.exit(1)
+          print('All post-deployment smoke tests passed successfully.')
+          "

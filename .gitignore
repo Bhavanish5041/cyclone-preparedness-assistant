@@ -39,8 +39,16 @@ dist/
 *.pth
 *.bin
 *.onnx
+
+# Binary model files: ignore large dumps but allowlist production artifacts & intent models
 *.joblib
-data/cyclonelm/v0.8/
-models/cyclonelm/v0.8/
+!models/logistic_regression_tier.joblib
+!models/label_encoder.joblib
+!models/render_artifact/*.joblib
+!models/cyclonelm/v0.8/intent/*.joblib
 
-
+# Local logs, scratch, backups, and Colab exports
+logs/
+scratch/
+backups/
+export/

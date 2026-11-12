@@ -1,0 +1,69 @@
+# Isolated CI/CD Docker Validation Stack
+# Completely isolated from production containers, networks, volumes, and ports.
+
+name: cyclone-ci-test
+
+services:
+  frontend-ci-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: cyclone-ci-frontend:test
+    container_name: cyclone-ci-frontend-test
+    restart: "no"
+    ports:
+      - "8088:80"
+    networks:
+      - cyclone-ci-net
+    depends_on:
+      api-ci-test:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+  api-ci-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: cyclone-ci-api:test
+    container_name: cyclone-ci-api-test
+    restart: "no"
+    ports:
+      - "8008:8000"
+    environment:
+      - WANDB_MODEL_ARTIFACT=village-preparedness-classifier:v0
+      - WANDB_CACHE_DIR=/app/.wandb_artifacts_cache
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - MONITORING_REPORTS_DIR=/app/reports/model_monitoring
+      - PYTHONUNBUFFERED=1
+    extra_hosts:
+      - "host.docker.internal:172.18.0.1"
+    networks:
+      cyclone-ci-net:
+        aliases:
+          - api
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1536M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+networks:
+  cyclone-ci-net:
+    name: cyclone_ci_internal_net
+    driver: bridge

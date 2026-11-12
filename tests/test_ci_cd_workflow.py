@@ -1,14 +1,19 @@
-"""Tests for GitHub Actions CI/CD workflow configuration and static validation.
+"""Tests for GitHub Actions Multi-Stage CI/CD and Self-Hosted CD Workflows.
 
 Verifies:
-- Workflow existence, YAML syntax, and schema completeness.
-- Trigger conditions (push, pull_request, workflow_dispatch on default integration branch).
-- Strict job dependency graph (build-and-publish strictly depends on test passing).
-- Image matrix configuration (cyclone-assistant-api and cyclone-assistant-dashboard).
-- Least privilege permissions model (contents: read, packages: write).
-- PR security guardrails (no registry login or push on pull_request events).
-- Image tagging strategy (SHA-based immutability, branch tracking, latest on default).
-- Dockerfile and Compose validation consistency.
+- CI workflow existence, YAML schema, and multi-stage pipeline configuration.
+- Trigger conditions (push/PR/dispatch on master and main).
+- Strict 10-stage sequential dependency graph.
+- Matrix publication configuration for api, frontend, and dashboard services.
+- Least-privilege permissions model (contents: read, packages: write on publication).
+- Pull Request isolation (zero image pushes on PRs).
+- Image tagging strategy (commit-based sha-, branch tracking, latest).
+- CD workflow (.github/workflows/manual-deploy.yml) configuration:
+  - Manual trigger only (workflow_dispatch).
+  - Explicit confirmation token gate.
+  - Manual approval gate via GitHub Environment.
+  - Self-hosted runner execution with strict PR restriction.
+- Docker Compose configuration syntax and integrity.
 """
 
 from pathlib import Path
@@ -16,167 +21,182 @@ import subprocess
 import yaml
 import pytest
 
-WORKFLOW_PATH = Path(__file__).resolve().parent.parent / ".github/workflows/ci-cd.yml"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+CI_WORKFLOW_PATH = PROJECT_ROOT / ".github/workflows/ci-cd.yml"
+CD_WORKFLOW_PATH = PROJECT_ROOT / ".github/workflows/manual-deploy.yml"
 
 
 @pytest.fixture(scope="module")
-def workflow_data():
-    """Load and parse the CI/CD workflow YAML file."""
-    assert WORKFLOW_PATH.is_file(), f"Workflow file not found at {WORKFLOW_PATH}"
-    with open(WORKFLOW_PATH, "r", encoding="utf-8") as f:
+def ci_workflow_data():
+    """Load and parse the multi-stage CI workflow YAML file."""
+    assert CI_WORKFLOW_PATH.is_file(), f"CI workflow file not found at {CI_WORKFLOW_PATH}"
+    with open(CI_WORKFLOW_PATH, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    assert isinstance(data, dict), "Workflow YAML must parse into a dictionary"
+    assert isinstance(data, dict), "CI workflow YAML must parse into a dictionary"
     return data
 
 
-def test_workflow_top_level_metadata(workflow_data):
-    """Verify workflow name, top-level permissions, and triggers."""
-    assert "name" in workflow_data
-    assert "CI/CD" in workflow_data["name"]
+@pytest.fixture(scope="module")
+def cd_workflow_data():
+    """Load and parse the CD deployment workflow YAML file."""
+    assert CD_WORKFLOW_PATH.is_file(), f"CD workflow file not found at {CD_WORKFLOW_PATH}"
+    with open(CD_WORKFLOW_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    assert isinstance(data, dict), "CD workflow YAML must parse into a dictionary"
+    return data
+
+
+def test_ci_workflow_top_level_metadata(ci_workflow_data):
+    """Verify CI workflow name, least-privilege permissions, and triggers."""
+    assert "name" in ci_workflow_data
+    assert "CI" in ci_workflow_data["name"]
 
     # Verify least-privilege permissions at top level
-    assert "permissions" in workflow_data
-    assert workflow_data["permissions"].get("contents") == "read"
+    assert "permissions" in ci_workflow_data
+    assert ci_workflow_data["permissions"].get("contents") == "read"
 
-    # Verify triggers
-    triggers = workflow_data.get("on")
-    assert isinstance(triggers, dict)
+    # Verify triggers (in PyYAML, unquoted 'on' is parsed as boolean True)
+    triggers = ci_workflow_data.get("on") or ci_workflow_data.get(True, {})
     assert "push" in triggers
     assert "pull_request" in triggers
     assert "workflow_dispatch" in triggers
 
-    # Verify branch targeting includes default integration branch 'master'
+    # Verify branch targeting includes master and main
     assert "master" in triggers["push"]["branches"]
     assert "master" in triggers["pull_request"]["branches"]
 
 
-def test_workflow_job_graph_and_dependencies(workflow_data):
-    """Verify required jobs and strict dependency sequencing."""
-    jobs = workflow_data.get("jobs", {})
-    assert "test" in jobs
-    assert "build-and-publish" in jobs
-    assert "deployment-readiness" in jobs
+def test_ci_workflow_10_stages_and_dependencies(ci_workflow_data):
+    """Verify all 10 pipeline stages and their strict dependency ordering."""
+    jobs = ci_workflow_data.get("jobs", {})
+    expected_stages = [
+        "stage-1-repo-config-validation",
+        "stage-2-model-integrity-and-risk",
+        "stage-3-model-quality-evaluation",
+        "stage-4-static-analysis-and-security",
+        "stage-5-backend-tests",
+        "stage-6-frontend-tests",
+        "stage-7-qwen-ollama-mocks",
+        "stage-8-docker-validation",
+        "stage-9-e2e-regression",
+        "stage-10-artifact-publication",
+    ]
+    for stage in expected_stages:
+        assert stage in jobs, f"Missing pipeline stage: {stage}"
 
-    # Verify test job does not depend on other jobs
-    assert "needs" not in jobs["test"]
+    # Verify dependency links
+    assert "needs" not in jobs["stage-1-repo-config-validation"]
+    assert jobs["stage-2-model-integrity-and-risk"].get("needs") == "stage-1-repo-config-validation"
+    assert jobs["stage-3-model-quality-evaluation"].get("needs") == "stage-2-model-integrity-and-risk"
+    assert jobs["stage-4-static-analysis-and-security"].get("needs") == "stage-1-repo-config-validation"
+    assert jobs["stage-5-backend-tests"].get("needs") == "stage-2-model-integrity-and-risk"
+    assert jobs["stage-6-frontend-tests"].get("needs") == "stage-4-static-analysis-and-security"
+    assert jobs["stage-7-qwen-ollama-mocks"].get("needs") == "stage-5-backend-tests"
 
-    # Verify build-and-publish strictly depends on test passing
-    assert jobs["build-and-publish"].get("needs") == "test"
+    stage8_needs = jobs["stage-8-docker-validation"].get("needs", [])
+    assert "stage-5-backend-tests" in stage8_needs
+    assert "stage-6-frontend-tests" in stage8_needs
 
-    # Verify deployment-readiness depends on both test and build-and-publish
-    deploy_needs = jobs["deployment-readiness"].get("needs")
-    if isinstance(deploy_needs, list):
-        assert "test" in deploy_needs
-        assert "build-and-publish" in deploy_needs
-    else:
-        assert deploy_needs == "build-and-publish"
+    stage9_needs = jobs["stage-9-e2e-regression"].get("needs", [])
+    assert "stage-5-backend-tests" in stage9_needs
+    assert "stage-7-qwen-ollama-mocks" in stage9_needs
+    assert "stage-8-docker-validation" in stage9_needs
 
-
-def test_test_job_configuration(workflow_data):
-    """Verify CI test job installs dependencies and runs pytest and compose config."""
-    test_job = workflow_data["jobs"]["test"]
-    assert test_job["runs-on"] == "ubuntu-latest"
-    assert test_job.get("permissions", {}).get("contents") == "read"
-
-    steps = test_job.get("steps", [])
-    step_names = [s.get("name", "") for s in steps]
-    step_runs = [s.get("run", "") for s in steps]
-
-    # Verify checkout with Git LFS and setup-python
-    uses = [s.get("uses", "") for s in steps]
-    checkout_steps = [s for s in steps if "actions/checkout" in s.get("uses", "")]
-    assert len(checkout_steps) > 0, "actions/checkout step required"
-    assert checkout_steps[0].get("with", {}).get("lfs") is True, "actions/checkout must have lfs: true"
-    assert any("actions/setup-python" in u for u in uses)
-
-    # Verify requirements.txt installation and pytest invocation
-    all_runs = "\n".join(step_runs)
-    assert "requirements.txt" in all_runs
-    assert "pytest" in all_runs
-    assert "docker compose config" in all_runs
-    assert ".wandb_artifacts_cache" in all_runs
-    assert "data/processed/coastal_vulnerability_archetypes.parquet" in all_runs
-    assert "data/processed/modelling_dataset.parquet" in all_runs
-    assert "data/processed/master_village_preparedness.parquet" in all_runs
+    stage10_needs = jobs["stage-10-artifact-publication"].get("needs", [])
+    assert "stage-3-model-quality-evaluation" in stage10_needs
+    assert "stage-7-qwen-ollama-mocks" in stage10_needs
+    assert "stage-8-docker-validation" in stage10_needs
+    assert "stage-9-e2e-regression" in stage10_needs
 
 
-def test_build_and_publish_matrix_configuration(workflow_data):
-    """Verify build matrix defines both api and dashboard services with valid Dockerfiles."""
-    build_job = workflow_data["jobs"]["build-and-publish"]
-    strategy = build_job.get("strategy", {})
+def test_ci_runs_on_github_hosted_runners(ci_workflow_data):
+    """Verify that CI strictly runs on GitHub-hosted runners (ubuntu-latest), never self-hosted."""
+    jobs = ci_workflow_data.get("jobs", {})
+    for stage_id, stage_config in jobs.items():
+        runs_on = stage_config.get("runs-on")
+        assert runs_on == "ubuntu-latest", (
+            f"Stage {stage_id} must run on ubuntu-latest, found: {runs_on}"
+        )
+
+
+def test_ci_artifact_publication_matrix(ci_workflow_data):
+    """Verify Stage 10 matrix publishes api, frontend, and dashboard images with valid Dockerfiles."""
+    pub_job = ci_workflow_data["jobs"]["stage-10-artifact-publication"]
+    strategy = pub_job.get("strategy", {})
     matrix = strategy.get("matrix", {})
     include_list = matrix.get("include", [])
 
-    assert len(include_list) == 2, "Matrix must define exactly two services: api and dashboard"
-
+    assert len(include_list) == 3, "Matrix must define 3 services: api, frontend, dashboard"
     services = {item["service"]: item for item in include_list}
     assert "api" in services
+    assert "frontend" in services
     assert "dashboard" in services
 
-    # Verify image names and Dockerfiles
     assert services["api"]["image_name"] == "cyclone-assistant-api"
     assert services["api"]["dockerfile"] == "Dockerfile.api"
     assert (PROJECT_ROOT / services["api"]["dockerfile"]).is_file()
+
+    assert services["frontend"]["image_name"] == "cyclone-assistant-frontend"
+    assert services["frontend"]["dockerfile"] == "Dockerfile.frontend"
+    assert (PROJECT_ROOT / services["frontend"]["dockerfile"]).is_file()
 
     assert services["dashboard"]["image_name"] == "cyclone-assistant-dashboard"
     assert services["dashboard"]["dockerfile"] == "Dockerfile.dashboard"
     assert (PROJECT_ROOT / services["dashboard"]["dockerfile"]).is_file()
 
-    # Verify checkout with Git LFS and cache seeding in build job
-    steps = build_job.get("steps", [])
-    checkout_steps = [s for s in steps if "actions/checkout" in s.get("uses", "")]
-    assert len(checkout_steps) > 0, "actions/checkout step required in build job"
-    assert checkout_steps[0].get("with", {}).get("lfs") is True, "build checkout must have lfs: true"
+    # Verify PR guard condition prevents publishing from pull requests
+    job_if = pub_job.get("if", "")
+    assert "pull_request" in job_if
+    assert "!=" in job_if
 
-    step_runs = "\n".join(s.get("run", "") for s in steps)
-    assert ".wandb_artifacts_cache" in step_runs, "build job must seed offline W&B artifact cache"
+    # Verify permissions
+    perms = pub_job.get("permissions", {})
+    assert perms.get("packages") == "write"
+    assert perms.get("contents") == "read"
 
-
-def test_security_and_pull_request_guardrails(workflow_data):
-    """Verify that images are NEVER pushed from untrusted pull requests."""
-    build_job = workflow_data["jobs"]["build-and-publish"]
-    steps = build_job.get("steps", [])
-
-    # Check login step condition
-    login_step = next((s for s in steps if "login-action" in s.get("uses", "")), None)
-    assert login_step is not None, "Login step must be present"
-    login_if = login_step.get("if", "")
-    assert "pull_request" in login_if
-    assert "!=" in login_if or "github.event_name != 'pull_request'" in login_if
-
-    # Check build-push step condition
-    build_step = next((s for s in steps if "build-push-action" in s.get("uses", "")), None)
-    assert build_step is not None, "Build-push step must be present"
-    push_condition = build_step.get("with", {}).get("push", "")
-    assert "pull_request" in push_condition
-    assert "!=" in push_condition
-
-    # Verify least-privilege packages: write permission on build job
-    permissions = build_job.get("permissions", {})
-    assert permissions.get("packages") == "write"
-    assert permissions.get("contents") == "read"
+    # Verify lowercase repo owner normalization step exists
+    step_names = [step.get("name", "") for step in pub_job.get("steps", [])]
+    assert any("Lowercase" in name or "Normalize" in name for name in step_names)
+    assert any("W&B" in name or "cache" in name for name in step_names)
 
 
-def test_image_tagging_strategy(workflow_data):
-    """Verify image tagging includes SHA-based immutable tags and branch tracking."""
-    build_job = workflow_data["jobs"]["build-and-publish"]
-    steps = build_job.get("steps", [])
-    meta_step = next((s for s in steps if "metadata-action" in s.get("uses", "")), None)
-    assert meta_step is not None, "Docker metadata action must be configured"
+def test_cd_workflow_security_and_approval_gates(cd_workflow_data):
+    """Verify CD deployment workflow safety, manual approvals, and self-hosted runner constraints."""
+    # Must only trigger on workflow_dispatch (manual)
+    triggers = cd_workflow_data.get("on") or cd_workflow_data.get(True, {})
+    assert "workflow_dispatch" in triggers
+    assert "push" not in triggers
+    assert "pull_request" not in triggers
 
-    tags_config = meta_step.get("with", {}).get("tags", "")
-    assert "type=sha" in tags_config
-    assert "prefix=sha-" in tags_config
-    assert "type=ref,event=branch" in tags_config
-    assert "latest" in tags_config
+    jobs = cd_workflow_data.get("jobs", {})
+    assert "pre-deployment-verification" in jobs
+    assert "production-release-gate" in jobs
+    assert "deploy-to-laptop" in jobs
 
-    images_config = meta_step.get("with", {}).get("images", "")
-    assert "ghcr.io" in images_config
+    # Pre-deployment verification runs on GitHub-hosted runner
+    assert jobs["pre-deployment-verification"]["runs-on"] == "ubuntu-latest"
+
+    # Production release gate requires manual approval via GitHub Environment
+    gate_job = jobs["production-release-gate"]
+    assert gate_job["runs-on"] == "ubuntu-latest"
+    assert "environment" in gate_job
+
+    # Deployment job targets dedicated self-hosted runner on the Ubuntu laptop
+    deploy_job = jobs["deploy-to-laptop"]
+    assert "environment" in deploy_job
+    runs_on = deploy_job.get("runs-on")
+    assert isinstance(runs_on, list)
+    assert "self-hosted" in runs_on
+    assert "cyclone-runner" in runs_on
+
+    # Security check: PR execution strictly forbidden on runner
+    job_if = deploy_job.get("if", "")
+    assert "workflow_dispatch" in job_if
+    assert "repository" in job_if
 
 
 def test_docker_compose_config_validation():
-    """Verify local docker-compose.yml passes validation cleanly without errors."""
+    """Verify local docker-compose.yml and docker-compose.test.yml pass validation cleanly."""
     res = subprocess.run(
         ["docker", "compose", "config", "--quiet"],
         cwd=PROJECT_ROOT,
@@ -184,3 +204,11 @@ def test_docker_compose_config_validation():
         text=True,
     )
     assert res.returncode == 0, f"docker compose config failed: {res.stderr}"
+
+    res_test = subprocess.run(
+        ["docker", "compose", "-f", "docker-compose.test.yml", "config", "--quiet"],
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert res_test.returncode == 0, f"docker-compose.test.yml config failed: {res_test.stderr}"

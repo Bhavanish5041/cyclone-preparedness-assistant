@@ -103,7 +103,7 @@ All conversational responses adhere to the non-negotiable scientific hierarchy o
 
 ### Tool 6: `explain_vulnerability_archetype`
 - **Module:** `src/assistant/tools/archetypes.py`
-- **Purpose:** Explain structural vulnerability profiles across the 4 K-Means archetypes (`Cluster 0: Low Exposure / High Infrastructure`, `Cluster 1: High Physical Exposure`, `Cluster 2: Institutional & Healthcare Deficit`, `Cluster 3: Severe Socio-Economic Vulnerability`).
+- **Purpose:** Explain structural vulnerability profiles across the 4 K-Means archetypes (`Cluster 0: Urban & Peri-Urban Well-Resourced Corridor`, `Cluster 1: Remote Foothill & Healthcare-Isolated Communities`, `Cluster 2: Socioeconomically Vulnerable Rural Interior`, `Cluster 3: High-Exposure Coastal Rural Belt`).
 - **Parameters:**
   - `archetype_id` (`integer`, optional): Cluster ID (0 to 3).
   - `community_identifier` (`string`, optional): Explain archetype assignment for a specific community.

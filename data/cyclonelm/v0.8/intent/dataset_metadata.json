@@ -1,0 +1,116 @@
+{
+  "dataset_name": "CycloneLM v0.8 Intent Classification & Refusal Suite",
+  "partitions": {
+    "train": {
+      "total": 560,
+      "intents": {
+        "refusal_live_telemetry": 12,
+        "explain_preparedness_assessment": 116,
+        "get_intervention_recommendations": 116,
+        "lookup_community": 116,
+        "analyze_infrastructure_and_exposure": 116,
+        "filter_and_rank_communities": 26,
+        "compare_districts": 24,
+        "explain_vulnerability_archetype": 14,
+        "ambiguous": 10,
+        "out_of_scope": 10
+      }
+    },
+    "val": {
+      "total": 208,
+      "intents": {
+        "filter_and_rank_communities": 26,
+        "explain_preparedness_assessment": 28,
+        "get_intervention_recommendations": 28,
+        "compare_districts": 24,
+        "refusal_live_telemetry": 12,
+        "lookup_community": 28,
+        "out_of_scope": 10,
+        "ambiguous": 10,
+        "analyze_infrastructure_and_exposure": 28,
+        "explain_vulnerability_archetype": 14
+      }
+    },
+    "test": {
+      "total": 273,
+      "intents": {
+        "analyze_infrastructure_and_exposure": 41,
+        "compare_districts": 29,
+        "lookup_community": 41,
+        "get_intervention_recommendations": 41,
+        "explain_vulnerability_archetype": 16,
+        "ambiguous": 10,
+        "filter_and_rank_communities": 29,
+        "explain_preparedness_assessment": 41,
+        "refusal_live_telemetry": 15,
+        "out_of_scope": 10
+      }
+    }
+  },
+  "target_classes": [
+    "analyze_infrastructure_and_exposure",
+    "compare_districts",
+    "explain_preparedness_assessment",
+    "explain_vulnerability_archetype",
+    "filter_and_rank_communities",
+    "get_intervention_recommendations",
+    "lookup_community",
+    "refusal_live_telemetry",
+    "out_of_scope",
+    "ambiguous"
+  ],
+  "leakage_prevention": {
+    "entity_isolation": "Strictly disjoint community entities across train, val, test",
+    "train_communities": [
+      "Ullal",
+      "Someshwara",
+      "Kotekar",
+      "Surathkal",
+      "Mulki",
+      "Bantwal",
+      "Belthangady",
+      "Puttur",
+      "Sullia",
+      "Kadaba",
+      "Kaup",
+      "Padubidri",
+      "Saligrama",
+      "Brahmavara",
+      "Karkala",
+      "Hebri",
+      "Byndoor",
+      "Kundapura",
+      "Shirali",
+      "Mavalli",
+      "Kumta",
+      "Ankola",
+      "Karwar",
+      "Honnavar",
+      "Siddapur",
+      "Sirsi",
+      "Yellapur",
+      "Haliyal",
+      "Jida"
+    ],
+    "val_communities": [
+      "Moodabidri",
+      "Halady",
+      "Gokarna",
+      "Bhatkal",
+      "Mundgod",
+      "Kinnigoli",
+      "Kota"
+    ],
+    "test_communities": [
+      "Tallur",
+      "Bengre",
+      "Malpe",
+      "Edmoge",
+      "Koni",
+      "Aghanashini",
+      "Kodimbala",
+      "Sulya (TP)",
+      "Bappalgundi"
+    ]
+  }
+}

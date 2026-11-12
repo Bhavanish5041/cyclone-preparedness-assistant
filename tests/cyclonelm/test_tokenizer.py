@@ -141,3 +141,45 @@ def test_v01_checkpoint_incompatible_with_v02_vocabulary():
                 device="cpu",
             )
 
+
+def test_tokenizer_roundtrip_actual_training_text():
+    """Verify lossless round-trip encoding/decoding on actual CycloneLM training text."""
+    v02_tok_path = Path("models/cyclonelm/v0.2/tokenizer/vocab.json")
+    v01_tok_path = Path("models/cyclonelm/v0.1/tokenizer/vocab.json")
+
+    # Test v0.2 tokenizer with v0.2 training corpus
+    if v02_tok_path.exists():
+        tok_v02 = BPETokenizer.load(v02_tok_path)
+        corpus_path = Path("data/cyclonelm/v0.2/domain_corpus/train_combined_corpus.txt")
+        if corpus_path.exists():
+            with open(corpus_path, "r", encoding="utf-8") as f:
+                lines = [line.strip() for line in f if line.strip()][:50]
+            for line in lines:
+                encoded = tok_v02.encode(line, add_bos=False, add_eos=False)
+                decoded = tok_v02.decode(encoded["input_ids"], skip_special_tokens=False)
+                assert decoded == line, f"Roundtrip failed for line: {line[:50]}..."
+
+        # Test v0.2 instruction text
+        inst_path = Path("data/cyclonelm/v0.2/instructions/train.jsonl")
+        if inst_path.exists():
+            with open(inst_path, "r", encoding="utf-8") as f:
+                records = [json.loads(line) for line in f if line.strip()][:25]
+            for r in records:
+                text = f"<user>{r['instruction']}</user><assistant>{r['response']}</assistant>"
+                encoded = tok_v02.encode(text)
+                decoded = tok_v02.decode(encoded["input_ids"], skip_special_tokens=False)
+                assert decoded == text, f"Roundtrip failed for instruction: {text[:50]}..."
+
+    # Test v0.1 tokenizer with v0.1 training corpus
+    if v01_tok_path.exists():
+        tok_v01 = BPETokenizer.load(v01_tok_path)
+        v01_corpus_path = Path("data/cyclonelm/pretraining/cyclonelm_domain_corpus.txt")
+        if v01_corpus_path.exists():
+            with open(v01_corpus_path, "r", encoding="utf-8") as f:
+                lines = [line.strip() for line in f if line.strip()][:50]
+            for line in lines:
+                encoded = tok_v01.encode(line, add_bos=False, add_eos=False)
+                decoded = tok_v01.decode(encoded["input_ids"], skip_special_tokens=False)
+                assert decoded == line, f"Roundtrip failed for v0.1 line: {line[:50]}..."
+
+

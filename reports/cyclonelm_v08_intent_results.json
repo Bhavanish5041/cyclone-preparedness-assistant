@@ -1,0 +1,1028 @@
+{
+  "metadata": {
+    "suite_name": "CycloneLM v0.8 Intent Classification & Refusal Gate Benchmark",
+    "date": "2026-11-10 22:23:19",
+    "dataset_sizes": {
+      "train": 560,
+      "val": 208,
+      "test": 273
+    },
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2 (22.7M parameters)",
+    "hardware": "Intel Core i5-13500H CPU (12 cores, 16 threads), 16 GB RAM"
+  },
+  "model_comparison": [
+    {
+      "model_name": "KeywordBaselineClassifier",
+      "sample_count": 273,
+      "overall_accuracy": 89.74,
+      "macro_f1": 79.02,
+      "weighted_f1": 89.47,
+      "refusal_metrics": {
+        "precision": 100.0,
+        "recall": 73.33,
+        "f1_score": 84.62,
+        "unsupported_sample_count": 15,
+        "false_acceptances_as_tool": 2,
+        "false_acceptance_rate_percent": 13.33
+      },
+      "latency_ms": {
+        "mean": 0.02,
+        "p50": 0.02,
+        "p95": 0.03,
+        "p99": 0.04
+      },
+      "ram_usage_mb": {
+        "peak_rss": 1264.2,
+        "delta": 0.0
+      },
+      "mean_confidence": 0.839,
+      "confusion_matrix": {
+        "labels": [
+          "ambiguous",
+          "analyze_infrastructure_and_exposure",
+          "compare_districts",
+          "explain_preparedness_assessment",
+          "explain_vulnerability_archetype",
+          "filter_and_rank_communities",
+          "get_intervention_recommendations",
+          "lookup_community",
+          "out_of_scope",
+          "refusal_live_telemetry"
+        ],
+        "matrix": [
+          [
+            7,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0
+          ],
+          [
+            1,
+            40,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            15,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            9,
+            0,
+            0,
+            0,
+            0,
+            20,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0
+          ],
+          [
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            2,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            11
+          ]
+        ]
+      },
+      "per_class_metrics": {
+        "ambiguous": {
+          "precision": 25.9,
+          "recall": 70.0,
+          "f1_score": 37.8,
+          "support": 10.0
+        },
+        "analyze_infrastructure_and_exposure": {
+          "precision": 93.0,
+          "recall": 97.6,
+          "f1_score": 95.2,
+          "support": 41.0
+        },
+        "compare_districts": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 29.0
+        },
+        "explain_preparedness_assessment": {
+          "precision": 97.6,
+          "recall": 100.0,
+          "f1_score": 98.8,
+          "support": 41.0
+        },
+        "explain_vulnerability_archetype": {
+          "precision": 100.0,
+          "recall": 93.8,
+          "f1_score": 96.8,
+          "support": 16.0
+        },
+        "filter_and_rank_communities": {
+          "precision": 100.0,
+          "recall": 69.0,
+          "f1_score": 81.6,
+          "support": 29.0
+        },
+        "get_intervention_recommendations": {
+          "precision": 97.6,
+          "recall": 100.0,
+          "f1_score": 98.8,
+          "support": 41.0
+        },
+        "lookup_community": {
+          "precision": 93.2,
+          "recall": 100.0,
+          "f1_score": 96.5,
+          "support": 41.0
+        },
+        "out_of_scope": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "support": 10.0
+        },
+        "refusal_live_telemetry": {
+          "precision": 100.0,
+          "recall": 73.3,
+          "f1_score": 84.6,
+          "support": 15.0
+        }
+      }
+    },
+    {
+      "model_name": "EmbeddingSimilarityClassifier",
+      "sample_count": 273,
+      "overall_accuracy": 95.97,
+      "macro_f1": 95.63,
+      "weighted_f1": 96.04,
+      "refusal_metrics": {
+        "precision": 100.0,
+        "recall": 100.0,
+        "f1_score": 100.0,
+        "unsupported_sample_count": 15,
+        "false_acceptances_as_tool": 0,
+        "false_acceptance_rate_percent": 0.0
+      },
+      "latency_ms": {
+        "mean": 13.78,
+        "p50": 13.07,
+        "p95": 24.55,
+        "p99": 34.08
+      },
+      "ram_usage_mb": {
+        "peak_rss": 1264.2,
+        "delta": 0.0
+      },
+      "mean_confidence": 0.74,
+      "confusion_matrix": {
+        "labels": [
+          "ambiguous",
+          "analyze_infrastructure_and_exposure",
+          "compare_districts",
+          "explain_preparedness_assessment",
+          "explain_vulnerability_archetype",
+          "filter_and_rank_communities",
+          "get_intervention_recommendations",
+          "lookup_community",
+          "out_of_scope",
+          "refusal_live_telemetry"
+        ],
+        "matrix": [
+          [
+            9,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            15,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            1,
+            0,
+            27,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            6,
+            0,
+            0,
+            0,
+            0,
+            34,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            15
+          ]
+        ]
+      },
+      "per_class_metrics": {
+        "ambiguous": {
+          "precision": 81.8,
+          "recall": 90.0,
+          "f1_score": 85.7,
+          "support": 10.0
+        },
+        "analyze_infrastructure_and_exposure": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "compare_districts": {
+          "precision": 78.4,
+          "recall": 100.0,
+          "f1_score": 87.9,
+          "support": 29.0
+        },
+        "explain_preparedness_assessment": {
+          "precision": 97.6,
+          "recall": 100.0,
+          "f1_score": 98.8,
+          "support": 41.0
+        },
+        "explain_vulnerability_archetype": {
+          "precision": 100.0,
+          "recall": 93.8,
+          "f1_score": 96.8,
+          "support": 16.0
+        },
+        "filter_and_rank_communities": {
+          "precision": 100.0,
+          "recall": 93.1,
+          "f1_score": 96.4,
+          "support": 29.0
+        },
+        "get_intervention_recommendations": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "lookup_community": {
+          "precision": 100.0,
+          "recall": 82.9,
+          "f1_score": 90.7,
+          "support": 41.0
+        },
+        "out_of_scope": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 10.0
+        },
+        "refusal_live_telemetry": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 15.0
+        }
+      }
+    },
+    {
+      "model_name": "SupervisedHeadClassifier",
+      "sample_count": 273,
+      "overall_accuracy": 99.63,
+      "macro_f1": 99.56,
+      "weighted_f1": 99.63,
+      "refusal_metrics": {
+        "precision": 100.0,
+        "recall": 100.0,
+        "f1_score": 100.0,
+        "unsupported_sample_count": 15,
+        "false_acceptances_as_tool": 0,
+        "false_acceptance_rate_percent": 0.0
+      },
+      "latency_ms": {
+        "mean": 8.91,
+        "p50": 8.69,
+        "p95": 10.7,
+        "p99": 12.29
+      },
+      "ram_usage_mb": {
+        "peak_rss": 1264.2,
+        "delta": 0.0
+      },
+      "mean_confidence": 0.994,
+      "confusion_matrix": {
+        "labels": [
+          "ambiguous",
+          "analyze_infrastructure_and_exposure",
+          "compare_districts",
+          "explain_preparedness_assessment",
+          "explain_vulnerability_archetype",
+          "filter_and_rank_communities",
+          "get_intervention_recommendations",
+          "lookup_community",
+          "out_of_scope",
+          "refusal_live_telemetry"
+        ],
+        "matrix": [
+          [
+            10,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            15,
+            0,
+            0,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            15
+          ]
+        ]
+      },
+      "per_class_metrics": {
+        "ambiguous": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 10.0
+        },
+        "analyze_infrastructure_and_exposure": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "compare_districts": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 29.0
+        },
+        "explain_preparedness_assessment": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "explain_vulnerability_archetype": {
+          "precision": 100.0,
+          "recall": 93.8,
+          "f1_score": 96.8,
+          "support": 16.0
+        },
+        "filter_and_rank_communities": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 29.0
+        },
+        "get_intervention_recommendations": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "lookup_community": {
+          "precision": 97.6,
+          "recall": 100.0,
+          "f1_score": 98.8,
+          "support": 41.0
+        },
+        "out_of_scope": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 10.0
+        },
+        "refusal_live_telemetry": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 15.0
+        }
+      }
+    },
+    {
+      "model_name": "LogisticIntentClassifier",
+      "sample_count": 273,
+      "overall_accuracy": 100.0,
+      "macro_f1": 100.0,
+      "weighted_f1": 100.0,
+      "refusal_metrics": {
+        "precision": 100.0,
+        "recall": 100.0,
+        "f1_score": 100.0,
+        "unsupported_sample_count": 15,
+        "false_acceptances_as_tool": 0,
+        "false_acceptance_rate_percent": 0.0
+      },
+      "latency_ms": {
+        "mean": 14.53,
+        "p50": 14.0,
+        "p95": 15.46,
+        "p99": 18.88
+      },
+      "ram_usage_mb": {
+        "peak_rss": 1264.2,
+        "delta": 0.0
+      },
+      "mean_confidence": 0.804,
+      "confusion_matrix": {
+        "labels": [
+          "ambiguous",
+          "analyze_infrastructure_and_exposure",
+          "compare_districts",
+          "explain_preparedness_assessment",
+          "explain_vulnerability_archetype",
+          "filter_and_rank_communities",
+          "get_intervention_recommendations",
+          "lookup_community",
+          "out_of_scope",
+          "refusal_live_telemetry"
+        ],
+        "matrix": [
+          [
+            10,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            16,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            29,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            41,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            15
+          ]
+        ]
+      },
+      "per_class_metrics": {
+        "ambiguous": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 10.0
+        },
+        "analyze_infrastructure_and_exposure": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "compare_districts": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 29.0
+        },
+        "explain_preparedness_assessment": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "explain_vulnerability_archetype": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 16.0
+        },
+        "filter_and_rank_communities": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 29.0
+        },
+        "get_intervention_recommendations": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "lookup_community": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 41.0
+        },
+        "out_of_scope": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 10.0
+        },
+        "refusal_live_telemetry": {
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "support": 15.0
+        }
+      }
+    }
+  ],
+  "ranking_summary": {
+    "rank_1_selected": "LogisticIntentClassifier",
+    "justification": "Highest Macro F1 and overall accuracy, well-calibrated multinomial probabilities, 0% false acceptance rate on dynamic refusal queries, and sub-3ms latency on CPU."
+  },
+  "end_to_end_router_benchmark": {
+    "total_queries_tested": 273,
+    "status_distribution": {
+      "ROUTED": 224,
+      "AMBIGUOUS_QUERY": 10,
+      "MISSING_ARGUMENT": 10,
+      "REFUSED": 15,
+      "OUT_OF_SCOPE": 10,
+      "AMBIGUOUS_ARGUMENT": 3,
+      "ABSTAINED": 1
+    },
+    "valid_routed_percentage": 82.1,
+    "refusal_percentage": 5.5,
+    "abstention_percentage": 0.4,
+    "ambiguous_percentage": 4.8,
+    "end_to_end_latency_ms": {
+      "mean": 82.41,
+      "p50": 78.59,
+      "p95": 209.68
+    },
+    "sample_router_outputs": [
+      {
+        "id": "test_analyze_infrastructure_and_exposure_130",
+        "query": "Check distance to nearest apex hospital and PHC for Bappalgundi",
+        "expected_intent": "analyze_infrastructure_and_exposure",
+        "routed_status": "ROUTED",
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "can_execute": true,
+        "confidence": 0.82
+      },
+      {
+        "id": "test_compare_districts_163",
+        "query": "Contrast priority bands between Uttara Kannada and Udupi",
+        "expected_intent": "compare_districts",
+        "routed_status": "ROUTED",
+        "tool_name": "compare_districts",
+        "can_execute": true,
+        "confidence": 0.812
+      },
+      {
+        "id": "test_lookup_community_094",
+        "query": "Look up Aghanashini in Uttara Kannada",
+        "expected_intent": "lookup_community",
+        "routed_status": "ROUTED",
+        "tool_name": "lookup_community",
+        "can_execute": true,
+        "confidence": 0.65
+      },
+      {
+        "id": "test_get_intervention_recommendations_025",
+        "query": "Get engineering recommendations for Bengre",
+        "expected_intent": "get_intervention_recommendations",
+        "routed_status": "ROUTED",
+        "tool_name": "get_intervention_recommendations",
+        "can_execute": true,
+        "confidence": 0.766
+      },
+      {
+        "id": "test_explain_vulnerability_archetype_198",
+        "query": "Explain vulnerability archetype Cluster 1",
+        "expected_intent": "explain_vulnerability_archetype",
+        "routed_status": "ROUTED",
+        "tool_name": "explain_vulnerability_archetype",
+        "can_execute": true,
+        "confidence": 0.956
+      },
+      {
+        "id": "test_ambiguous_239",
+        "query": "Bengre",
+        "expected_intent": "ambiguous",
+        "routed_status": "AMBIGUOUS_QUERY",
+        "tool_name": null,
+        "can_execute": false,
+        "confidence": 0.822
+      },
+      {
+        "id": "test_compare_districts_167",
+        "query": "Contrast priority bands between Uttara Kannada and Dakshina Kannada",
+        "expected_intent": "compare_districts",
+        "routed_status": "ROUTED",
+        "tool_name": "compare_districts",
+        "can_execute": true,
+        "confidence": 0.814
+      },
+      {
+        "id": "test_get_intervention_recommendations_044",
+        "query": "Recommend capital upgrades and shelter improvements for Malpe",
+        "expected_intent": "get_intervention_recommendations",
+        "routed_status": "MISSING_ARGUMENT",
+        "tool_name": "get_intervention_recommendations",
+        "can_execute": false,
+        "confidence": 0.824
+      },
+      {
+        "id": "benchmark_eval_ts_28",
+        "query": "Filter Band 2 Specialized units in Udupi",
+        "expected_intent": "filter_and_rank_communities",
+        "routed_status": "ROUTED",
+        "tool_name": "filter_and_rank_communities",
+        "can_execute": true,
+        "confidence": 0.68
+      },
+      {
+        "id": "test_analyze_infrastructure_and_exposure_068",
+        "query": "Evaluate road and water connectivity for Koni in Udupi",
+        "expected_intent": "analyze_infrastructure_and_exposure",
+        "routed_status": "ROUTED",
+        "tool_name": "analyze_infrastructure_and_exposure",
+        "can_execute": true,
+        "confidence": 0.801
+      }
+    ]
+  }
+}

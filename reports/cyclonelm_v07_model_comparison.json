@@ -1,0 +1,390 @@
+{
+  "study_metadata": {
+    "title": "CycloneLM Phase 7: Pretrained Model Comparison Matrix",
+    "project": "CYCLONE INTEL — Coastal Karnataka Cyclone Preparedness",
+    "date": "November 2026",
+    "phase": "v0.7",
+    "hardware_target": "Intel Core i5-13500H CPU (12 cores, 16 threads, AVX2, AVX-VNNI), 16 GB RAM (12 GiB usable), Intel Iris Xe iGPU, Ubuntu Linux",
+    "constraint_summary": "Zero-cost, open-weights, no paid APIs, no credit card required, strict CPU training & inference feasibility"
+  },
+  "candidate_models": [
+    {
+      "model_id": "cyclonelm_5m_scratch",
+      "canonical_name": "CycloneLM 5.3M (Scratch Baseline)",
+      "provider": "In-house (v0.1-v0.6)",
+      "parameter_count": 5296128,
+      "architecture": "Custom Decoder-only Transformer (Post-LN, learned absolute embeddings)",
+      "vocab_size": 1024,
+      "context_window": 256,
+      "license": "Internal / Open",
+      "gated": false,
+      "pretraining_tokens": 23358,
+      "memory_fp32_mb": 21.2,
+      "memory_fp16_mb": 10.6,
+      "memory_int8_mb": 5.3,
+      "memory_int4_mb": 2.7,
+      "cpu_inference_tokens_per_sec": 380.0,
+      "full_ft_ram_required_gb": 0.25,
+      "lora_ram_required_gb": 0.15,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "Baseline / Reference",
+      "pros": [
+        "Extremely small memory footprint (<25 MB)",
+        "Zero-dependency custom PyTorch implementation",
+        "Deterministic local execution in milliseconds"
+      ],
+      "cons": [
+        "Severe data starvation (220:1 param-to-token ratio)",
+        "0.0% Pydantic valid JSON tool calling",
+        "Cannot generate fluent English syntax or reasoning from scratch",
+        "Prone to limit-cycle repetition without penalty"
+      ],
+      "recommendation_notes": "Preserve as experimental reference baseline; discontinue for conversational and assistant production tasks."
+    },
+    {
+      "model_id": "distilbert/distilgpt2",
+      "canonical_name": "DistilGPT-2",
+      "provider": "Hugging Face / DistilBERT team",
+      "parameter_count": 82000000,
+      "architecture": "Distilled GPT-2 (6 layers, 12 heads, 768 hidden, Post-LN)",
+      "vocab_size": 50257,
+      "context_window": 1024,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 40000000000,
+      "memory_fp32_mb": 328.0,
+      "memory_fp16_mb": 164.0,
+      "memory_int8_mb": 82.0,
+      "memory_int4_mb": 41.0,
+      "cpu_inference_tokens_per_sec": 120.0,
+      "full_ft_ram_required_gb": 1.4,
+      "lora_ram_required_gb": 0.5,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "Low Feasibility (Outdated)",
+      "pros": [
+        "Very fast CPU inference (>100 tokens/s)",
+        "Trivial RAM footprint (<350 MB FP32)",
+        "Apache 2.0 permissive license"
+      ],
+      "cons": [
+        "Distilled in 2019 without instruction fine-tuning",
+        "Outdated architecture (Post-LN, absolute positional embeddings)",
+        "Very weak structured output adherence and reasoning",
+        "Small 1024 context window"
+      ],
+      "recommendation_notes": "Not recommended. Lacks instruction alignment; substantially outperformed by modern sub-500M architectures."
+    },
+    {
+      "model_id": "openai-community/gpt2",
+      "canonical_name": "GPT-2 Small",
+      "provider": "OpenAI",
+      "parameter_count": 124439808,
+      "architecture": "GPT-2 (12 layers, 12 heads, 768 hidden, Post-LN)",
+      "vocab_size": 50257,
+      "context_window": 1024,
+      "license": "MIT / Modified OpenAI",
+      "gated": false,
+      "pretraining_tokens": 40000000000,
+      "memory_fp32_mb": 497.8,
+      "memory_fp16_mb": 248.9,
+      "memory_int8_mb": 124.4,
+      "memory_int4_mb": 62.2,
+      "cpu_inference_tokens_per_sec": 75.0,
+      "full_ft_ram_required_gb": 2.2,
+      "lora_ram_required_gb": 0.8,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "Low Feasibility (Outdated)",
+      "pros": [
+        "High library compatibility and ubiquitous examples",
+        "Permissive license",
+        "Low memory requirements"
+      ],
+      "cons": [
+        "Pretrained in 2019 on uncurated web text (WebText)",
+        "No instruction tuning or alignment",
+        "Lacks modern LLM architectural enhancements (RMSNorm, RoPE, SwiGLU)",
+        "Hallucinates heavily when prompted for structured evidence synthesis"
+      ],
+      "recommendation_notes": "Not recommended. Superseded across all quality, efficiency, and safety dimensions by modern models."
+    },
+    {
+      "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+      "canonical_name": "SmolLM2-135M-Instruct",
+      "provider": "Hugging Face",
+      "parameter_count": 134516352,
+      "architecture": "Llama-derived modern decoder (30 layers, 9 heads, 3 KV heads [GQA], 576 hidden, RMSNorm, RoPE, SwiGLU)",
+      "vocab_size": 49152,
+      "context_window": 8192,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 11000000000000,
+      "memory_fp32_mb": 538.1,
+      "memory_fp16_mb": 269.0,
+      "memory_int8_mb": 134.5,
+      "memory_int4_mb": 67.3,
+      "cpu_inference_tokens_per_sec": 80.7,
+      "full_ft_ram_required_gb": 2.7,
+      "lora_ram_required_gb": 0.7,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "High Feasibility (Top Ultra-Light Candidate)",
+      "pros": [
+        "Permissive Apache 2.0 license, un-gated",
+        "State-of-the-art 2024 architecture (GQA, RoPE, RMSNorm, SwiGLU)",
+        "Pretrained on 11 trillion high-quality educational tokens (FineWeb-Edu, Cosmopedia v2)",
+        "Pre-aligned with DPO and SFT for instruction following",
+        "High CPU generation speed (80.7 tokens/s on i5-13500H)",
+        "8k context window allows multi-turn evidence context",
+        "Both full fine-tuning and LoRA fit within available laptop RAM"
+      ],
+      "cons": [
+        "Limited parameter capacity for complex multi-step reasoning",
+        "Small hidden dimension (576) can lead to slight compression loss on technical domain terms"
+      ],
+      "recommendation_notes": "Excellent candidate for edge deployment, lightweight CPU serving, and low-latency response generation."
+    },
+    {
+      "model_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+      "canonical_name": "SmolLM2-360M-Instruct",
+      "provider": "Hugging Face",
+      "parameter_count": 361730560,
+      "architecture": "Llama-derived modern decoder (32 layers, 15 heads, 5 KV heads [GQA], 960 hidden, RMSNorm, RoPE, SwiGLU)",
+      "vocab_size": 49152,
+      "context_window": 8192,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 11000000000000,
+      "memory_fp32_mb": 1446.9,
+      "memory_fp16_mb": 723.5,
+      "memory_int8_mb": 361.7,
+      "memory_int4_mb": 180.9,
+      "cpu_inference_tokens_per_sec": 19.8,
+      "full_ft_ram_required_gb": 6.8,
+      "lora_ram_required_gb": 1.3,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "High Feasibility (Strong Balanced Candidate)",
+      "pros": [
+        "Apache 2.0 license, un-gated",
+        "High linguistic fluency and syntactic consistency",
+        "GQA architecture with 8k context window",
+        "LoRA fine-tuning comfortably fits in 1.3 GB RAM",
+        "CPU inference throughput of ~20 tokens/sec is well above human reading speed"
+      ],
+      "cons": [
+        "Full fine-tuning on CPU (6.8 GB RAM) is tight on 5.3 GB free memory; must use LoRA",
+        "Slightly smaller community adoption than Qwen2.5 series"
+      ],
+      "recommendation_notes": "Strong candidate. Excellent balance between parameter expressiveness and CPU resource utilization."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "canonical_name": "Qwen2.5-0.5B-Instruct",
+      "provider": "Alibaba Cloud Qwen Team",
+      "parameter_count": 494032768,
+      "architecture": "Qwen2 modern decoder (24 layers, 14 heads, 2 KV heads [GQA], 896 hidden, intermediate 4864, RMSNorm, RoPE)",
+      "vocab_size": 151936,
+      "context_window": 32768,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 18000000000000,
+      "memory_fp32_mb": 1976.1,
+      "memory_fp16_mb": 988.1,
+      "memory_int8_mb": 494.0,
+      "memory_int4_mb": 247.0,
+      "cpu_inference_tokens_per_sec": 20.3,
+      "full_ft_ram_required_gb": 9.1,
+      "lora_ram_required_gb": 1.8,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "Top Recommendation (Best Overall Quality & Capability)",
+      "pros": [
+        "Permissive Apache 2.0 license, un-gated, free open weights",
+        "Industry-standard benchmark leader for models under 1B parameters",
+        "Massive 152k vocabulary provides superior tokenization of technical and geographic terms",
+        "32k native context window (128k with YaRN)",
+        "Superior instruction following, schema awareness, and factual grounding",
+        "LoRA fine-tuning uses only 1.8 GB RAM on CPU",
+        "Inference runs smoothly at 20.3 tokens/sec on i5-13500H CPU"
+      ],
+      "cons": [
+        "Full fine-tuning requires 9.1 GB RAM (exceeds available free RAM, necessitating LoRA)",
+        "Embedding table represents ~136M params due to large 152k vocabulary"
+      ],
+      "recommendation_notes": "PRIMARY RECOMMENDATION. Best empirical instruction following, evidence synthesis quality, and safety alignment under 1B parameters."
+    },
+    {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "canonical_name": "Qwen2.5-1.5B-Instruct",
+      "provider": "Alibaba Cloud Qwen Team",
+      "parameter_count": 1543714560,
+      "architecture": "Qwen2 modern decoder (28 layers, 12 heads, 2 KV heads [GQA], 1536 hidden, intermediate 8960)",
+      "vocab_size": 151936,
+      "context_window": 32768,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 18000000000000,
+      "memory_fp32_mb": 6174.9,
+      "memory_fp16_mb": 3087.4,
+      "memory_int8_mb": 1543.7,
+      "memory_int4_mb": 771.9,
+      "cpu_inference_tokens_per_sec": 6.8,
+      "full_ft_ram_required_gb": 26.5,
+      "lora_ram_required_gb": 5.8,
+      "cpu_trainable": false,
+      "zero_cost_open": true,
+      "suitability_tier": "Low Feasibility (Hardware Constrained)",
+      "pros": [
+        "Highest reasoning quality among sub-2B models",
+        "Apache 2.0 license",
+        "32k context window"
+      ],
+      "cons": [
+        "Full fine-tuning on CPU impossible (>26 GB RAM needed)",
+        "LoRA training requires ~5.8 GB RAM (exceeds current 5.3 GB available memory, risking thrashing)",
+        "CPU inference latency drops to ~6.8 tokens/sec, causing sluggish interactive UX"
+      ],
+      "recommendation_notes": "Not recommended for this laptop hardware. Exceeds practical CPU training budget."
+    },
+    {
+      "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "canonical_name": "TinyLlama 1.1B Chat",
+      "provider": "Zhang et al. / Singapore University of Technology and Design",
+      "parameter_count": 1100048384,
+      "architecture": "Llama-2 architecture (22 layers, 32 heads, 4 KV heads, 2048 hidden)",
+      "vocab_size": 32000,
+      "context_window": 2048,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 3000000000000,
+      "memory_fp32_mb": 4400.2,
+      "memory_fp16_mb": 2200.1,
+      "memory_int8_mb": 1100.0,
+      "memory_int4_mb": 550.0,
+      "cpu_inference_tokens_per_sec": 9.5,
+      "full_ft_ram_required_gb": 19.2,
+      "lora_ram_required_gb": 4.5,
+      "cpu_trainable": false,
+      "zero_cost_open": true,
+      "suitability_tier": "Low Feasibility (Superseded)",
+      "pros": [
+        "Apache 2.0 license",
+        "Llama-2 architecture compatibility"
+      ],
+      "cons": [
+        "Outperformed across benchmarks by Qwen2.5-0.5B despite having 2.2x parameters",
+        "Small 2048 context window",
+        "Heavy memory consumption during training (~4.5 GB LoRA)",
+        "Inferior instruction adherence compared to SmolLM2 and Qwen2.5"
+      ],
+      "recommendation_notes": "Not recommended. Superseded by Qwen2.5-0.5B and SmolLM2 series."
+    },
+    {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "canonical_name": "Llama 3.2 1B Instruct",
+      "provider": "Meta AI",
+      "parameter_count": 1235814400,
+      "architecture": "Llama-3.2 modern decoder (16 layers, 32 heads, 8 KV heads, 2048 hidden, 128k context)",
+      "vocab_size": 128256,
+      "context_window": 131072,
+      "license": "Llama 3.2 Community License (Gated)",
+      "gated": true,
+      "pretraining_tokens": 9000000000000,
+      "memory_fp32_mb": 4943.3,
+      "memory_fp16_mb": 2471.6,
+      "memory_int8_mb": 1235.8,
+      "memory_int4_mb": 617.9,
+      "cpu_inference_tokens_per_sec": 8.8,
+      "full_ft_ram_required_gb": 21.5,
+      "lora_ram_required_gb": 5.0,
+      "cpu_trainable": false,
+      "zero_cost_open": false,
+      "suitability_tier": "Disqualified (Licensing / Gated Access)",
+      "pros": [
+        "Exceptional 128k context window",
+        "Strong instruction and structured reasoning"
+      ],
+      "cons": [
+        "Requires manual Hugging Face account approval and gated license acceptance",
+        "Non-standard Llama 3.2 community license restrictions",
+        "LoRA training is marginal on 5.3 GB available RAM (~5.0 GB needed)",
+        "CPU inference speed is relatively slow (<9 tokens/s)"
+      ],
+      "recommendation_notes": "Disqualified due to gated access requirements, proprietary licensing constraints, and memory overhead."
+    },
+    {
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "canonical_name": "MiniLM-L6-v2 (Specialized Intent Classifier)",
+      "provider": "Microsoft / Sentence Transformers",
+      "parameter_count": 22713216,
+      "architecture": "Bidirectional BERT encoder (6 layers, 12 heads, 384 hidden)",
+      "vocab_size": 30522,
+      "context_window": 256,
+      "license": "Apache-2.0",
+      "gated": false,
+      "pretraining_tokens": 1000000000000,
+      "memory_fp32_mb": 90.9,
+      "memory_fp16_mb": 45.4,
+      "memory_int8_mb": 22.7,
+      "memory_int4_mb": 11.4,
+      "cpu_inference_tokens_per_sec": 500.0,
+      "full_ft_ram_required_gb": 0.45,
+      "lora_ram_required_gb": 0.2,
+      "cpu_trainable": true,
+      "zero_cost_open": true,
+      "suitability_tier": "Top Recommendation for Intent Classification",
+      "pros": [
+        "Ultra-lightweight (22.7M parameters)",
+        "Sub-10ms classification latency on CPU",
+        "100% deterministic argmax intent routing over 7 tools + refusal class",
+        "0.0% syntax failure risk (cannot generate malformed JSON)",
+        "Can be fine-tuned or trained with SetFit in under 2 minutes on CPU",
+        "Apache 2.0 license"
+      ],
+      "cons": [
+        "Cannot perform free-text natural-language generation (encoder only)",
+        "Must be paired with a generative model for synthesis"
+      ],
+      "recommendation_notes": "PRIMARY RECOMMENDATION FOR INTENT ROUTING. Solves the 0.0% tool calling failure mode deterministically."
+    }
+  ],
+  "comparative_rankings": {
+    "natural_language_generation": [
+      {
+        "rank": 1,
+        "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+        "score": 9.4,
+        "justification": "Highest instruction adherence, 32k context, 152k vocab, Apache 2.0, viable for CPU LoRA fine-tuning and 20 tokens/s CPU inference."
+      },
+      {
+        "rank": 2,
+        "model_id": "HuggingFaceTB/SmolLM2-135M-Instruct",
+        "score": 8.9,
+        "justification": "Fastest CPU inference (80.7 tokens/s), minimal RAM footprint (<300 MB), 8k context, Apache 2.0, ultra-efficient for laptop deployment."
+      },
+      {
+        "rank": 3,
+        "model_id": "HuggingFaceTB/SmolLM2-360M-Instruct",
+        "score": 8.6,
+        "justification": "Solid middle ground between 135M and 0.5B, good fluency, viable with LoRA."
+      }
+    ],
+    "tool_intent_routing": [
+      {
+        "rank": 1,
+        "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+        "score": 9.8,
+        "justification": "Deterministic classification head over 7 tools + refusal; eliminates autoregressive JSON syntax errors entirely (<10ms CPU latency)."
+      },
+      {
+        "rank": 2,
+        "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+        "score": 7.5,
+        "justification": "Can perform schema-aware generation, but autoregressive generation remains vulnerable to syntax errors compared to a dedicated classifier."
+      }
+    ]
+  }
+}

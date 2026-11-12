@@ -219,6 +219,32 @@ def test_cd_workflow_security_and_approval_gates(cd_workflow_data):
     assert "workflow_dispatch" in job_if
     assert "repository" in job_if
 
+    # Permissions check: Least privilege read access to packages and contents
+    perms = cd_workflow_data.get("permissions", {})
+    assert perms.get("packages") == "read"
+    assert perms.get("contents") == "read"
+
+
+def test_cd_workflow_immutable_image_tag_enforcement(cd_workflow_data):
+    """Verify CD workflow mandates immutable image tags and strictly forbids mutable 'latest' in production."""
+    triggers = cd_workflow_data.get("on") or cd_workflow_data.get(True, {})
+    inputs = triggers.get("workflow_dispatch", {}).get("inputs", {})
+    assert "image_tag" in inputs, "CD workflow must define image_tag input"
+
+    tag_input = inputs["image_tag"]
+    assert tag_input.get("default") != "latest", "CD image_tag default must not be mutable 'latest'"
+    assert tag_input.get("default", "").startswith("sha-"), "CD image_tag default must be an immutable sha-* tag"
+    assert "forbidden" in tag_input.get("description", "").lower(), "Description must document that 'latest' is forbidden"
+
+    # Pre-deployment verification job must enforce immutable tag check
+    verify_job = cd_workflow_data["jobs"]["pre-deployment-verification"]
+    step_scripts = [step.get("run", "") for step in verify_job.get("steps", [])]
+    assert any("CONFIRM-DEPLOY" in s for s in step_scripts), "Pre-deployment must check CONFIRM-DEPLOY token"
+    assert any("latest" in s and ("forbidden" in s.lower() or "violation" in s.lower()) for s in step_scripts), (
+        "Pre-deployment step must reject 'latest' tag for production"
+    )
+    assert any("sha-" in s for s in step_scripts), "Pre-deployment step must validate sha- tag format"
+
 
 def test_docker_compose_config_validation():
     """Verify local docker-compose.yml and docker-compose.test.yml pass validation cleanly."""

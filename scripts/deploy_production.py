@@ -5,12 +5,13 @@ Handles zero-downtime rolling service cutovers on self-hosted Ubuntu runner:
 1. Records previous running container state for instant automatic rollback.
 2. Detects which services actually changed (API, Frontend, Dashboard).
 3. Leaves host Ollama (11434) and Cloudflare Tunnel untouched.
-4. Pulls GHCR verified images with commit-based tags.
-5. Recreates only changed services using Docker Compose without restarting untouched containers.
-6. Conducts multi-layer health checks (Docker container health + HTTP probes).
-7. Automatically rolls back to previous working images if any health check fails.
-8. Writes timestamped deployment audit logs.
-9. Supports isolated simulation mode (--simulate) for safe end-to-end verification.
+4. Enforces immutable commit-based image tags (rejects mutable 'latest').
+5. Runs comprehensive deployment preflight checks (docker daemon, disk space, remote images).
+6. Executes dependency-ordered cutovers (API first, then dependent Frontend/Dashboard).
+7. Conducts multi-layer health checks (Docker container health + HTTP probes).
+8. Automatically rolls back ALL touched services if any check fails (preventing partial updates).
+9. Masks secrets and credentials in all logs.
+10. Supports isolated simulation mode (--simulate) for safe end-to-end verification.
 """
 
 from __future__ import annotations
@@ -22,6 +23,8 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -92,6 +95,60 @@ SIMULATION_METADATA = {
     },
 }
 
+# Strict service dependency ordering: Root service 'api' first, followed by dependents
+SERVICE_DEPLOYMENT_ORDER = ["api", "frontend", "dashboard"]
+SERVICE_ROLLBACK_ORDER = ["dashboard", "frontend", "api"]
+
+# Immutable tag validation: Enforce sha-<short_sha> or semantic version tags; strictly forbid mutable tags
+IMMUTABLE_TAG_PATTERN = re.compile(
+    r"^(sha-[0-9a-zA-Z._-]+|v[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9.]+)?)$"
+)
+MUTABLE_TAGS = {"latest", "master", "main", "staging", "dev", "develop", "head"}
+
+
+def is_immutable_image_tag(tag: Optional[str]) -> bool:
+    """Return True if image tag is an immutable release tag (e.g., sha-<commit_sha> or vX.Y.Z)."""
+    if not tag or not isinstance(tag, str):
+        return False
+    tag_clean = tag.strip().lower()
+    if tag_clean in MUTABLE_TAGS:
+        return False
+    return bool(IMMUTABLE_TAG_PATTERN.match(tag.strip()))
+
+
+class SecretMaskingFilter(logging.Filter):
+    """Filter that scrubs secrets, tokens, and credentials from log messages."""
+
+    SECRET_PATTERNS = [
+        re.compile(r"ghp_[a-zA-Z0-9]{36}"),
+        re.compile(r"github_pat_[a-zA-Z0-9_]{82}"),
+        re.compile(r"AKIA[0-9A-Z]{16}"),
+        re.compile(r"-----BEGIN [A-Z ]+ PRIVATE KEY-----[\s\S]+?-----END [A-Z ]+ PRIVATE KEY-----"),
+        re.compile(r"(?:api[_-]?key|secret|password|token|bearer)[=:\s]+(['\"]?)([\w./-]{8,})\1", re.IGNORECASE),
+        re.compile(r"(?<=://)[^/:]+:[^/@]+(?=@)"),
+    ]
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.msg, str):
+            for pat in self.SECRET_PATTERNS:
+                record.msg = pat.sub("***REDACTED***", record.msg)
+        if record.args:
+            if isinstance(record.args, dict):
+                record.args = {
+                    k: (self._mask(v) if isinstance(v, str) else v)
+                    for k, v in record.args.items()
+                }
+            elif isinstance(record.args, tuple):
+                record.args = tuple(
+                    self._mask(a) if isinstance(a, str) else a for a in record.args
+                )
+        return True
+
+    def _mask(self, val: str) -> str:
+        for pat in self.SECRET_PATTERNS:
+            val = pat.sub("***REDACTED***", val)
+        return val
+
 
 def setup_logger(log_file: Optional[Path] = None) -> logging.Logger:
     logger = logging.getLogger("cyclone_deployer")
@@ -102,14 +159,18 @@ def setup_logger(log_file: Optional[Path] = None) -> logging.Logger:
         "%(asctime)s [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
 
+    mask_filter = SecretMaskingFilter()
+
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
+    console_handler.addFilter(mask_filter)
     logger.addHandler(console_handler)
 
     if log_file:
         log_file.parent.mkdir(parents=True, exist_ok=True)
         file_handler = logging.FileHandler(str(log_file), encoding="utf-8")
         file_handler.setFormatter(formatter)
+        file_handler.addFilter(mask_filter)
         logger.addHandler(file_handler)
 
     return logger
@@ -213,6 +274,77 @@ def get_container_info(container_name: str) -> Optional[Dict[str, Any]]:
         return json.loads(proc.stdout.strip())
     except Exception:
         return None
+
+
+def execute_preflight_checks(
+    logger: logging.Logger,
+    image_tag: str,
+    repo_owner: str,
+    services: List[str],
+    compose_file: str,
+    is_simulation: bool = False,
+) -> bool:
+    """Execute preflight checks prior to modifying any container."""
+    logger.info("Executing deployment preflight checks...")
+
+    # 1. Docker Daemon Connectivity Check
+    docker_info = run_command(["docker", "info"], check=False)
+    if docker_info.returncode != 0:
+        logger.critical("Preflight check failed: Docker daemon is unreachable or not running.")
+        return False
+    logger.info("  ✅ Preflight: Docker daemon is responsive.")
+
+    # 2. Immutable Tag Enforcement (Production)
+    if not is_simulation:
+        if not is_immutable_image_tag(image_tag):
+            logger.critical(
+                f"Preflight check failed: Tag '{image_tag}' is mutable or unverified. "
+                "Production CD strictly requires an immutable tag (e.g. sha-<commit_sha> or vX.Y.Z)."
+            )
+            return False
+        logger.info(f"  ✅ Preflight: Image tag '{image_tag}' verified immutable.")
+
+    # 3. Host Disk Space Check (require >= 1GB free)
+    try:
+        total, used, free = shutil.disk_usage(PROJECT_ROOT)
+        free_mb = free / (1024 * 1024)
+        if free < 1024 * 1024 * 1024:
+            logger.critical(
+                f"Preflight check failed: Insufficient host disk space ({free_mb:.1f} MB free, require >= 1024 MB)."
+            )
+            return False
+        logger.info(f"  ✅ Preflight: Host disk space verified ({free_mb:.1f} MB free).")
+    except Exception as e:
+        logger.warning(f"  ⚠️ Preflight: Could not determine disk space: {e}")
+
+    # 4. Docker Compose Syntax & Configuration Check
+    compose_check = run_command(["docker", "compose", "-f", compose_file, "config", "--quiet"], check=False)
+    if compose_check.returncode != 0:
+        logger.critical(f"Preflight check failed: Docker Compose configuration '{compose_file}' has syntax errors.")
+        return False
+    logger.info(f"  ✅ Preflight: Docker Compose configuration '{compose_file}' is valid.")
+
+    # 5. Image Pre-pull and Provenance Verification (All target services upfront)
+    if not is_simulation:
+        for svc in services:
+            meta = SERVICE_METADATA.get(svc)
+            if not meta:
+                continue
+            full_image_name = f"ghcr.io/{repo_owner}/{meta['ghcr_repo']}:{image_tag}"
+            logger.info(f"  Preflight: Pulling verified immutable image: {full_image_name}")
+            pull_proc = run_command(["docker", "pull", full_image_name], check=False)
+            if pull_proc.returncode != 0:
+                inspect_proc = run_command(["docker", "inspect", full_image_name], check=False)
+                if inspect_proc.returncode != 0:
+                    logger.critical(
+                        f"Preflight check failed: Image '{full_image_name}' could not be pulled from GHCR "
+                        f"and is not present locally. Deployment aborted before modifying containers."
+                    )
+                    return False
+            logger.info(f"  ✅ Preflight: Image verified for service '{svc}': {full_image_name}")
+
+    logger.info("All preflight checks passed successfully.")
+    return True
 
 
 def record_current_deployment_state(
@@ -392,7 +524,13 @@ def execute_rollback(
     services_data = backup_state.get("services", {})
     env = os.environ.copy()
 
-    for svc in rollback_services:
+    # Revert services in reverse dependency order: dashboard, frontend, then api
+    ordered_rollback = [s for s in SERVICE_ROLLBACK_ORDER if s in rollback_services]
+    for s in rollback_services:
+        if s not in ordered_rollback:
+            ordered_rollback.append(s)
+
+    for svc in ordered_rollback:
         svc_backup = services_data.get(svc)
         if not svc_backup:
             logger.warning(f"No backup data for service '{svc}'. Skipping rollback image retag.")
@@ -416,7 +554,7 @@ def execute_rollback(
             env[env_var] = target_image
 
     project_args = ["-p", "cyclone-ci-test"] if "test" in compose_file else ["-p", "cyclone-prod"]
-    cmd = ["docker", "compose"] + project_args + ["-f", compose_file, "up", "-d", "--no-deps"] + rollback_services
+    cmd = ["docker", "compose"] + project_args + ["-f", compose_file, "up", "-d", "--no-deps"] + ordered_rollback
     logger.info(f"Executing rollback compose cutover: {' '.join(cmd)}")
     proc = subprocess.run(cmd, env=env, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
     if proc.returncode != 0:
@@ -425,7 +563,7 @@ def execute_rollback(
 
     logger.info("Verifying rollback health...")
     healthy = perform_health_checks(
-        logger, rollback_services, timeout_seconds=45, is_simulation="test" in compose_file
+        logger, ordered_rollback, timeout_seconds=45, is_simulation="test" in compose_file
     )
     if healthy:
         logger.info("✅ Automatic rollback completed successfully. Previous working state restored.")
@@ -483,86 +621,134 @@ def deploy_production(
             logger.info("No services require deployment. System is fully up-to-date.")
             return 0
 
-        logger.info(f"Services scheduled for deployment: {changed_services}")
+        # Enforce service dependency ordering: api root first, followed by dependent services
+        ordered_services = [s for s in SERVICE_DEPLOYMENT_ORDER if s in changed_services]
+        for s in changed_services:
+            if s not in ordered_services:
+                ordered_services.append(s)
+        changed_services = ordered_services
+
+        logger.info(f"Services scheduled for deployment (dependency ordered): {changed_services}")
         logger.info("Preserving host Ollama daemon (:11434) and Cloudflare Tunnel untouched.")
 
+        # Fast-path for dry-run inspection (does not mutate containers or query docker daemon)
         if dry_run:
+            if not simulate and not is_immutable_image_tag(image_tag):
+                logger.critical(
+                    f"[DRY-RUN] Preflight check failed: Tag '{image_tag}' is mutable or unverified. "
+                    "Production CD strictly requires an immutable tag (e.g. sha-<commit_sha> or vX.Y.Z)."
+                )
+                return 1
             logger.info("[DRY-RUN] Execution planned without altering runtime state.")
             for svc in changed_services:
                 img = f"ghcr.io/{repo_owner}/{SERVICE_METADATA[svc]['ghcr_repo']}:{image_tag}"
-                logger.info(f"[DRY-RUN] Would pull: {img}")
+                logger.info(f"[DRY-RUN] Would deploy verified image: {img}")
                 logger.info(f"[DRY-RUN] Would restart container: {SERVICE_METADATA[svc]['container_name']}")
             return 0
 
-        # 2. Record Baseline State for Rollback
+        # 2. Comprehensive Preflight Checks (Executed prior to touching any container)
+        compose_file = "docker-compose.test.yml" if simulate else "docker-compose.yml"
+        preflight_ok = execute_preflight_checks(
+            logger=logger,
+            image_tag=image_tag,
+            repo_owner=repo_owner,
+            services=changed_services,
+            compose_file=compose_file,
+            is_simulation=simulate,
+        )
+        if not preflight_ok:
+            logger.critical("Aborting deployment due to preflight check failure.")
+            return 1
+
+        # 3. Record Baseline State for Rollback BEFORE Modifying Any Containers
         if not simulate:
             record_current_deployment_state(logger, changed_services)
 
-        # 3. Pull / Verify Target Images
+        # 4. Prepare Environment with Immutable Image References
         env = os.environ.copy()
-        compose_file = "docker-compose.test.yml" if simulate else "docker-compose.yml"
+        if not simulate:
+            for svc in changed_services:
+                meta = SERVICE_METADATA[svc]
+                full_image_name = f"ghcr.io/{repo_owner}/{meta['ghcr_repo']}:{image_tag}"
+                if meta["env_var"]:
+                    env[meta["env_var"]] = full_image_name
+                # Also tag as local for compose consistency
+                run_command(["docker", "tag", full_image_name, f"{meta['ghcr_repo']}:latest"], check=False)
 
-        for svc in changed_services:
-            meta = SERVICE_METADATA[svc]
-            full_image_name = f"ghcr.io/{repo_owner}/{meta['ghcr_repo']}:{image_tag}"
-
-            if not simulate:
-                logger.info(f"Pulling verified image for '{svc}': {full_image_name}")
-                pull_proc = run_command(["docker", "pull", full_image_name], check=False)
-                if pull_proc.returncode == 0:
-                    # Also tag as local for compose consistency
-                    run_command(["docker", "tag", full_image_name, f"{meta['ghcr_repo']}:latest"], check=False)
-                    if meta["env_var"]:
-                        env[meta["env_var"]] = full_image_name
-                else:
-                    logger.warning(
-                        f"Remote pull returned {pull_proc.returncode}. Checking local image fallback..."
-                    )
-                    local_inspect = run_command(["docker", "inspect", f"{meta['ghcr_repo']}:latest"], check=False)
-                    if local_inspect.returncode != 0:
-                        logger.error(f"Image not found remotely or locally for service '{svc}'. Aborting.")
-                        return 1
-
-        # 4. Handle Simulated Failure Injection if Requested
+        # 5. Handle Simulated Failure Injection if Requested
         if simulate and simulate_failure:
             logger.warning("[SIMULATION] Intentionally injecting failure into test service to verify failure detection & rollback...")
             os.environ["SIMULATE_HEALTH_FAILURE"] = "true"
 
-        # 5. Execute Zero-Downtime Rolling Cutover
-        compose_services = []
-        if simulate:
-            for svc in changed_services:
-                sim_meta = SIMULATION_METADATA.get(svc)
-                if sim_meta:
-                    compose_services.append(sim_meta["compose_service"])
-        else:
-            compose_services = changed_services
-
-        logger.info(f"Executing rolling cutover via compose: {compose_services}")
+        # 6. Service Ordering Cutover:
+        # Step A: If 'api' is being deployed, cutover and verify 'api' first.
+        # Step B: Only when 'api' is healthy, cutover dependent services ('frontend', 'dashboard').
+        # If ANY step fails, roll back ALL changed services to restore full consistency without partial updates.
+        deployed_so_far: List[str] = []
         project_args = ["-p", "cyclone-ci-test"] if simulate else ["-p", "cyclone-prod"]
-        cmd = ["docker", "compose"] + project_args + ["-f", compose_file, "up", "-d", "--no-deps"] + compose_services
-        proc = subprocess.run(cmd, env=env, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
-        if proc.returncode != 0:
-            logger.error(f"Docker compose up failed: {proc.stderr}")
-            if not simulate:
-                execute_rollback(logger, changed_services, compose_file)
-            return 1
 
-        # 6. Verify Health Checks
-        healthy = perform_health_checks(
-            logger, changed_services, timeout_seconds=health_timeout, is_simulation=simulate
-        )
+        # Group services into ordered cutover batches: primary (api) first, then dependents
+        batches: List[List[str]] = []
+        if "api" in changed_services:
+            batches.append(["api"])
+            dependents = [s for s in changed_services if s != "api"]
+            if dependents:
+                batches.append(dependents)
+        else:
+            batches.append(changed_services)
 
-        if not healthy:
-            logger.error("Health check failure detected during post-deployment verification!")
+        for batch_index, batch_services in enumerate(batches, start=1):
+            batch_compose_services = []
             if simulate:
-                logger.info("[SIMULATION] Triggering simulated rollback teardown...")
-                run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
-                logger.info("[SIMULATION] Teardown complete. Failure was correctly caught and isolated.")
-                return 1
+                for svc in batch_services:
+                    sim_meta = SIMULATION_METADATA.get(svc)
+                    if sim_meta:
+                        batch_compose_services.append(sim_meta["compose_service"])
             else:
-                rollback_ok = execute_rollback(logger, changed_services, compose_file)
-                return 1 if not rollback_ok else 2
+                batch_compose_services = batch_services
+
+            logger.info(
+                f"Executing deployment cutover [Stage {batch_index}/{len(batches)}]: {batch_services}"
+            )
+            cmd = (
+                ["docker", "compose"]
+                + project_args
+                + ["-f", compose_file, "up", "-d", "--no-deps"]
+                + batch_compose_services
+            )
+            proc = subprocess.run(cmd, env=env, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
+            if proc.returncode != 0:
+                logger.error(f"Docker compose up failed for batch {batch_services}: {proc.stderr}")
+                if simulate:
+                    run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
+                else:
+                    all_to_revert = list(dict.fromkeys(deployed_so_far + batch_services))
+                    execute_rollback(logger, all_to_revert, compose_file)
+                return 1
+
+            deployed_so_far.extend(batch_services)
+
+            # Verify health checks for current batch
+            logger.info(f"Verifying health for batch: {batch_services}...")
+            healthy = perform_health_checks(
+                logger, batch_services, timeout_seconds=health_timeout, is_simulation=simulate
+            )
+            if not healthy:
+                logger.error(f"Health check failure detected in batch {batch_services}!")
+                if simulate:
+                    logger.info("[SIMULATION] Triggering simulated rollback teardown...")
+                    run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
+                    logger.info("[SIMULATION] Teardown complete. Failure was correctly caught and isolated.")
+                    return 1
+                else:
+                    # Roll back ALL services touched in this deployment batch (prevents partially updated state)
+                    all_to_revert = list(dict.fromkeys(deployed_so_far))
+                    logger.critical(
+                        f"Health check failed. Rolling back all touched services ({all_to_revert}) "
+                        "to prevent partial deployment inconsistency."
+                    )
+                    rollback_ok = execute_rollback(logger, all_to_revert, compose_file)
+                    return 1 if not rollback_ok else 2
 
         # 7. Record Deployment Success
         if simulate:
@@ -604,7 +790,11 @@ def deploy_production(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Automated Production CD for CYCLONE INTEL")
-    parser.add_argument("--image-tag", default="latest", help="Target image tag to deploy (e.g. sha-7d0e09a)")
+    parser.add_argument(
+        "--image-tag",
+        default="sha-4694bdc",
+        help="Exact immutable image tag to deploy (e.g. sha-4694bdc). Mutable 'latest' is forbidden.",
+    )
     parser.add_argument("--commit-sha", default=None, help="Target Git commit SHA (default: HEAD)")
     parser.add_argument("--repo-owner", default="Bhavanish5041", help="GitHub repository owner")
     parser.add_argument("--services", default="auto", help="Services to deploy: auto, all, or comma-separated list")

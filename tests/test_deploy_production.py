@@ -8,9 +8,16 @@ Verifies:
 - Health check polling logic and failure detection.
 - Rollback execution when health probes fail.
 - Dry run execution.
+- Immutable tag validation (rejection of mutable 'latest', acceptance of sha- and semver).
+- Comprehensive preflight checks (docker daemon, disk space, remote image pull).
+- Service ordering (API cutover and verified first, then dependent services).
+- Atomic rollback preventing partial updates when dependent services fail.
+- Secret and credential masking in logs.
 """
 
+import io
 import json
+import logging
 from pathlib import Path
 import unittest.mock as mock
 import pytest
@@ -18,9 +25,14 @@ import pytest
 from scripts.deploy_production import (
     SERVICE_METADATA,
     SIMULATION_METADATA,
+    SERVICE_DEPLOYMENT_ORDER,
+    SERVICE_ROLLBACK_ORDER,
     detect_changed_services,
     record_current_deployment_state,
     perform_health_checks,
+    execute_preflight_checks,
+    is_immutable_image_tag,
+    SecretMaskingFilter,
     deploy_production,
     setup_logger,
 )
@@ -113,7 +125,7 @@ def test_perform_health_checks_failure_timeout():
 
 
 def test_deploy_production_dry_run():
-    """Verify dry-run mode returns 0 without executing Docker commands."""
+    """Verify dry-run mode returns 0 with immutable tag without executing Docker commands."""
     logger = setup_logger()
     ret = deploy_production(
         image_tag="sha-test1234",
@@ -246,3 +258,211 @@ def test_execute_rollback_restores_backup_tag(tmp_path):
                     assert any("cyclone-assistant-api:latest" in c for c in tag_calls)
 
 
+# ============================================================================
+# NEW ENHANCED CONTINUOUS DEPLOYMENT TESTS
+# ============================================================================
+
+def test_is_immutable_image_tag_validation():
+    """Verify is_immutable_image_tag accurately validates immutable vs mutable tags."""
+    # Valid immutable tags
+    assert is_immutable_image_tag("sha-4694bdc") is True
+    assert is_immutable_image_tag("sha-7d0e09a") is True
+    assert is_immutable_image_tag("sha-097eef2000000000000000000000000000000000") is True
+    assert is_immutable_image_tag("v1.0.0") is True
+    assert is_immutable_image_tag("v2.1.3-beta.1") is True
+
+    # Mutable / unverified tags strictly forbidden
+    assert is_immutable_image_tag("latest") is False
+    assert is_immutable_image_tag("LATEST") is False
+    assert is_immutable_image_tag("master") is False
+    assert is_immutable_image_tag("main") is False
+    assert is_immutable_image_tag("staging") is False
+    assert is_immutable_image_tag("dev") is False
+    assert is_immutable_image_tag("head") is False
+    assert is_immutable_image_tag("") is False
+    assert is_immutable_image_tag(None) is False
+    assert is_immutable_image_tag("unverified-random-tag") is False
+
+
+def test_deploy_production_rejects_mutable_latest_tag():
+    """Verify deploy_production strictly rejects 'latest' and other mutable tags in production mode."""
+    logger = setup_logger()
+    ret = deploy_production(
+        image_tag="latest",
+        dry_run=True,
+        simulate=False,
+        logger=logger,
+    )
+    assert ret == 1
+
+    ret_master = deploy_production(
+        image_tag="master",
+        dry_run=True,
+        simulate=False,
+        logger=logger,
+    )
+    assert ret_master == 1
+
+
+def test_execute_preflight_checks_success():
+    """Verify preflight checks pass when docker is responsive, tag is immutable, and disk is adequate."""
+    logger = setup_logger()
+    with mock.patch("scripts.deploy_production.run_command") as mock_run:
+        # docker info -> 0, docker compose config -> 0, docker pull -> 0
+        mock_run.return_value = mock.Mock(returncode=0)
+        with mock.patch("shutil.disk_usage", return_value=(100 * 10**9, 50 * 10**9, 50 * 10**9)):
+            ok = execute_preflight_checks(
+                logger=logger,
+                image_tag="sha-4694bdc",
+                repo_owner="bhavanish5041",
+                services=["api", "frontend"],
+                compose_file="docker-compose.yml",
+                is_simulation=False,
+            )
+            assert ok is True
+
+
+def test_execute_preflight_checks_docker_down():
+    """Verify preflight check fails immediately if Docker daemon is unresponsive."""
+    logger = setup_logger()
+    with mock.patch("scripts.deploy_production.run_command") as mock_run:
+        mock_run.return_value = mock.Mock(returncode=1, stderr="Cannot connect to the Docker daemon")
+        ok = execute_preflight_checks(
+            logger=logger,
+            image_tag="sha-4694bdc",
+            repo_owner="bhavanish5041",
+            services=["api"],
+            compose_file="docker-compose.yml",
+            is_simulation=False,
+        )
+        assert ok is False
+
+
+def test_execute_preflight_checks_insufficient_disk_space():
+    """Verify preflight check fails if host free disk space is less than 1GB."""
+    logger = setup_logger()
+    with mock.patch("scripts.deploy_production.run_command") as mock_run:
+        mock_run.return_value = mock.Mock(returncode=0)
+        # Mock 500 MB free (less than 1 GB threshold)
+        with mock.patch("shutil.disk_usage", return_value=(100 * 10**9, 99.5 * 10**9, 500 * 1024 * 1024)):
+            ok = execute_preflight_checks(
+                logger=logger,
+                image_tag="sha-4694bdc",
+                repo_owner="bhavanish5041",
+                services=["api"],
+                compose_file="docker-compose.yml",
+                is_simulation=False,
+            )
+            assert ok is False
+
+
+def test_execute_preflight_checks_missing_remote_and_local_image_fails():
+    """Verify preflight fails if image cannot be pulled from GHCR and is not present locally."""
+    logger = setup_logger()
+    with mock.patch("scripts.deploy_production.run_command") as mock_run:
+        # First call: docker info (0)
+        # Second call: docker compose config (0)
+        # Third call: docker pull (1 - failed)
+        # Fourth call: docker inspect (1 - missing locally)
+        mock_run.side_effect = [
+            mock.Mock(returncode=0),
+            mock.Mock(returncode=0),
+            mock.Mock(returncode=1, stderr="repository does not exist"),
+            mock.Mock(returncode=1, stderr="No such image"),
+        ]
+        with mock.patch("shutil.disk_usage", return_value=(100 * 10**9, 50 * 10**9, 50 * 10**9)):
+            ok = execute_preflight_checks(
+                logger=logger,
+                image_tag="sha-4694bdc",
+                repo_owner="bhavanish5041",
+                services=["api"],
+                compose_file="docker-compose.yml",
+                is_simulation=False,
+            )
+            assert ok is False
+
+
+def test_service_ordering_api_deployed_before_dependent_services(tmp_path):
+    """Verify that root service 'api' is cut over and probed first before dependent services."""
+    logger = setup_logger()
+    lock_file = tmp_path / ".deploy.lock"
+
+    compose_calls = []
+
+    def mock_sub_run(cmd, *args, **kwargs):
+        compose_calls.append(cmd)
+        return mock.Mock(returncode=0)
+
+    with mock.patch("scripts.deploy_production.DEPLOYMENT_LOCK_FILE", lock_file):
+        with mock.patch("scripts.deploy_production.execute_preflight_checks", return_value=True):
+            with mock.patch("scripts.deploy_production.record_current_deployment_state", return_value={}):
+                with mock.patch("scripts.deploy_production.perform_health_checks", return_value=True):
+                    with mock.patch("scripts.deploy_production.run_command", return_value=mock.Mock(returncode=0)):
+                        with mock.patch("scripts.deploy_production.subprocess.run", side_effect=mock_sub_run):
+                            ret = deploy_production(
+                                image_tag="sha-4694bdc",
+                                services_arg="all",  # api, frontend, dashboard
+                                logger=logger,
+                            )
+                            assert ret == 0
+
+    # Verify cutover sequence: api first in batch 1, frontend & dashboard in batch 2
+    compose_up_calls = [cmd for cmd in compose_calls if "up" in cmd]
+    assert len(compose_up_calls) == 2, f"Expected 2 ordered cutover batches, got {len(compose_up_calls)}"
+    # First batch must contain only 'api'
+    assert "api" in compose_up_calls[0]
+    assert "frontend" not in compose_up_calls[0]
+    # Second batch must contain dependent services
+    assert "frontend" in compose_up_calls[1]
+    assert "dashboard" in compose_up_calls[1]
+
+
+def test_rollback_prevents_partial_update_when_dependent_service_fails(tmp_path):
+    """Verify that if 'api' succeeds but 'frontend' fails, rollback restores ALL touched services."""
+    logger = setup_logger()
+    lock_file = tmp_path / ".deploy.lock"
+
+    # Stage 1 (api) health check returns True; Stage 2 (frontend) health check returns False
+    health_results = [True, False]
+
+    with mock.patch("scripts.deploy_production.DEPLOYMENT_LOCK_FILE", lock_file):
+        with mock.patch("scripts.deploy_production.execute_preflight_checks", return_value=True):
+            with mock.patch("scripts.deploy_production.record_current_deployment_state", return_value={}):
+                with mock.patch("scripts.deploy_production.perform_health_checks", side_effect=health_results):
+                    with mock.patch("scripts.deploy_production.run_command", return_value=mock.Mock(returncode=0)):
+                        with mock.patch("scripts.deploy_production.subprocess.run", return_value=mock.Mock(returncode=0)):
+                            with mock.patch("scripts.deploy_production.execute_rollback", return_value=True) as mock_rb:
+                                ret = deploy_production(
+                                    image_tag="sha-4694bdc",
+                                    services_arg="api,frontend",
+                                    logger=logger,
+                                )
+                                assert ret == 2  # Rollback succeeded return code
+                                # Crucial: rollback must be called for BOTH api and frontend, not leaving api partially updated!
+                                mock_rb.assert_called_once()
+                                rolled_back_svcs = mock_rb.call_args[0][1]
+                                assert "api" in rolled_back_svcs
+                                assert "frontend" in rolled_back_svcs
+
+
+def test_secret_masking_filter():
+    """Verify that SecretMaskingFilter scrubs tokens, PATs, and credentials from all logged outputs."""
+    log_stream = io.StringIO()
+    handler = logging.StreamHandler(log_stream)
+    formatter = logging.Formatter("%(message)s")
+    handler.setFormatter(formatter)
+    handler.addFilter(SecretMaskingFilter())
+
+    test_logger = logging.getLogger("test_secret_masker")
+    test_logger.setLevel(logging.INFO)
+    test_logger.handlers = [handler]
+
+    test_logger.info("Logging into GHCR with ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    test_logger.info("AWS key detected: AKIAIOSFODNN7EXAMPLE")
+    test_logger.info("Connecting with password=SuperSecretPassword123!")
+
+    output = log_stream.getvalue()
+    assert "ghp_" not in output
+    assert "AKIAIOSFODNN7EXAMPLE" not in output
+    assert "SuperSecretPassword123!" not in output
+    assert "***REDACTED***" in output

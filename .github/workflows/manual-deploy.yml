@@ -15,9 +15,9 @@ on:
           - staging
           - simulation
       image_tag:
-        description: "Exact Docker image tag to deploy (e.g., sha-7d0e09a or latest)"
+        description: "Exact immutable Docker image tag to deploy (e.g., sha-4694bdc). Mutable 'latest' is strictly forbidden."
         required: true
-        default: "latest"
+        default: "sha-4694bdc"
         type: string
       git_commit_sha:
         description: "Git Commit SHA or release tag to deploy (default: HEAD)"
@@ -67,14 +67,27 @@ jobs:
     name: "Pre-Deployment Verification & Safety Gate"
     runs-on: ubuntu-latest
     steps:
-      - name: Verify explicit confirmation token
+      - name: Verify explicit confirmation token and immutable image tag
         run: |
           if [ "${{ github.event.inputs.confirm_deployment }}" != "CONFIRM-DEPLOY" ]; then
             echo "CRITICAL: Deployment aborted. You must enter 'CONFIRM-DEPLOY' to trigger deployment."
             exit 1
           fi
-          echo "Explicit confirmation received. Target: ${{ github.event.inputs.target_environment }}"
-          echo "Selected Image Tag: ${{ github.event.inputs.image_tag }}"
+          IMAGE_TAG="${{ github.event.inputs.image_tag }}"
+          TARGET_ENV="${{ github.event.inputs.target_environment }}"
+          if [ "$TARGET_ENV" = "production" ]; then
+            if [ "$IMAGE_TAG" = "latest" ] || [ "$IMAGE_TAG" = "master" ] || [ "$IMAGE_TAG" = "main" ]; then
+              echo "CRITICAL POLICY VIOLATION: Deploying mutable tag '$IMAGE_TAG' to production is strictly forbidden."
+              echo "Production deployments must specify an exact immutable tag produced by CI (e.g., sha-<commit_sha> or vX.Y.Z)."
+              exit 1
+            fi
+            if ! echo "$IMAGE_TAG" | grep -E -q '^(sha-[0-9a-zA-Z._-]+|v[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9.]+)?)$'; then
+              echo "CRITICAL: Image tag '$IMAGE_TAG' does not conform to required immutable tag format (sha-<short_sha> or vX.Y.Z)."
+              exit 1
+            fi
+          fi
+          echo "Explicit confirmation received. Target: $TARGET_ENV"
+          echo "Verified Immutable Image Tag: $IMAGE_TAG"
           echo "Selected Commit SHA: ${{ github.event.inputs.git_commit_sha }}"
           echo "Target Services: ${{ github.event.inputs.services }}"
 

@@ -151,6 +151,57 @@ class LocalModelRegistry:
 
         return results
 
+    def register_candidate(
+        self,
+        model_id: str,
+        version: str,
+        artifact_files: List[Dict[str, Any]],
+        input_schema: Dict[str, Any],
+        output_schema: Dict[str, Any],
+        evaluation_metrics: Dict[str, Any],
+        author: str = "pipeline",
+        note: str = "",
+    ) -> Dict[str, Any]:
+        """Register a new candidate model version without altering active production aliases.
+
+        Ensures that newly registered models receive 'candidate' status and that
+        the active production version and champion aliases are preserved.
+        """
+        models = self.data.setdefault("models", {})
+        if model_id not in models:
+            raise KeyError(f"Model '{model_id}' not found in registry.")
+
+        m = models[model_id]
+        versions = m.setdefault("versions", {})
+        if version in versions and versions[version].get("status") == "production":
+            raise ValueError(f"Cannot overwrite active production version '{version}' with candidate registration.")
+
+        candidate_entry = {
+            "version": version,
+            "status": "candidate",
+            "artifact_files": artifact_files,
+            "input_schema": input_schema,
+            "output_schema": output_schema,
+            "evaluation_metrics": evaluation_metrics,
+            "registered_at_utc": datetime.now(timezone.utc).isoformat(),
+            "history": [
+                {
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "action": "registered_candidate",
+                    "status": "candidate",
+                    "author": author,
+                    "note": note,
+                }
+            ],
+        }
+        versions[version] = candidate_entry
+        self.save()
+        logger.info(
+            f"Registered candidate version '{version}' for model '{model_id}'. "
+            f"Active version remains '{m.get('active_version')} [production]'."
+        )
+        return candidate_entry
+
     def promote_model(
         self,
         model_id: str,

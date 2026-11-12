@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "updated_at_utc": "2026-11-13T00:00:00Z",
+  "description": "Configurable quality gate thresholds and scientific limitations for CYCLONE INTEL models.",
+  "classification": {
+    "model_identifier": "village-preparedness-classifier",
+    "model_type": "LogisticRegression (RobustScaler + multinomial L-BFGS)",
+    "target": "preparedness_tier",
+    "classes": ["High", "Low", "Medium"],
+    "feature_count": 26,
+    "evaluation_split": {
+      "strategy": "Stratified 70/15/15 train/val/test split",
+      "test_samples": 282,
+      "random_state": 42
+    },
+    "thresholds": {
+      "accuracy_min": 0.85,
+      "macro_f1_min": 0.80,
+      "weighted_f1_min": 0.85,
+      "low_tier_recall_min": 0.70,
+      "generalization_gap_max": 0.08,
+      "inter_district_mae_gap_max": 5.0
+    },
+    "scientific_limitation": "Logistic Regression is an AHP-derived preparedness-tier surrogate, not a cyclone hazard predictor. Its probabilities must not be described as calibrated without calibration evaluation."
+  },
+  "clustering": {
+    "model_identifier": "coastal-vulnerability-kmeans",
+    "model_type": "KMeans (k=4, StandardScaler, n_init=20)",
+    "n_clusters": 4,
+    "feature_count": 4,
+    "features": [
+      "dim_healthcare_deficit",
+      "dim_demographic_vulnerability",
+      "dim_infrastructure_deficit",
+      "dim_coastal_exposure"
+    ],
+    "thresholds": {
+      "silhouette_min": 0.30,
+      "davies_bouldin_max": 1.30,
+      "calinski_harabasz_min": 250.0,
+      "cluster_balance_ratio_min": 0.25,
+      "min_cluster_size": 50,
+      "max_empty_clusters": 0,
+      "stability_mean_ari_min": 0.95,
+      "stability_min_ari_min": 0.90
+    },
+    "stability_evaluation": {
+      "seeds": [42, 123, 456, 789, 999, 1024, 2024, 7, 13, 99],
+      "n_init": 20
+    },
+    "scientific_limitation": "Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions."
+  },
+  "promotion_rules": {
+    "target_status": "production",
+    "require_all_gates_pass": true,
+    "auto_replace_production": false,
+    "preserve_existing_artifacts": true
+  }
+}

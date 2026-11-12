@@ -97,6 +97,147 @@ ARCHETYPE_LABELS_K4: Dict[int, Dict[str, str]] = {
     },
 }
 
+# Empirical interpretations for candidate K values (k=2..6)
+CLUSTER_DESCRIPTIONS_BY_K: Dict[int, Dict[int, Dict[str, str]]] = {
+    2: {
+        0: {
+            "short_label": "Inland & Foothill Vulnerability Zone",
+            "detailed_description": (
+                "Inland communities characterized by elevated healthcare isolation (mean 16.2 km to hospital), "
+                "elevated demographic vulnerability (21.3% SC/ST), and high infrastructure deficit (open drains and unpaved roads). "
+                "Predominantly Dakshina Kannada (73.5%)."
+            ),
+            "primary_intervention_need": "Decentralized primary health clinics, all-weather transport corridors, and social welfare support.",
+        },
+        1: {
+            "short_label": "Coastal Shoreline & Urban-Adjacent Corridor",
+            "detailed_description": (
+                "Coastal shoreline and urban-adjacent communities with high marine storm-surge and wind exposure (mean 10.4 km to coast), "
+                "lower healthcare deficit, and lower demographic vulnerability. Balanced across DK and Udupi."
+            ),
+            "primary_intervention_need": "Storm surge defenses, early warning dissemination, urban drainage resilience, and coastal embankment reinforcement.",
+        },
+    },
+    3: {
+        0: {
+            "short_label": "Urban & Peri-Urban Well-Resourced Corridor",
+            "detailed_description": (
+                "Well-resourced urban and peri-urban corridor with low healthcare deficit, low demographic vulnerability, and the lowest "
+                "infrastructure deficit (closed drainage, piped water). High population concentration (1.55M people, 76.3% DK)."
+            ),
+            "primary_intervention_need": "Stormwater pump maintenance, urban grid power resilience, and hospital surge capacity.",
+        },
+        1: {
+            "short_label": "High-Exposure Rural Coastal Belt",
+            "detailed_description": (
+                "High-exposure coastal settlements with heavy infrastructure deficits (untreated water, open drains prone to saline flooding) "
+                "and proximity to the Arabian Sea (mean 12.3 km to coast). Predominantly Udupi (60.3%)."
+            ),
+            "primary_intervention_need": "Cyclone evacuation shelters, saline water intrusion barriers, and coastal embankment reinforcement.",
+        },
+        2: {
+            "short_label": "Combined Rural Interior & Remote Foothills",
+            "detailed_description": (
+                "Agrarian interior and foothill communities combining elevated healthcare deficit (mean 17.2 km to hospital) "
+                "and high demographic vulnerability (mean 46.1% score). Predominantly Dakshina Kannada (76.0%)."
+            ),
+            "primary_intervention_need": "Rural road connectivity, decentralized primary health clinics, and targeted socio-economic safety nets.",
+        },
+    },
+    4: ARCHETYPE_LABELS_K4,
+    5: {
+        0: {
+            "short_label": "Extreme Demographic Vulnerability Interior",
+            "detailed_description": (
+                "Agrarian interior communities with the highest demographic disadvantage (SC/ST vulnerability mean 0.6213) "
+                "and high infrastructure deficit (0.6195). Predominantly Dakshina Kannada (77.8%)."
+            ),
+            "primary_intervention_need": "Targeted social safety nets, clean drinking water access, and community-based shelter facilities.",
+        },
+        1: {
+            "short_label": "Urban & Peri-Urban Well-Resourced Corridor",
+            "detailed_description": (
+                "Urban and peri-urban settlements with low infrastructure deficit (0.1776) and high population density (1.53M population). "
+                "Concentrated around Mangalore City and taluk hubs."
+            ),
+            "primary_intervention_need": "Urban flood drainage, hospital surge preparedness, and electrical substation protection.",
+        },
+        2: {
+            "short_label": "Immediate Coastal Shoreline Belt",
+            "detailed_description": (
+                "Communities closest to the Arabian Sea (mean 7.6 km to coast, coastal exposure 0.8941) with high infrastructure deficit (0.6446). "
+                "Heavily concentrated in Udupi (69.3%)."
+            ),
+            "primary_intervention_need": "Marine storm-surge barriers, cyclone evacuation shelters, and saline intrusion defenses.",
+        },
+        3: {
+            "short_label": "Remote Foothill & Healthcare-Isolated Communities",
+            "detailed_description": (
+                "Deep Western Ghats foothill communities with severe healthcare distance (mean 24.2 km to hospital, healthcare deficit 0.5768) "
+                "and low coastal exposure (mean 45.4 km to coast). Sheltered from storm surge but vulnerable to isolation."
+            ),
+            "primary_intervention_need": "Mobile medical units, pre-positioned trauma supplies, all-weather road maintenance, and satellite communication.",
+        },
+        4: {
+            "short_label": "Transitional Interior Agrarian Belt",
+            "detailed_description": (
+                "Sub-coastal agrarian interior communities with moderate demographic vulnerability (0.3424), intermediate coastal exposure (0.5857), "
+                "and high infrastructure deficit (0.6174)."
+            ),
+            "primary_intervention_need": "Drainage canal de-silting, emergency drinking water purification, and all-weather road access.",
+        },
+    },
+    6: {
+        0: {
+            "short_label": "Coastal Belt with Elevated Healthcare Isolation",
+            "detailed_description": (
+                "Coastal settlements with high marine exposure (0.8346) and high infrastructure deficit (0.6424), "
+                "with elevated distance to hospitals (mean 19.0 km, deficit 0.4031). Predominantly Udupi (58.5%)."
+            ),
+            "primary_intervention_need": "Coastal emergency clinics, cyclone shelters with medical triage, and road clearance.",
+        },
+        1: {
+            "short_label": "Extreme Demographic Vulnerability Interior",
+            "detailed_description": (
+                "Interior communities with peak demographic vulnerability (mean 0.6130, SC/ST disadvantage) and high infrastructure deficit (0.6153). "
+                "Predominantly Dakshina Kannada (73.9%)."
+            ),
+            "primary_intervention_need": "Targeted social safety nets, clean drinking water distribution, and accessible community shelters.",
+        },
+        2: {
+            "short_label": "Urban & Peri-Urban Well-Resourced Corridor",
+            "detailed_description": (
+                "Primary urban corridor with low infrastructure deficit (0.1681), low healthcare deficit (0.2469), and the largest population share (1.52M). "
+                "Strong hospital and infrastructure baseline."
+            ),
+            "primary_intervention_need": "Stormwater pump maintenance, power grid backup, and hospital surge readiness.",
+        },
+        3: {
+            "short_label": "Deep Foothill Healthcare-Isolated Frontier",
+            "detailed_description": (
+                "Most remote Western Ghats foothill settlements with maximum hospital distance (mean 25.2 km, deficit 0.5984) "
+                "and lowest coastal exposure (mean 51.8 km to coast)."
+            ),
+            "primary_intervention_need": "Pre-positioned trauma supplies, satellite communication links, and emergency evacuation access.",
+        },
+        4: {
+            "short_label": "Transitional Interior Agrarian Belt",
+            "detailed_description": (
+                "Intermediate interior zone with moderate demographic vulnerability (0.3402) and intermediate coastal distance (31.6 km)."
+            ),
+            "primary_intervention_need": "Agricultural drainage clearing, drinking water purification, and community shelter upgrades.",
+        },
+        5: {
+            "short_label": "Immediate Shoreline Fishing Communities",
+            "detailed_description": (
+                "Ultra-close shoreline settlements (mean 6.2 km to coast, coastal exposure 0.9134) with moderate healthcare access (10.2 km to hospital) "
+                "but open drainage and well water reliance."
+            ),
+            "primary_intervention_need": "Early warning sirens, sea-wall maintenance, fishing vessel harbor protection, and saline barrier reinforcement.",
+        },
+    },
+}
+
 
 def extract_clustering_features(
     df: pd.DataFrame,
@@ -187,21 +328,23 @@ def fit_and_evaluate_clustering(
     if n_clusters >= len(X):
         raise ValueError("n_clusters must be strictly less than n_samples.")
 
+    kwargs_clean = dict(kwargs)
     if algorithm.lower() == "kmeans":
-        n_init = kwargs.get("n_init", 20)
+        n_init = kwargs_clean.pop("n_init", 20)
         model = KMeans(
             n_clusters=n_clusters,
             random_state=random_state,
             n_init=n_init,
-            **kwargs,
+            **kwargs_clean,
         )
         labels = model.fit_predict(X)
         inertia = float(model.inertia_)
     elif algorithm.lower() == "agglomerative":
-        linkage = kwargs.get("linkage", "ward")
+        linkage = kwargs_clean.pop("linkage", "ward")
         model = AgglomerativeClustering(
             n_clusters=n_clusters,
             linkage=linkage,
+            **kwargs_clean,
         )
         labels = model.fit_predict(X)
         inertia = None
@@ -248,6 +391,7 @@ def compute_archetype_profiles(
     df: pd.DataFrame,
     cluster_labels: np.ndarray,
     dimension_cols: Optional[List[str]] = None,
+    k: Optional[int] = None,
 ) -> pd.DataFrame:
     """Compute comprehensive statistical profiles for each discovered cluster archetype.
 
@@ -256,11 +400,13 @@ def compute_archetype_profiles(
     - District composition (Dakshina Kannada vs Udupi breakdown)
     - Mean and median for each of the four dimension scores
     - Raw geographic proxies (distance to coast, distance to hospital, distance to PHC, SC/ST ratio)
+    - Empirical cluster description and primary intervention need
 
     Args:
         df: Input DataFrame with dimension scores and context columns.
         cluster_labels: Array of cluster assignments of length len(df).
         dimension_cols: List of dimension column names.
+        k: Optional explicit cluster count K. If None, inferred from unique cluster labels.
 
     Returns:
         DataFrame with cluster profiles indexed by cluster ID.
@@ -271,9 +417,12 @@ def compute_archetype_profiles(
     temp_df = df.copy()
     temp_df["cluster_id"] = cluster_labels
     n_total = len(temp_df)
+    unique_clusters = sorted(temp_df["cluster_id"].unique())
+    k_eff = k if k is not None else len(unique_clusters)
+    descriptions_map = CLUSTER_DESCRIPTIONS_BY_K.get(k_eff, ARCHETYPE_LABELS_K4 if k_eff == 4 else {})
 
     profile_records = []
-    for c_id in sorted(temp_df["cluster_id"].unique()):
+    for c_id in unique_clusters:
         c_sub = temp_df[temp_df["cluster_id"] == c_id]
         c_size = len(c_sub)
         pct = round(c_size / n_total * 100, 1)
@@ -329,8 +478,12 @@ def compute_archetype_profiles(
         if "sc_st_ratio" in c_sub.columns:
             record["sc_st_ratio_mean"] = round(float(c_sub["sc_st_ratio"].mean()), 3)
 
-        # Descriptive label if k=4
-        if c_id in ARCHETYPE_LABELS_K4:
+        # Descriptive labels
+        if c_id in descriptions_map:
+            record["archetype_name"] = descriptions_map[c_id].get("short_label", f"Cluster {c_id}")
+            record["detailed_description"] = descriptions_map[c_id].get("detailed_description", "")
+            record["primary_intervention_need"] = descriptions_map[c_id].get("primary_intervention_need", "")
+        elif c_id in ARCHETYPE_LABELS_K4:
             record["archetype_name"] = ARCHETYPE_LABELS_K4[c_id]["short_label"]
             record["primary_intervention_need"] = ARCHETYPE_LABELS_K4[c_id]["primary_intervention_need"]
 
@@ -364,6 +517,7 @@ def plot_kmeans_pca_projection(
     labels: np.ndarray,
     cluster_centers: Optional[np.ndarray] = None,
     output_path: Optional[Union[str, Path]] = None,
+    k: Optional[int] = None,
 ) -> Tuple[PCA, np.ndarray, plt.Figure]:
     """Generate 2D PCA projection scatter plot with cluster centroids.
 
@@ -372,33 +526,30 @@ def plot_kmeans_pca_projection(
         labels: Cluster assignment vector.
         cluster_centers: Array of cluster center coordinates in standardized feature space.
         output_path: Path to save the generated PNG plot.
+        k: Optional cluster count K. If None, inferred from unique labels.
 
     Returns:
         Tuple of (pca_model, X_pca, fig).
     """
     pca, X_pca, var_exp = compute_kmeans_pca(X_scaled, n_components=2, random_state=42)
 
-    fig, ax = plt.subplots(figsize=(10, 7.5))
-    colors = {
-        0: "#2ca02c",  # Green: Urban Well-Resourced Corridor
-        1: "#d62728",  # Red: Foothill Healthcare-Isolated
-        2: "#9467bd",  # Purple: Vulnerable Rural Interior
-        3: "#1f77b4",  # Blue: High-Exposure Coastal Belt
-    }
-    names = {
-        0: "Cluster 0: Urban Well-Resourced Corridor",
-        1: "Cluster 1: Foothill Healthcare-Isolated",
-        2: "Cluster 2: Vulnerable Rural Interior",
-        3: "Cluster 3: High-Exposure Coastal Belt",
-    }
+    unique_labels = sorted(np.unique(labels))
+    k_eff = k if k is not None else len(unique_labels)
+    desc_map = CLUSTER_DESCRIPTIONS_BY_K.get(k_eff, ARCHETYPE_LABELS_K4 if k_eff == 4 else {})
 
-    for c_id in sorted(np.unique(labels)):
+    palette = ["#2ca02c", "#d62728", "#9467bd", "#1f77b4", "#ff7f0e", "#8c564b", "#e377c2", "#7f7f7f"]
+
+    fig, ax = plt.subplots(figsize=(10, 7.5))
+
+    for c_id in unique_labels:
         mask = (labels == c_id)
+        short_label = desc_map.get(c_id, {}).get("short_label", f"Cluster {c_id}")
+        cluster_legend = f"Cluster {c_id}: {short_label}" if short_label != f"Cluster {c_id}" else f"Cluster {c_id}"
         ax.scatter(
             X_pca[mask, 0],
             X_pca[mask, 1],
-            c=colors.get(c_id, f"C{c_id}"),
-            label=names.get(c_id, f"Cluster {c_id}"),
+            c=palette[c_id % len(palette)],
+            label=cluster_legend,
             alpha=0.75,
             edgecolors="none",
             s=45,
@@ -414,12 +565,12 @@ def plot_kmeans_pca_projection(
             s=240,
             edgecolors="black",
             linewidths=1.5,
-            label="Cluster Centroids (k=4)",
+            label=f"Cluster Centroids (k={k_eff})",
             zorder=10,
         )
 
     ax.set_title(
-        f"K-Means (k=4) Vulnerability Archetypes — 2D PCA Projection\n"
+        f"K-Means (k={k_eff}) Vulnerability Archetypes — 2D PCA Projection\n"
         f"Total Explained Variance: {(var_exp[0] + var_exp[1]) * 100:.1f}%",
         fontsize=12,
         fontweight="bold",
@@ -731,4 +882,128 @@ def log_clustering_experiments_wandb(
         artifact_aliases=artifact_aliases,
     )
     return bool(res.get("synced", False))
+
+
+def train_kmeans_model(
+    data_or_path: Union[str, Path, pd.DataFrame, gpd.GeoDataFrame],
+    n_clusters: int = 4,
+    random_state: int = 42,
+    n_init: int = 20,
+    output_dir: Optional[Union[str, Path]] = None,
+    save_artifacts: bool = False,
+) -> Tuple[KMeans, StandardScaler, Dict[str, Any], ClusteringMetrics, np.ndarray]:
+    """Train and serialize the canonical K-Means vulnerability clustering model.
+
+    Separates model training from inference and adheres strictly to:
+    - Four canonical clustering dimensions:
+        1. dim_healthcare_deficit
+        2. dim_demographic_vulnerability
+        3. dim_infrastructure_deficit
+        4. dim_coastal_exposure
+    - Standard preprocessing using a fitted StandardScaler.
+    - Reproducible initialization (random_state=42, n_init=20).
+    - Preserves existing production artifacts unless an explicit output_dir is given.
+
+    Args:
+        data_or_path: Path to dataset parquet or pre-loaded DataFrame/GeoDataFrame.
+        n_clusters: Number of clusters (default 4).
+        random_state: Random seed for initialization (default 42).
+        n_init: Number of centroid re-initializations (default 20).
+        output_dir: Optional directory to persist artifacts.
+        save_artifacts: Whether to serialize model, scaler, and metadata to disk.
+
+    Returns:
+        Tuple of (fitted_model, fitted_scaler, metadata_dict, metrics_dataclass, cluster_labels).
+    """
+    if isinstance(data_or_path, (str, Path)):
+        p = Path(data_or_path)
+        if not p.exists():
+            raise FileNotFoundError(f"Input dataset not found at: {p}")
+        df = gpd.read_parquet(p) if str(p).endswith(".parquet") else pd.read_csv(p)
+    else:
+        df = data_or_path.copy()
+
+    # Extract standardized features using the canonical 4 dimensions
+    X_scaled, scaler = extract_clustering_features(
+        df,
+        dimension_cols=CLUSTERING_DIMENSION_COLUMNS,
+        standardize=True,
+    )
+
+    # Fit K-Means
+    model = KMeans(
+        n_clusters=n_clusters,
+        random_state=random_state,
+        n_init=n_init,
+    )
+    labels = model.fit_predict(X_scaled)
+    inertia = float(model.inertia_)
+
+    sil = float(silhouette_score(X_scaled, labels))
+    db = float(davies_bouldin_score(X_scaled, labels))
+    ch = float(calinski_harabasz_score(X_scaled, labels))
+    sizes = pd.Series(labels).value_counts().sort_index().tolist()
+    balance = float(min(sizes) / max(sizes))
+
+    metrics = ClusteringMetrics(
+        algorithm="kmeans",
+        n_clusters=n_clusters,
+        random_state=random_state,
+        silhouette=round(sil, 4),
+        davies_bouldin=round(db, 4),
+        calinski_harabasz=round(ch, 2),
+        inertia=round(inertia, 2),
+        cluster_sizes=sizes,
+        cluster_balance_ratio=round(balance, 4),
+    )
+
+    metadata: Dict[str, Any] = {
+        "model_identifier": "coastal-vulnerability-kmeans",
+        "algorithm": "KMeans",
+        "n_clusters": n_clusters,
+        "random_state": random_state,
+        "n_init": n_init,
+        "standardize": True,
+        "features": list(CLUSTERING_DIMENSION_COLUMNS),
+        "disclaimer": ARCHETYPE_DISCLAIMER,
+        "total_units": len(df),
+        "evaluation_metrics": {
+            "silhouette": round(sil, 4),
+            "davies_bouldin": round(db, 4),
+            "calinski_harabasz": round(ch, 2),
+            "inertia": inertia,
+            "cluster_balance_ratio": round(balance, 4),
+        },
+        "cluster_centers": model.cluster_centers_.tolist(),
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+
+    if save_artifacts and output_dir is not None:
+        out_p = Path(output_dir)
+        out_p.mkdir(parents=True, exist_ok=True)
+
+        joblib.dump(model, out_p / f"kmeans_k{n_clusters}_model.joblib")
+        joblib.dump(scaler, out_p / "kmeans_scaler.joblib")
+
+        with open(out_p / "kmeans_metadata.json", "w", encoding="utf-8") as f:
+            json.dump(metadata, f, indent=2)
+
+        schema = {
+            "dimensions": len(CLUSTERING_DIMENSION_COLUMNS),
+            "dimension_columns": CLUSTERING_DIMENSION_COLUMNS,
+            "scaling": "sklearn.preprocessing.StandardScaler (mean=0, std=1)",
+            "feature_descriptions": {
+                "dim_healthcare_deficit": "Normalized straight-line distance to nearest PHC/CHC and Hospital",
+                "dim_demographic_vulnerability": "Proportion of scheduled caste and scheduled tribe population (Census 2011)",
+                "dim_infrastructure_deficit": "Untreated water source, unpaved road, and open/no drainage deficits (Census 2011)",
+                "dim_coastal_exposure": "Inverted distance to the Arabian Sea coastline proxy",
+            },
+        }
+        with open(out_p / "feature_schema.json", "w", encoding="utf-8") as f:
+            json.dump(schema, f, indent=2)
+
+        logger.info(f"K-Means artifacts successfully serialized to {out_p}")
+
+    return model, scaler, metadata, metrics, labels
+
 

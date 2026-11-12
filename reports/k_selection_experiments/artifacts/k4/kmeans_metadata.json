@@ -1,0 +1,78 @@
+{
+  "model_identifier": "kmeans-candidate-k4",
+  "model_family": "scikit-learn",
+  "algorithm": "KMeans",
+  "n_clusters": 4,
+  "random_state": 42,
+  "n_init": 20,
+  "standardize": true,
+  "features": [
+    "dim_healthcare_deficit",
+    "dim_demographic_vulnerability",
+    "dim_infrastructure_deficit",
+    "dim_coastal_exposure"
+  ],
+  "source_dataset": "data/processed/coastal_prioritization_baseline.parquet",
+  "total_units": 4,
+  "total_population": 3254857,
+  "evaluation_metrics": {
+    "algorithm": "kmeans",
+    "n_clusters": 4,
+    "random_state": 42,
+    "n_init": 20,
+    "inertia": 1015.73,
+    "silhouette": 0.3348,
+    "davies_bouldin": 1.1771,
+    "calinski_harabasz": 298.59,
+    "min_cluster_size": 82,
+    "max_cluster_size": 249,
+    "cluster_balance_ratio": 0.3293,
+    "cluster_sizes": [
+      130,
+      82,
+      161,
+      249
+    ],
+    "runtime_seconds": 0.1186
+  },
+  "stability_metrics": {
+    "stability_mean_ari": 0.9912,
+    "stability_std_ari": 0.0114,
+    "stability_min_ari": 0.9635,
+    "stability_max_ari": 1.0,
+    "stability_mean_ami": 0.9882,
+    "stability_std_ami": 0.0158,
+    "stability_mean_silhouette": 0.3346,
+    "stability_std_silhouette": 0.0004,
+    "stability_seed_count": 10
+  },
+  "cluster_centers": [
+    [
+      -0.4938585768362958,
+      -0.5492402752645084,
+      -1.7199676051406558,
+      0.4827219467889738
+    ],
+    [
+      1.8053867203381524,
+      0.3990615414598354,
+      0.3033299047233454,
+      -1.2879837683232038
+    ],
+    [
+      -0.13114042838101847,
+      1.0568635453208313,
+      0.40904011239431337,
+      -0.7474440813117085
+    ],
+    [
+      -0.25191360285006453,
+      -0.5280194434215827,
+      0.5336035276525565,
+      0.6554189277555073
+    ]
+  ],
+  "disclaimer": "DISCLAIMER: Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions. They serve as descriptive planning archetypes to identify communities with shared intervention requirements.",
+  "candidate_status": "experimental_candidate",
+  "registered_at_utc": "2026-11-12T19:15:46.024672+00:00"
+}

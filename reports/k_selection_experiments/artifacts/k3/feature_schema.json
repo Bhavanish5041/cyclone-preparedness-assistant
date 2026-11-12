@@ -1,0 +1,25 @@
+{
+  "dimensions": 4,
+  "dimension_columns": [
+    "dim_healthcare_deficit",
+    "dim_demographic_vulnerability",
+    "dim_infrastructure_deficit",
+    "dim_coastal_exposure"
+  ],
+  "scaling": "sklearn.preprocessing.StandardScaler (mean=0, std=1)",
+  "feature_descriptions": {
+    "dim_healthcare_deficit": "Normalized straight-line distance to nearest PHC/CHC and Hospital",
+    "dim_demographic_vulnerability": "Proportion of scheduled caste and scheduled tribe population (Census 2011)",
+    "dim_infrastructure_deficit": "Untreated water source, unpaved road, and open/no drainage deficits (Census 2011)",
+    "dim_coastal_exposure": "Inverted distance to the Arabian Sea coastline proxy"
+  },
+  "disallowed_columns": [
+    "geometry",
+    "shrid2",
+    "pc11_id",
+    "priority_score",
+    "priority_rank",
+    "rep_point_latitude",
+    "rep_point_longitude"
+  ]
+}

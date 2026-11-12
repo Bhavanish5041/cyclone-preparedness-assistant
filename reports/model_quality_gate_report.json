@@ -1,0 +1,465 @@
+{
+  "timestamp_utc": "2026-11-12T20:19:42.906855+00:00",
+  "overall_status": "PASS",
+  "promotion_eligibility": "PROMOTION_ELIGIBLE",
+  "promotion_verdict": "PASSED \u2014 All quality gates satisfied. Models are eligible for champion / production registry aliases.",
+  "failure_reasons": [],
+  "performance_summary": {
+    "logistic_regression": {
+      "test_samples": 282,
+      "accuracy": 0.9433,
+      "macro_f1": 0.906,
+      "weighted_f1": 0.9422,
+      "low_tier_recall": 0.7391,
+      "confusion_matrix": [
+        [
+          85,
+          0,
+          5
+        ],
+        [
+          0,
+          17,
+          6
+        ],
+        [
+          3,
+          2,
+          164
+        ]
+      ],
+      "classes": [
+        "High",
+        "Low",
+        "Medium"
+      ],
+      "classification_report": {
+        "High": {
+          "precision": 0.9659090909090909,
+          "recall": 0.9444444444444444,
+          "f1-score": 0.9550561797752809,
+          "support": 90.0
+        },
+        "Low": {
+          "precision": 0.8947368421052632,
+          "recall": 0.7391304347826086,
+          "f1-score": 0.8095238095238095,
+          "support": 23.0
+        },
+        "Medium": {
+          "precision": 0.9371428571428572,
+          "recall": 0.9704142011834319,
+          "f1-score": 0.9534883720930233,
+          "support": 169.0
+        },
+        "accuracy": 0.9432624113475178,
+        "macro avg": {
+          "precision": 0.9325962633857371,
+          "recall": 0.8846630268034951,
+          "f1-score": 0.9060227871307046,
+          "support": 282.0
+        },
+        "weighted avg": {
+          "precision": 0.9428649234304329,
+          "recall": 0.9432624113475178,
+          "f1-score": 0.9422469456827796,
+          "support": 282.0
+        }
+      },
+      "scientific_limitation": "Logistic Regression is an AHP-derived preparedness-tier surrogate, not a cyclone hazard predictor. Its probabilities must not be described as calibrated without calibration evaluation."
+    },
+    "kmeans": {
+      "total_units": 622,
+      "silhouette": 0.3348,
+      "davies_bouldin": 1.1771,
+      "calinski_harabasz": 298.59,
+      "cluster_sizes": {
+        "0": 130,
+        "1": 82,
+        "2": 161,
+        "3": 249
+      },
+      "cluster_balance_ratio": 0.3293,
+      "scientific_limitation": "Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions."
+    }
+  },
+  "stability_summary": {
+    "kmeans_stability": {
+      "seeds_evaluated": [
+        42,
+        123,
+        456,
+        789,
+        999,
+        1024,
+        2024,
+        7,
+        13,
+        99
+      ],
+      "mean_ari": 0.9912,
+      "min_ari": 0.9635,
+      "std_ari": 0.0114
+    },
+    "lr_generalization": {
+      "train_f1": 0.9351806340597754,
+      "test_f1": 0.9060227871307046,
+      "gap": 0.0292
+    }
+  },
+  "dimension_results": {
+    "code_quality": {
+      "import_load_registered_model": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_features_count_is_26": {
+        "passed": true,
+        "measured": 3,
+        "threshold": null,
+        "detail": ""
+      },
+      "import_clustering": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "kmeans_features_count_is_4": {
+        "passed": true,
+        "measured": 4,
+        "threshold": 4,
+        "detail": ""
+      },
+      "import_fastapi_app": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      }
+    },
+    "data_quality": {
+      "modelling_dataset_exists": {
+        "passed": true,
+        "measured": "1879 rows",
+        "threshold": null,
+        "detail": ""
+      },
+      "modelling_dataset_rows_valid": {
+        "passed": true,
+        "measured": 1879,
+        "threshold": ">=1800",
+        "detail": ""
+      },
+      "modelling_target_present": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "modelling_target_no_nulls": {
+        "passed": true,
+        "measured": 0,
+        "threshold": 0,
+        "detail": ""
+      },
+      "baseline_coastal_dataset_exists": {
+        "passed": true,
+        "measured": "622 units",
+        "threshold": null,
+        "detail": ""
+      },
+      "clustering_4_features_present": {
+        "passed": true,
+        "measured": 4,
+        "threshold": 4,
+        "detail": "Missing: []"
+      },
+      "clustering_features_no_nan": {
+        "passed": true,
+        "measured": 0,
+        "threshold": 0,
+        "detail": ""
+      }
+    },
+    "model_loading": {
+      "lr_pipeline_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_label_encoder_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_metadata_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_classes_complete": {
+        "passed": true,
+        "measured": [
+          "High",
+          "Low",
+          "Medium"
+        ],
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_scaler_step_present": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": "RobustScaler step verified"
+      },
+      "kmeans_model_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "kmeans_scaler_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "kmeans_metadata_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "kmeans_n_clusters_is_4": {
+        "passed": true,
+        "measured": 4,
+        "threshold": 4,
+        "detail": ""
+      },
+      "kmeans_cluster_centers_shape": {
+        "passed": true,
+        "measured": [
+          4,
+          4
+        ],
+        "threshold": [
+          4,
+          4
+        ],
+        "detail": ""
+      },
+      "registry_manifest_valid_json": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "registry_has_classifier": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "registry_has_kmeans": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      }
+    },
+    "model_correctness": {
+      "lr_prediction_valid_tier": {
+        "passed": true,
+        "measured": "High",
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_prob_sum_is_one": {
+        "passed": true,
+        "measured": 1.0,
+        "threshold": "1.0 \u00b1 1e-5",
+        "detail": ""
+      },
+      "lr_probs_finite": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_probs_in_unit_interval": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "lr_low_tier_preservation_fidelity": {
+        "passed": true,
+        "measured": 0.75,
+        "threshold": ">=0.70",
+        "detail": "Scientific safeguard: ML surrogate preserves AHP Low classifications"
+      },
+      "kmeans_cluster_id_in_valid_range": {
+        "passed": true,
+        "measured": [
+          0,
+          3
+        ],
+        "threshold": "[0, 1, 2, 3]",
+        "detail": ""
+      },
+      "kmeans_deterministic_inference": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": "Identical outputs across consecutive runs"
+      }
+    },
+    "model_performance": {
+      "lr_accuracy_gate": {
+        "passed": true,
+        "measured": 0.9433,
+        "threshold": ">=0.85",
+        "detail": ""
+      },
+      "lr_macro_f1_gate": {
+        "passed": true,
+        "measured": 0.906,
+        "threshold": ">=0.8",
+        "detail": ""
+      },
+      "lr_weighted_f1_gate": {
+        "passed": true,
+        "measured": 0.9422,
+        "threshold": ">=0.85",
+        "detail": ""
+      },
+      "lr_low_tier_recall_gate": {
+        "passed": true,
+        "measured": 0.7391,
+        "threshold": ">=0.7",
+        "detail": ""
+      },
+      "kmeans_silhouette_gate": {
+        "passed": true,
+        "measured": 0.3348,
+        "threshold": ">=0.3",
+        "detail": ""
+      },
+      "kmeans_davies_bouldin_gate": {
+        "passed": true,
+        "measured": 1.1771,
+        "threshold": "<=1.3",
+        "detail": ""
+      },
+      "kmeans_calinski_harabasz_gate": {
+        "passed": true,
+        "measured": 298.59,
+        "threshold": ">=250.0",
+        "detail": ""
+      },
+      "kmeans_no_empty_clusters": {
+        "passed": true,
+        "measured": 0,
+        "threshold": 0,
+        "detail": ""
+      },
+      "kmeans_cluster_balance_gate": {
+        "passed": true,
+        "measured": 0.3293,
+        "threshold": ">=0.25",
+        "detail": ""
+      },
+      "kmeans_min_cluster_size_gate": {
+        "passed": true,
+        "measured": 82,
+        "threshold": ">=50",
+        "detail": ""
+      }
+    },
+    "model_stability": {
+      "kmeans_mean_ari_stability_gate": {
+        "passed": true,
+        "measured": 0.9912,
+        "threshold": ">=0.95",
+        "detail": ""
+      },
+      "kmeans_min_ari_stability_gate": {
+        "passed": true,
+        "measured": 0.9635,
+        "threshold": ">=0.9",
+        "detail": ""
+      },
+      "lr_train_test_generalization_gap": {
+        "passed": true,
+        "measured": 0.0292,
+        "threshold": "<=0.08",
+        "detail": "Train F1=0.935, Test F1=0.906"
+      }
+    },
+    "api_correctness": {
+      "api_health_endpoint_200": {
+        "passed": true,
+        "measured": 200,
+        "threshold": 200,
+        "detail": ""
+      },
+      "api_health_reports_model_loaded": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "openapi_json_available": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "api_predict_valid_request_200": {
+        "passed": true,
+        "measured": 200,
+        "threshold": 200,
+        "detail": ""
+      },
+      "api_predict_returns_tier": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "api_predict_returns_probabilities": {
+        "passed": true,
+        "measured": null,
+        "threshold": null,
+        "detail": ""
+      },
+      "api_predict_rejects_missing_features": {
+        "passed": true,
+        "measured": 422,
+        "threshold": "400 or 422",
+        "detail": "Safely rejects incomplete schema"
+      },
+      "api_predict_rejects_malformed_json": {
+        "passed": true,
+        "measured": 422,
+        "threshold": "400 or 422",
+        "detail": ""
+      }
+    },
+    "deployment_readiness": {
+      "all_quality_gates_passed": {
+        "passed": true,
+        "measured": "PROMOTION_ELIGIBLE",
+        "threshold": "PROMOTION_ELIGIBLE",
+        "detail": "PASSED \u2014 All quality gates satisfied. Models are eligible for champion / production registry aliases."
+      }
+    }
+  }
+}

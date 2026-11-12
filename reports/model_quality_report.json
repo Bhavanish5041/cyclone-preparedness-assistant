@@ -1,5 +1,5 @@
 {
-  "timestamp_utc": "2026-11-12T18:02:24.323421+00:00",
+  "timestamp_utc": "2026-11-12T19:03:20.003558+00:00",
   "pipeline_status": "PASSED",
   "total_samples_evaluated": 130,
   "dataset_limitations_and_scope": "This dataset contains 130 curated regression test cases drawn from the authoritative Census 2011 and multi-criteria AHP ground truth for coastal Karnataka (1,879 administrative units across Dakshina Kannada, Udupi, and Uttara Kannada). It is designed for regression gating, boundary verification, and scientific invariance enforcement. It does NOT claim statistical generalizability beyond coastal Karnataka.",
@@ -21,37 +21,37 @@
     "fallback_frequency": 0.0
   },
   "latency_metrics": {
-    "mean_ms": 28.56,
-    "median_ms": 22.78,
-    "p95_ms": 63.98,
+    "mean_ms": 28.51,
+    "median_ms": 22.69,
+    "p95_ms": 64.34,
     "deterministic_pipeline_latency": {
-      "mean_ms": 28.56,
-      "median_ms": 22.78,
-      "p95_ms": 63.98,
+      "mean_ms": 28.51,
+      "median_ms": 22.69,
+      "p95_ms": 64.34,
       "min_ms": 0.0,
-      "max_ms": 127.17
+      "max_ms": 127.55
     },
     "deterministic_tool_latency": {
-      "mean_ms": 4.01,
-      "median_ms": 4.07,
-      "p95_ms": 4.25
+      "mean_ms": 4.19,
+      "median_ms": 4.12,
+      "p95_ms": 4.68
     },
     "qwen_llm_generation_latency": {
       "ollama_accessible": true,
       "model": "qwen2.5:0.5b-instruct",
       "benchmark_samples": 3,
-      "mean_ms": 646.61,
-      "median_ms": 714.22,
-      "p95_ms": 730.56,
-      "avg_tokens_per_response": 25.7,
-      "estimated_tokens_per_second": 39.69
+      "mean_ms": 862.14,
+      "median_ms": 787.78,
+      "p95_ms": 1039.89,
+      "avg_tokens_per_response": 28.3,
+      "estimated_tokens_per_second": 32.86
     },
-    "total_evaluation_run_time_ms": 8674.32
+    "total_evaluation_run_time_ms": 8611.26
   },
   "resource_metrics": {
-    "initial_rss_mb": 522.23,
-    "final_rss_mb": 522.48,
-    "memory_delta_mb": 0.25
+    "initial_rss_mb": 806.97,
+    "final_rss_mb": 806.97,
+    "memory_delta_mb": 0.0
   },
   "per_intent_breakdown": {
     "analyze_infrastructure_and_exposure": {
@@ -303,7 +303,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 25.07,
+      "elapsed_pipeline_ms": 22.31,
       "valid_schema": true
     },
     {
@@ -317,7 +317,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 22.55,
+      "elapsed_pipeline_ms": 21.41,
       "valid_schema": true
     },
     {
@@ -331,7 +331,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 54.49,
+      "elapsed_pipeline_ms": 53.96,
       "valid_schema": true
     },
     {
@@ -345,7 +345,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 31.76,
+      "elapsed_pipeline_ms": 31.18,
       "valid_schema": true
     },
     {
@@ -359,7 +359,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 54.11,
+      "elapsed_pipeline_ms": 51.69,
       "valid_schema": true
     },
     {
@@ -373,7 +373,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 40.2,
+      "elapsed_pipeline_ms": 41.75,
       "valid_schema": true
     },
     {
@@ -387,7 +387,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.07,
+      "elapsed_pipeline_ms": 10.21,
       "valid_schema": true
     },
     {
@@ -401,7 +401,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 34.52,
+      "elapsed_pipeline_ms": 34.28,
       "valid_schema": true
     },
     {
@@ -415,7 +415,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.52,
+      "elapsed_pipeline_ms": 23.25,
       "valid_schema": true
     },
     {
@@ -429,7 +429,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 66.11,
+      "elapsed_pipeline_ms": 57.17,
       "valid_schema": true
     },
     {
@@ -443,7 +443,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 59.6,
+      "elapsed_pipeline_ms": 58.94,
       "valid_schema": true
     },
     {
@@ -457,7 +457,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.37,
+      "elapsed_pipeline_ms": 64.03,
       "valid_schema": true
     },
     {
@@ -471,7 +471,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.02,
+      "elapsed_pipeline_ms": 22.87,
       "valid_schema": true
     },
     {
@@ -485,7 +485,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 32.37,
+      "elapsed_pipeline_ms": 32.16,
       "valid_schema": true
     },
     {
@@ -499,7 +499,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 55.64,
+      "elapsed_pipeline_ms": 56.54,
       "valid_schema": true
     },
     {
@@ -513,7 +513,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 43.26,
+      "elapsed_pipeline_ms": 44.67,
       "valid_schema": true
     },
     {
@@ -527,7 +527,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 40.82,
+      "elapsed_pipeline_ms": 42.17,
       "valid_schema": true
     },
     {
@@ -541,7 +541,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 59.65,
+      "elapsed_pipeline_ms": 59.59,
       "valid_schema": true
     },
     {
@@ -555,7 +555,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 22.9,
+      "elapsed_pipeline_ms": 22.21,
       "valid_schema": true
     },
     {
@@ -569,7 +569,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.03,
+      "elapsed_pipeline_ms": 60.08,
       "valid_schema": true
     },
     {
@@ -583,7 +583,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 52.97,
+      "elapsed_pipeline_ms": 52.5,
       "valid_schema": true
     },
     {
@@ -597,7 +597,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 56.27,
+      "elapsed_pipeline_ms": 56.23,
       "valid_schema": true
     },
     {
@@ -611,7 +611,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 5.8,
+      "elapsed_pipeline_ms": 5.73,
       "valid_schema": true
     },
     {
@@ -625,7 +625,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 5.47,
+      "elapsed_pipeline_ms": 5.67,
       "valid_schema": true
     },
     {
@@ -639,7 +639,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 14.81,
+      "elapsed_pipeline_ms": 15.27,
       "valid_schema": true
     },
     {
@@ -653,7 +653,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 9.62,
+      "elapsed_pipeline_ms": 10.36,
       "valid_schema": true
     },
     {
@@ -667,7 +667,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 15.31,
+      "elapsed_pipeline_ms": 16.03,
       "valid_schema": true
     },
     {
@@ -681,7 +681,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 14.92,
+      "elapsed_pipeline_ms": 15.1,
       "valid_schema": true
     },
     {
@@ -695,7 +695,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.37,
+      "elapsed_pipeline_ms": 22.57,
       "valid_schema": true
     },
     {
@@ -709,7 +709,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 33.35,
+      "elapsed_pipeline_ms": 32.45,
       "valid_schema": true
     },
     {
@@ -723,7 +723,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.1,
+      "elapsed_pipeline_ms": 60.21,
       "valid_schema": true
     },
     {
@@ -737,7 +737,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.38,
+      "elapsed_pipeline_ms": 23.55,
       "valid_schema": true
     },
     {
@@ -751,7 +751,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.28,
+      "elapsed_pipeline_ms": 60.98,
       "valid_schema": true
     },
     {
@@ -765,7 +765,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 15.74,
+      "elapsed_pipeline_ms": 16.39,
       "valid_schema": true
     },
     {
@@ -779,7 +779,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.5,
+      "elapsed_pipeline_ms": 10.67,
       "valid_schema": true
     },
     {
@@ -793,7 +793,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 14.66,
+      "elapsed_pipeline_ms": 14.65,
       "valid_schema": true
     },
     {
@@ -807,7 +807,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 32.71,
+      "elapsed_pipeline_ms": 34.69,
       "valid_schema": true
     },
     {
@@ -821,7 +821,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 57.11,
+      "elapsed_pipeline_ms": 57.72,
       "valid_schema": true
     },
     {
@@ -835,7 +835,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 41.64,
+      "elapsed_pipeline_ms": 42.35,
       "valid_schema": true
     },
     {
@@ -849,7 +849,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.24,
+      "elapsed_pipeline_ms": 10.42,
       "valid_schema": true
     },
     {
@@ -863,7 +863,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 35.72,
+      "elapsed_pipeline_ms": 36.26,
       "valid_schema": true
     },
     {
@@ -877,7 +877,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 24.23,
+      "elapsed_pipeline_ms": 24.31,
       "valid_schema": true
     },
     {
@@ -891,7 +891,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.16,
+      "elapsed_pipeline_ms": 61.68,
       "valid_schema": true
     },
     {
@@ -905,7 +905,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 22.65,
+      "elapsed_pipeline_ms": 23.1,
       "valid_schema": true
     },
     {
@@ -919,7 +919,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.55,
+      "elapsed_pipeline_ms": 61.73,
       "valid_schema": true
     },
     {
@@ -933,7 +933,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 59.87,
+      "elapsed_pipeline_ms": 61.38,
       "valid_schema": true
     },
     {
@@ -947,7 +947,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.76,
+      "elapsed_pipeline_ms": 65.33,
       "valid_schema": true
     },
     {
@@ -961,7 +961,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 22.63,
+      "elapsed_pipeline_ms": 23.57,
       "valid_schema": true
     },
     {
@@ -975,7 +975,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.15,
+      "elapsed_pipeline_ms": 10.21,
       "valid_schema": true
     },
     {
@@ -989,7 +989,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 15.75,
+      "elapsed_pipeline_ms": 15.91,
       "valid_schema": true
     },
     {
@@ -1003,7 +1003,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 15.42,
+      "elapsed_pipeline_ms": 15.48,
       "valid_schema": true
     },
     {
@@ -1017,7 +1017,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 32.72,
+      "elapsed_pipeline_ms": 32.69,
       "valid_schema": true
     },
     {
@@ -1031,7 +1031,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 55.87,
+      "elapsed_pipeline_ms": 57.63,
       "valid_schema": true
     },
     {
@@ -1045,7 +1045,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 41.45,
+      "elapsed_pipeline_ms": 42.53,
       "valid_schema": true
     },
     {
@@ -1059,7 +1059,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 43.28,
+      "elapsed_pipeline_ms": 43.73,
       "valid_schema": true
     },
     {
@@ -1129,7 +1129,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 0.02,
+      "elapsed_pipeline_ms": 0.03,
       "valid_schema": true
     },
     {
@@ -1143,7 +1143,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 0.04,
+      "elapsed_pipeline_ms": 0.03,
       "valid_schema": true
     },
     {
@@ -1185,7 +1185,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 0.17,
+      "elapsed_pipeline_ms": 0.19,
       "valid_schema": true
     },
     {
@@ -1227,7 +1227,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 0.04,
+      "elapsed_pipeline_ms": 0.03,
       "valid_schema": true
     },
     {
@@ -1325,7 +1325,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.71,
+      "elapsed_pipeline_ms": 63.92,
       "valid_schema": true
     },
     {
@@ -1339,7 +1339,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.71,
+      "elapsed_pipeline_ms": 64.85,
       "valid_schema": true
     },
     {
@@ -1353,7 +1353,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.47,
+      "elapsed_pipeline_ms": 64.0,
       "valid_schema": true
     },
     {
@@ -1367,7 +1367,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 64.16,
+      "elapsed_pipeline_ms": 64.59,
       "valid_schema": true
     },
     {
@@ -1381,7 +1381,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 21.94,
+      "elapsed_pipeline_ms": 22.82,
       "valid_schema": true
     },
     {
@@ -1395,7 +1395,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 57.75,
+      "elapsed_pipeline_ms": 59.15,
       "valid_schema": true
     },
     {
@@ -1409,7 +1409,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.2,
+      "elapsed_pipeline_ms": 10.14,
       "valid_schema": true
     },
     {
@@ -1423,7 +1423,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 56.69,
+      "elapsed_pipeline_ms": 57.96,
       "valid_schema": true
     },
     {
@@ -1439,7 +1439,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 45.89,
+      "elapsed_pipeline_ms": 46.76,
       "valid_schema": true
     },
     {
@@ -1455,7 +1455,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 120.57,
+      "elapsed_pipeline_ms": 122.32,
       "valid_schema": true
     },
     {
@@ -1471,7 +1471,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 127.17,
+      "elapsed_pipeline_ms": 127.55,
       "valid_schema": true
     },
     {
@@ -1487,7 +1487,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 12.06,
+      "elapsed_pipeline_ms": 11.66,
       "valid_schema": true
     },
     {
@@ -1503,7 +1503,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 37.16,
+      "elapsed_pipeline_ms": 36.67,
       "valid_schema": true
     },
     {
@@ -1519,7 +1519,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 64.7,
+      "elapsed_pipeline_ms": 63.65,
       "valid_schema": true
     },
     {
@@ -1535,7 +1535,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 84.87,
+      "elapsed_pipeline_ms": 82.58,
       "valid_schema": true
     },
     {
@@ -1551,7 +1551,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 109.2,
+      "elapsed_pipeline_ms": 107.94,
       "valid_schema": true
     },
     {
@@ -1565,7 +1565,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 59.3,
+      "elapsed_pipeline_ms": 57.46,
       "valid_schema": true
     },
     {
@@ -1579,7 +1579,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 32.69,
+      "elapsed_pipeline_ms": 32.88,
       "valid_schema": true
     },
     {
@@ -1593,7 +1593,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 22.13,
+      "elapsed_pipeline_ms": 21.71,
       "valid_schema": true
     },
     {
@@ -1607,7 +1607,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 58.76,
+      "elapsed_pipeline_ms": 57.31,
       "valid_schema": true
     },
     {
@@ -1621,7 +1621,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 17.04,
+      "elapsed_pipeline_ms": 16.03,
       "valid_schema": true
     },
     {
@@ -1635,7 +1635,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 54.06,
+      "elapsed_pipeline_ms": 52.9,
       "valid_schema": true
     },
     {
@@ -1655,7 +1655,7 @@
       "predicted_intents": [],
       "expected_refusal": true,
       "actual_refusal": true,
-      "elapsed_pipeline_ms": 0.03,
+      "elapsed_pipeline_ms": 0.02,
       "valid_schema": true
     },
     {
@@ -1745,7 +1745,7 @@
       "predicted_intents": [],
       "expected_refusal": true,
       "actual_refusal": true,
-      "elapsed_pipeline_ms": 0.01,
+      "elapsed_pipeline_ms": 0.0,
       "valid_schema": true
     },
     {
@@ -1765,7 +1765,7 @@
       "predicted_intents": [],
       "expected_refusal": true,
       "actual_refusal": true,
-      "elapsed_pipeline_ms": 0.02,
+      "elapsed_pipeline_ms": 0.03,
       "valid_schema": true
     },
     {
@@ -1785,7 +1785,7 @@
       "predicted_intents": [],
       "expected_refusal": true,
       "actual_refusal": true,
-      "elapsed_pipeline_ms": 0.0,
+      "elapsed_pipeline_ms": 0.01,
       "valid_schema": true
     },
     {
@@ -1859,7 +1859,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 62.48,
+      "elapsed_pipeline_ms": 61.85,
       "valid_schema": true
     },
     {
@@ -1873,7 +1873,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 62.75,
+      "elapsed_pipeline_ms": 62.7,
       "valid_schema": true
     },
     {
@@ -1887,7 +1887,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 63.74,
+      "elapsed_pipeline_ms": 62.35,
       "valid_schema": true
     },
     {
@@ -1915,7 +1915,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 14.94,
+      "elapsed_pipeline_ms": 15.07,
       "valid_schema": true
     },
     {
@@ -1929,7 +1929,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.56,
+      "elapsed_pipeline_ms": 23.1,
       "valid_schema": true
     },
     {
@@ -1943,7 +1943,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 34.0,
+      "elapsed_pipeline_ms": 33.48,
       "valid_schema": true
     },
     {
@@ -1957,7 +1957,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.96,
+      "elapsed_pipeline_ms": 59.97,
       "valid_schema": true
     },
     {
@@ -1971,7 +1971,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.79,
+      "elapsed_pipeline_ms": 23.8,
       "valid_schema": true
     },
     {
@@ -1985,7 +1985,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 60.81,
+      "elapsed_pipeline_ms": 59.93,
       "valid_schema": true
     },
     {
@@ -1999,7 +1999,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 62.86,
+      "elapsed_pipeline_ms": 60.95,
       "valid_schema": true
     },
     {
@@ -2013,7 +2013,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 10.47,
+      "elapsed_pipeline_ms": 10.11,
       "valid_schema": true
     },
     {
@@ -2027,7 +2027,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 15.86,
+      "elapsed_pipeline_ms": 15.11,
       "valid_schema": true
     },
     {
@@ -2041,7 +2041,7 @@
       ],
       "expected_refusal": false,
       "actual_refusal": false,
-      "elapsed_pipeline_ms": 23.04,
+      "elapsed_pipeline_ms": 22.8,
       "valid_schema": true
     }
   ]

@@ -1,0 +1,64 @@
+{
+  "model_identifier": "kmeans-candidate-k2",
+  "model_family": "scikit-learn",
+  "algorithm": "KMeans",
+  "n_clusters": 2,
+  "random_state": 42,
+  "n_init": 20,
+  "standardize": true,
+  "features": [
+    "dim_healthcare_deficit",
+    "dim_demographic_vulnerability",
+    "dim_infrastructure_deficit",
+    "dim_coastal_exposure"
+  ],
+  "source_dataset": "data/processed/coastal_prioritization_baseline.parquet",
+  "total_units": 2,
+  "total_population": 3254857,
+  "evaluation_metrics": {
+    "algorithm": "kmeans",
+    "n_clusters": 2,
+    "random_state": 42,
+    "n_init": 20,
+    "inertia": 1681.94,
+    "silhouette": 0.3004,
+    "davies_bouldin": 1.3453,
+    "calinski_harabasz": 297.13,
+    "min_cluster_size": 260,
+    "max_cluster_size": 362,
+    "cluster_balance_ratio": 0.7182,
+    "cluster_sizes": [
+      260,
+      362
+    ],
+    "runtime_seconds": 0.172
+  },
+  "stability_metrics": {
+    "stability_mean_ari": 0.9949,
+    "stability_std_ari": 0.008,
+    "stability_min_ari": 0.9808,
+    "stability_max_ari": 1.0,
+    "stability_mean_ami": 0.9891,
+    "stability_std_ami": 0.0168,
+    "stability_mean_silhouette": 0.3007,
+    "stability_std_silhouette": 0.0005,
+    "stability_seed_count": 10
+  },
+  "cluster_centers": [
+    [
+      0.5397332453291759,
+      0.7811693951288244,
+      0.31144991867332966,
+      -0.89764681393119
+    ],
+    [
+      -0.3876537121148777,
+      -0.5610608915289896,
+      -0.22369331175432564,
+      0.644718706138424
+    ]
+  ],
+  "disclaimer": "DISCLAIMER: Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions. They serve as descriptive planning archetypes to identify communities with shared intervention requirements.",
+  "candidate_status": "experimental_candidate",
+  "registered_at_utc": "2026-11-12T19:15:20.134624+00:00"
+}

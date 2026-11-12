@@ -1,0 +1,92 @@
+{
+  "model_identifier": "kmeans-candidate-k6",
+  "model_family": "scikit-learn",
+  "algorithm": "KMeans",
+  "n_clusters": 6,
+  "random_state": 42,
+  "n_init": 20,
+  "standardize": true,
+  "features": [
+    "dim_healthcare_deficit",
+    "dim_demographic_vulnerability",
+    "dim_infrastructure_deficit",
+    "dim_coastal_exposure"
+  ],
+  "source_dataset": "data/processed/coastal_prioritization_baseline.parquet",
+  "total_units": 6,
+  "total_population": 3254857,
+  "evaluation_metrics": {
+    "algorithm": "kmeans",
+    "n_clusters": 6,
+    "random_state": 42,
+    "n_init": 20,
+    "inertia": 803.89,
+    "silhouette": 0.2797,
+    "davies_bouldin": 1.1611,
+    "calinski_harabasz": 258.1,
+    "min_cluster_size": 56,
+    "max_cluster_size": 128,
+    "cluster_balance_ratio": 0.4375,
+    "cluster_sizes": [
+      106,
+      88,
+      119,
+      56,
+      128,
+      125
+    ],
+    "runtime_seconds": 0.1372
+  },
+  "stability_metrics": {
+    "stability_mean_ari": 0.9514,
+    "stability_std_ari": 0.0332,
+    "stability_min_ari": 0.89,
+    "stability_max_ari": 1.0,
+    "stability_mean_ami": 0.9456,
+    "stability_std_ami": 0.0332,
+    "stability_mean_silhouette": 0.2806,
+    "stability_std_silhouette": 0.0021,
+    "stability_seed_count": 10
+  },
+  "cluster_centers": [
+    [
+      0.587002160067017,
+      -0.49190128807526917,
+      0.5291439937402251,
+      0.5589065446779178
+    ],
+    [
+      0.31388898702022733,
+      1.756417931887735,
+      0.39580591437087687,
+      -0.780965652403447
+    ],
+    [
+      -0.534378429858081,
+      -0.5455024101795144,
+      -1.80913553814487,
+      0.5410005464317466
+    ],
+    [
+      1.987941654558223,
+      0.26267318946468987,
+      0.21158932279519133,
+      -1.6834306864675634
+    ],
+    [
+      -0.36550898626113976,
+      0.24188082425611113,
+      0.38280675972339895,
+      -0.5483839008330662
+    ],
+    [
+      -0.7263440726848541,
+      -0.6654311901886767,
+      0.5081494233361006,
+      0.8765366111926596
+    ]
+  ],
+  "disclaimer": "DISCLAIMER: Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions. They serve as descriptive planning archetypes to identify communities with shared intervention requirements.",
+  "candidate_status": "experimental_candidate",
+  "registered_at_utc": "2026-11-12T19:16:11.646698+00:00"
+}

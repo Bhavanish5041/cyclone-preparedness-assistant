@@ -21,7 +21,7 @@ An end-to-end, scientifically defensible cyclone preparedness assessment, vulner
   - [Phase 2: Decision Support Engine, MLOps & Container Deployment](#phase-2-decision-support-engine-mlops--container-deployment)
   - [Phase 3: Modular Streamlit UI Redesign (Warm Editorial System)](#phase-3-modular-streamlit-ui-redesign-warm-editorial-system)
   - [Phase 4: Conversational AI Assistant & Closed-World Tool Suite](#phase-4-conversational-ai-assistant--closed-world-tool-suite)
-  - [Phase 4 Post-Hardening: OpenRouter Integration & Multi-Turn History](#phase-4-post-hardening-openrouter-integration--multi-turn-history)
+  - [Phase 4 Post-Hardening: Local Qwen (Ollama) Integration & Multi-Turn History](#phase-4-post-hardening-local-qwen-ollama-integration--multi-turn-history)
 - [Analytical Foundations & Scientific Methodology](#analytical-foundations--scientific-methodology)
 - [Conversational AI & Tool Suite](#conversational-ai--tool-suite)
 - [Modular Dashboard Architecture](#modular-dashboard-architecture)
@@ -43,7 +43,7 @@ This platform bridges scientific spatial analysis with operational disaster mana
 3. **Surrogate ML Classification**: Multinomial Logistic Regression model trained to predict preparedness tiers with calibrated class probabilities and feature importances, validated against the baseline.
 4. **Vulnerability Archetypes (K-Means, $k=4$)**: Unsupervised clustering across coastal proximity, accessibility, and demographic vulnerability (Urban Corridor, Remote Foothill, Rural Interior, Coastal Belt).
 5. **Operational Decision Support Matrix**: Priority Bands 1 to 4 with 18 rule-based intervention triggers and deterministic null-safe ranking.
-6. **Dual-Provider LLM Assistant (OpenRouter & Gemini)**: Closed-world tool-calling conversational agent backed by 7 deterministic tools, multi-turn history tracking, and a zero-downtime offline deterministic fallback engine.
+6. **Conversational LLM Assistant (Local Qwen via Ollama)**: Closed-world tool-calling conversational agent backed by 7 deterministic tools, multi-turn history tracking, and a zero-downtime offline deterministic fallback engine.
 7. **Hardware-Constrained Production Deployment**: Single-container deployment tailored for Render Free Tier (512 MiB RAM Cgroup limit) as well as full multi-container Docker Compose with Prometheus.
 
 ---
@@ -81,7 +81,7 @@ flowchart TD
     subgraph AssistantLayer["Conversational AI Engine (src/assistant/llm/)"]
         ORCH["Assistant Orchestrator & Multi-Turn History"]
         TOOLS["7 Deterministic Pydantic Tools<br/>lookup_community | explain_preparedness_assessment<br/>compare_districts | filter_and_rank_communities<br/>analyze_infrastructure | explain_archetype<br/>get_intervention_recommendations"]
-        LLM["Dual LLM Providers<br/>1. OpenRouter (nemotron-3.5-lightning, etc.)<br/>2. Google Gemini (gemini-2.5-flash)<br/>3. In-Process Deterministic Fallback"]
+        LLM["Production LLM Provider<br/>1. Qwen 2.5 via local Ollama (qwen2.5:0.5b-instruct)<br/>2. In-Process Deterministic Fallback Engine"]
     end
 
     subgraph Frontend["Streamlit Warm-Editorial UI (src/assistant/views/)"]
@@ -160,9 +160,9 @@ flowchart TD
 - **Deterministic Closed-World Tool Suite (7 Registered Tools)**:
   - Strict Pydantic v2 argument validation with boundary checks.
   - Zero hallucinations: all answers are computed directly from the verified spatial decision engine.
-- **Gemini Function-Calling Integration**:
-  - Native integration with Google Gemini API (`src/assistant/llm/client.py`).
-  - Recursive schema normalization (`clean_schema_for_gemini`) stripping unsupported OpenAPI fields (`title`, `examples`, nullable `anyOf`).
+- **Local Qwen Function-Calling & Intent Orchestration**:
+  - Prompt-grounded intent extraction and tool dispatch via local Ollama (`qwen2.5:0.5b-instruct`).
+  - Standardized JSON schema exports with closed-world execution bounds.
 - **Zero-Downtime Deterministic Fallback**:
   - In-process spatial decision support fallback when external LLM APIs encounter rate limits (HTTP 429), quota exhaustion, or offline environments.
 - **Scientific Correctness & Ground Truth Hardening**:
@@ -170,10 +170,10 @@ flowchart TD
   - Verified Udupi Priority-Band distribution: **Band 1: 0, Band 2: 20, Band 3: 43, Band 4: 190**.
   - Disambiguated healthcare distance measurements (e.g., Tallur village: in-village primary sub-centre 0.00 km vs PHC 3.09 km vs apex hospital 34.79 km).
 
-### Phase 4 Post-Hardening: OpenRouter Integration & Multi-Turn History
-- **OpenRouter LLM Provider Integration**:
-  - Integrated OpenRouter API as the default primary provider, supporting free/preview models (e.g. `nvidia/nemotron-3.5-lightning:free`) and standard OpenAI-compatible endpoints with native tool calling.
-  - Seamless fallback cascade: `OpenRouter` $\rightarrow$ `Gemini` $\rightarrow$ `In-Process Deterministic Fallback`.
+### Phase 4 Post-Hardening: Local Qwen (Ollama) Integration & Multi-Turn History
+- **Local Qwen LLM Provider Integration**:
+  - Integrated local self-hosted Qwen 2.5 (`qwen2.5:0.5b-instruct`) via Ollama as the sole production conversational LLM provider, guaranteeing zero cloud API costs and absolute data privacy.
+  - Seamless fallback cascade: `Qwen (Ollama)` $\rightarrow$ `In-Process Deterministic Fallback Engine`.
 - **Multi-Turn Conversation History (`src/assistant/llm/history.py`)**:
   - Stateful session tracking preserving conversational context across turns.
   - Retains active community focus (e.g., asking "What is its score?" followed by "What interventions are recommended?" maintains the selected village context).
@@ -241,7 +241,7 @@ sequenceDiagram
     participant UI as Streamlit Chat View
     participant Orch as Assistant Orchestrator
     participant Hist as Conversation History Manager
-    participant LLM as OpenRouter / Gemini API
+    participant LLM as Qwen 2.5 (Ollama)
     participant Tools as Deterministic Tool Suite
     participant Engine as Decision Support Engine
 
@@ -429,15 +429,14 @@ docker run -p 10000:10000 -e PORT=10000 cyclone-render
 | `DASHBOARD_PORT` | `8501` | Port for Streamlit dashboard |
 | `CYCLONE_ADAPTER_MODE` | `direct` | `direct` (in-memory execution) or `rest` (HTTP API client) |
 | `CYCLONE_API_BASE_URL` | `http://localhost:8000` | Target URL when in REST mode |
-| `LLM_PROVIDER` | `openrouter` | Primary LLM provider: `openrouter` or `gemini` |
-| `OPENROUTER_API_KEY` | *(optional)* | OpenRouter API key for conversational agent |
-| `OPENROUTER_MODEL` | `nvidia/nemotron-3.5-lightning:free` | Model identifier for OpenRouter |
-| `GEMINI_API_KEY` | *(optional)* | Google Gemini API key (fallback provider) |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Model identifier for Google Gemini |
+| `LLM_PROVIDER` | `ollama` | Production LLM provider (`ollama`) |
+| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Local Ollama daemon endpoint URL |
+| `OLLAMA_MODEL` | `qwen2.5:0.5b-instruct` | Production Qwen model identifier |
+| `OLLAMA_TIMEOUT` | `30.0` | Timeout in seconds for Ollama requests |
 | `WANDB_MODEL_ARTIFACT` | `village-preparedness-classifier:v0` | Model artifact version in W&B |
 | `WANDB_CACHE_DIR` | `/app/.wandb_artifacts_cache` | Local path for offline model artifact caching |
 
-> **Note on Offline Execution:** If neither `OPENROUTER_API_KEY` nor `GEMINI_API_KEY` is provided, the conversational assistant automatically engages the **In-Process Deterministic Fallback Engine**, providing full analytical responses without external network access or cost.
+> **Note on Offline Execution:** If the local Ollama daemon is offline or unconfigured, the conversational assistant automatically engages the **In-Process Deterministic Fallback Engine**, providing full analytical responses without external network access or cost.
 
 ---
 
@@ -450,7 +449,7 @@ The platform contains **35 test suites** comprising **438 automated tests** cove
 ./.venv/bin/pytest tests/ -v
 
 # Run assistant and tool tests
-./.venv/bin/pytest tests/test_assistant_*.py tests/test_openrouter_orchestrator.py -v
+./.venv/bin/pytest tests/test_assistant_*.py tests/test_qwen_orchestration.py tests/test_ollama_integration.py -v
 
 # Run decision engine and data consistency tests
 ./.venv/bin/pytest tests/test_decision_engine.py tests/test_data_consistency_phase4_4_1.py -v

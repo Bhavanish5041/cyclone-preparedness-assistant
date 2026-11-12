@@ -146,64 +146,65 @@ def test_session_history_bounded_size(mock_streamlit_session, direct_client):
 
 def test_direct_mode_chat_execution_fallback(direct_client):
     """Verify direct client executes orchestrator in-process without network overhead."""
-    # Ensure unconfigured keys trigger deterministic fallback
-    with patch.dict(os.environ, {"OPENROUTER_API_KEY": "", "GEMINI_API_KEY": ""}, clear=False):
-        from src.assistant.llm.client import OpenRouterClient
-        from src.assistant.llm.orchestrator import ToolCallingOrchestrator
+    from src.assistant.llm.client import OllamaClient
+    from src.assistant.llm.orchestrator import ToolCallingOrchestrator
 
-        direct_client._orchestrator = ToolCallingOrchestrator(
-            client=OpenRouterClient(api_key=""),
-            service=direct_client.service,
-        )
-        # 1. Unambiguous query without explicit community_identifier
-        req_tallur = ChatRequest(message="Explain why Tallur has its current priority classification.")
-        res_tallur = direct_client.chat(req_tallur)
-        assert res_tallur.is_fallback is True
-        assert res_tallur.conversation_status == ConversationStatus.FALLBACK
-        assert "lookup_community" in res_tallur.tools_executed
-        assert "explain_preparedness_assessment" in res_tallur.tools_executed
-        assert "Tallur" in res_tallur.answer
-        assert "74.34" in res_tallur.answer
-        assert "BAND_4_ADEQUATE" in res_tallur.answer
+    mock_client = MagicMock(spec=OllamaClient)
+    mock_client.is_configured.return_value = False
 
-        # 2. District comparison query
-        req_comp = ChatRequest(message="Compare Dakshina Kannada and Udupi.")
-        res_comp = direct_client.chat(req_comp)
-        assert res_comp.is_fallback is True
-        assert "compare_districts" in res_comp.tools_executed
-        assert "Dakshina Kannada" in res_comp.answer
-        assert "Udupi" in res_comp.answer
-        assert "369" in res_comp.answer
+    direct_client._orchestrator = ToolCallingOrchestrator(
+        client=mock_client,
+        service=direct_client.service,
+    )
+    # 1. Unambiguous query without explicit community_identifier
+    req_tallur = ChatRequest(message="Explain why Tallur has its current priority classification.")
+    res_tallur = direct_client.chat(req_tallur)
+    assert res_tallur.is_fallback is True
+    assert res_tallur.conversation_status == ConversationStatus.FALLBACK
+    assert "lookup_community" in res_tallur.tools_executed
+    assert "explain_preparedness_assessment" in res_tallur.tools_executed
+    assert "Tallur" in res_tallur.answer
+    assert "74.34" in res_tallur.answer
+    assert "BAND_4_ADEQUATE" in res_tallur.answer
 
-        # 3. Band filtering query
-        req_band = ChatRequest(message="Find Band 1 communities.")
-        res_band = direct_client.chat(req_band)
-        assert res_band.is_fallback is True
-        assert "filter_and_rank_communities" in res_band.tools_executed
-        assert "BAND_1_CRITICAL" in res_band.answer
-        assert "155" in res_band.answer
+    # 2. District comparison query
+    req_comp = ChatRequest(message="Compare Dakshina Kannada and Udupi.")
+    res_comp = direct_client.chat(req_comp)
+    assert res_comp.is_fallback is True
+    assert "compare_districts" in res_comp.tools_executed
+    assert "Dakshina Kannada" in res_comp.answer
+    assert "Udupi" in res_comp.answer
+    assert "369" in res_comp.answer
 
-        # 4. Fallback methodology query
-        req_uk = ChatRequest(message="Explain Uttara Kannada's fallback methodology.")
-        res_uk = direct_client.chat(req_uk)
-        assert res_uk.is_fallback is True
-        assert "explain_vulnerability_archetype" in res_uk.tools_executed
-        assert "1,257" in res_uk.answer
+    # 3. Band filtering query
+    req_band = ChatRequest(message="Find Band 1 communities.")
+    res_band = direct_client.chat(req_band)
+    assert res_band.is_fallback is True
+    assert "filter_and_rank_communities" in res_band.tools_executed
+    assert "BAND_1_CRITICAL" in res_band.answer
+    assert "155" in res_band.answer
 
-        # 5. Ambiguous community query
-        req_amb = ChatRequest(message="Assess Siddapur.")
-        res_amb = direct_client.chat(req_amb)
-        assert res_amb.is_fallback is True
-        assert "lookup_community" in res_amb.tools_executed
-        assert "Community Disambiguation Required" in res_amb.answer
-        assert "602812" in res_amb.answer
+    # 4. Fallback methodology query
+    req_uk = ChatRequest(message="Explain Uttara Kannada's fallback methodology.")
+    res_uk = direct_client.chat(req_uk)
+    assert res_uk.is_fallback is True
+    assert "explain_vulnerability_archetype" in res_uk.tools_executed
+    assert "1,257" in res_uk.answer
 
-        # 6. Unsupported query
-        req_unsup = ChatRequest(message="What is the weather in Paris tomorrow?")
-        res_unsup = direct_client.chat(req_unsup)
-        assert res_unsup.is_fallback is True
-        assert res_unsup.tools_executed == []
-        assert "Decision Support System Boundary" in res_unsup.answer
+    # 5. Ambiguous community query
+    req_amb = ChatRequest(message="Assess Siddapur.")
+    res_amb = direct_client.chat(req_amb)
+    assert res_amb.is_fallback is True
+    assert "lookup_community" in res_amb.tools_executed
+    assert "Community Disambiguation Required" in res_amb.answer
+    assert "602812" in res_amb.answer
+
+    # 6. Unsupported query
+    req_unsup = ChatRequest(message="What is the weather in Paris tomorrow?")
+    res_unsup = direct_client.chat(req_unsup)
+    assert res_unsup.is_fallback is True
+    assert res_unsup.tools_executed == []
+    assert "Decision Support System Boundary" in res_unsup.answer
 
 
 def test_direct_mode_chat_mocked_llm_response(shared_service):
@@ -239,7 +240,7 @@ def test_direct_mode_chat_mocked_llm_response(shared_service):
             },
             is_fallback=False,
             conversation_status=ConversationStatus.COMPLETED,
-            model_name="gemini-2.5-flash",
+            model_name="qwen2.5:0.5b-instruct",
             total_duration_ms=450.0,
             scientific_precedence_note="AHP is authoritative.",
         )

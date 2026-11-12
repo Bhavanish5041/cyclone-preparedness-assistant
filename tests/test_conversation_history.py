@@ -7,7 +7,7 @@ Verifies:
 - Extraction and sanitization of history from Streamlit session state.
 - Graceful handling of malformed, empty, or orphaned historical entries.
 - Preservation of the current user question in full.
-- Multi-turn conversational tool execution across OpenRouter and Gemini with compacted history.
+- Multi-turn conversational tool execution across local Ollama (Qwen) with compacted history.
 - Zero Pydantic ValidationError crashes during multi-turn interactions.
 """
 
@@ -23,9 +23,8 @@ from src.assistant.llm import (
     ChatRequest,
     ChatResponse,
     ConversationStatus,
-    GeminiClient,
     MessageRole,
-    OpenRouterClient,
+    OllamaClient,
     SCIENTIFIC_PRECEDENCE_DISCLAIMER,
     ToolCallingOrchestrator,
     compact_message_content,
@@ -194,32 +193,28 @@ def test_normal_short_conversation_history_preserved():
 
 
 # ==============================================================================
-# 4. MULTI-TURN ORCHESTRATION WITH OPENROUTER AND GEMINI
+# 4. MULTI-TURN ORCHESTRATION WITH LOCAL QWEN (OLLAMA)
 # ==============================================================================
 
 
-def test_openrouter_orchestrator_with_large_compacted_history(
+def test_ollama_orchestrator_with_large_compacted_history(
     shared_service: DecisionSupportService,
     shared_registry,
 ):
-    """Verify OpenRouter orchestrator turn cycle executes cleanly with large historical turns."""
+    """Verify Ollama (Qwen) orchestrator turn cycle executes cleanly with large historical turns."""
     async def _run():
-        mock_client = MagicMock(spec=OpenRouterClient)
+        mock_client = MagicMock(spec=OllamaClient)
         mock_client.is_configured.return_value = True
-        mock_client.provider_name = "openrouter"
-        mock_client.model = "nvidia/nemotron-3.5-lightning:free"
-        mock_client.create_chat_completion = AsyncMock(
-            return_value={
-                "choices": [
-                    {
-                        "message": {
-                            "role": "assistant",
-                            "content": "Follow-up analysis formulated successfully.",
-                        }
-                    }
-                ]
-            }
-        )
+        mock_client.model = "qwen2.5:0.5b-instruct"
+
+        qwen_intent_json = json.dumps({
+            "intents": ["lookup_community", "explain_preparedness_assessment"],
+            "arguments": {"identifier": "Tallur"},
+            "needs_clarification": False,
+            "clarification_question": None,
+        })
+        synthesis_text = "Follow-up analysis formulated successfully."
+        mock_client.generate = AsyncMock(side_effect=[qwen_intent_json, synthesis_text])
 
         orchestrator = ToolCallingOrchestrator(
             client=mock_client,
@@ -245,61 +240,6 @@ def test_openrouter_orchestrator_with_large_compacted_history(
         assert res.conversation_status == ConversationStatus.COMPLETED
         assert res.is_fallback is False
         assert "Follow-up analysis" in res.answer
-
-        # Verify messages sent to OpenRouter have bounded history
-        call_args = mock_client.create_chat_completion.call_args[1]
-        sent_messages = call_args["messages"]
-        # System instruction (1) + 4 history messages + current query (1) = 6 messages
-        assert len(sent_messages) == 6
-        for msg in sent_messages:
-            assert len(msg.get("content") or "") <= 5000
-
-    asyncio.run(_run())
-
-
-def test_gemini_orchestrator_with_large_compacted_history(
-    shared_service: DecisionSupportService,
-    shared_registry,
-):
-    """Verify Gemini orchestrator turn cycle executes cleanly with large historical turns."""
-    async def _run():
-        mock_client = MagicMock(spec=GeminiClient)
-        mock_client.is_configured.return_value = True
-        mock_client.provider_name = "gemini"
-        mock_client.model = "gemini-2.5-flash"
-        mock_client.generate_content = AsyncMock(
-            return_value={
-                "candidates": [
-                    {
-                        "content": {
-                            "role": "model",
-                            "parts": [{"text": "Gemini follow-up response formulated."}],
-                        }
-                    }
-                ]
-            }
-        )
-
-        orchestrator = ToolCallingOrchestrator(
-            client=mock_client,
-            registry=shared_registry,
-            service=shared_service,
-        )
-
-        raw_history = [
-            {"role": "user", "content": "Initial question."},
-            {"role": "assistant", "content": "Extremely detailed response. " * 250},
-        ]
-
-        prepared_history = prepare_conversation_history(raw_history)
-        req = ChatRequest(
-            message="Follow-up inquiry.",
-            conversation_history=prepared_history,
-        )
-
-        res = await orchestrator.process_chat(req)
-        assert res.conversation_status == ConversationStatus.COMPLETED
-        assert "Gemini follow-up" in res.answer
 
     asyncio.run(_run())
 
@@ -440,88 +380,22 @@ def test_compact_json_extreme_payload_never_produces_invalid_syntax():
     assert isinstance(parsed, dict)
 
 
-def test_openrouter_payload_preserves_tool_call_relationship():
-    """Verify OpenRouter message assembly preserves tool_call_id, name, and valid JSON tool content."""
-    tool_data = {
-        "unit_id": "Tallur",
-        "district": "Udupi",
-        "ahp_score": 74.34,
-        "priority_band": "BAND_4_ADEQUATE",
-    }
-    req = ChatRequest(
-        message="Follow up on previous assessment",
-        conversation_history=[
-            ChatMessage(role=MessageRole.USER, content="Initial inquiry"),
-            ChatMessage(
-                role=MessageRole.TOOL,
-                content=json.dumps(tool_data),
-                name="lookup_community",
-                tool_call_id="call_tallur_01",
-            ),
-        ],
-    )
-
-    orchestrator = ToolCallingOrchestrator(
-        client=OpenRouterClient(api_key="test-key"),
-        service=MagicMock(),
-    )
-    messages = orchestrator._build_initial_openrouter_messages(req)
-
-    # System + User + Tool + User = 4
-    assert len(messages) == 4
-    tool_msg = messages[2]
-    assert tool_msg["role"] == "tool"
-    assert tool_msg["tool_call_id"] == "call_tallur_01"
-    assert tool_msg["name"] == "lookup_community"
-
-    parsed_content = json.loads(tool_msg["content"])
-    assert parsed_content["ahp_score"] == 74.34
-    assert parsed_content["unit_id"] == "Tallur"
-
-
-def test_gemini_payload_preserves_tool_call_relationship():
-    """Verify Gemini contents assembly converts tool messages into valid functionResponse parts."""
-    tool_data = {"unit_id": "Tallur", "ahp_score": 74.34}
-    req = ChatRequest(
-        message="Follow up",
-        conversation_history=[
-            ChatMessage(
-                role=MessageRole.TOOL,
-                content=json.dumps(tool_data),
-                name="lookup_community",
-            ),
-        ],
-    )
-
-    orchestrator = ToolCallingOrchestrator(
-        client=GeminiClient(api_key="test-key"),
-        service=MagicMock(),
-    )
-    contents = orchestrator._build_initial_gemini_contents(req)
-
-    assert len(contents) == 2
-    tool_content = contents[0]
-    assert tool_content["role"] == "user"
-    assert "functionResponse" in tool_content["parts"][0]
-    assert tool_content["parts"][0]["functionResponse"]["name"] == "lookup_community"
-
-
 def test_http_client_lifecycle_across_asyncio_loops():
-    """Verify OpenRouterClient safely handles execution across multiple independent asyncio event loops."""
-    client = OpenRouterClient(api_key="test-key")
+    """Verify OllamaClient safely handles execution across multiple independent asyncio event loops."""
+    client = OllamaClient(base_url="http://127.0.0.1:11434")
 
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "choices": [{"message": {"role": "assistant", "content": "Loop test response."}}]
+        "response": "Loop test response."
     }
 
     # Simulate Turn 1 in loop 1
     async def turn1():
         with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
             mock_post.return_value = mock_response
-            res = await client.create_chat_completion(messages=[{"role": "user", "content": "Turn 1"}])
-            assert res["choices"][0]["message"]["content"] == "Loop test response."
+            res = await client.generate(prompt="Turn 1")
+            assert res == "Loop test response."
         await client.close()
 
     asyncio.run(turn1())
@@ -531,8 +405,8 @@ def test_http_client_lifecycle_across_asyncio_loops():
     async def turn2():
         with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
             mock_post.return_value = mock_response
-            res = await client.create_chat_completion(messages=[{"role": "user", "content": "Turn 2"}])
-            assert res["choices"][0]["message"]["content"] == "Loop test response."
+            res = await client.generate(prompt="Turn 2")
+            assert res == "Loop test response."
         await client.close()
 
     asyncio.run(turn2())
@@ -542,8 +416,8 @@ def test_http_client_lifecycle_across_asyncio_loops():
     async def turn3():
         with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
             mock_post.return_value = mock_response
-            res = await client.create_chat_completion(messages=[{"role": "user", "content": "Turn 3"}])
-            assert res["choices"][0]["message"]["content"] == "Loop test response."
+            res = await client.generate(prompt="Turn 3")
+            assert res == "Loop test response."
         await client.close()
 
     asyncio.run(turn3())
@@ -553,7 +427,7 @@ def test_http_client_lifecycle_across_asyncio_loops():
 def test_http_client_reused_within_same_loop():
     """Verify HTTP client instance is reused across multiple calls within the same event loop."""
     async def _run():
-        client = OpenRouterClient(api_key="test-key")
+        client = OllamaClient(base_url="http://127.0.0.1:11434")
         c1 = client._get_http_client()
         c2 = client._get_http_client()
         assert c1 is c2  # Exact same instance reused within loop

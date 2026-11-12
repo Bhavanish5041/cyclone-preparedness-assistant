@@ -1,4 +1,4 @@
-"""Pydantic request, response, and message schemas for the Gemini LLM assistant.
+"""Pydantic request, response, and message schemas for the Cyclone Preparedness Assistant.
 
 Provides:
 - Strict validation for user input, conversation history, and community context.
@@ -171,7 +171,7 @@ class ChatResponse(BaseModel):
     )
     is_fallback: bool = Field(
         False,
-        description="True if deterministic fallback was activated (e.g. Gemini API unreachable or rate-limited).",
+        description="True if deterministic fallback was activated (e.g. Ollama daemon offline or unconfigured).",
     )
     fallback_reason: Optional[str] = Field(
         None,
@@ -183,7 +183,7 @@ class ChatResponse(BaseModel):
     )
     model_name: Optional[str] = Field(
         None,
-        description="Exact model identifier used for response generation (e.g., 'gemini-2.5-flash').",
+        description="Exact model identifier used for response generation (e.g., 'qwen2.5:0.5b-instruct').",
     )
     total_duration_ms: float = Field(
         ...,

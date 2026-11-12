@@ -3,7 +3,7 @@
 Provides:
 - Tool registration, discovery, and lookup.
 - Safe argument validation and controlled execution.
-- Export of tool definitions for OpenAI, Gemini, and Anthropic tool-calling protocols.
+- Export of tool definitions for OpenAI and Anthropic tool-calling protocols.
 - Factory function creating a pre-configured registry with all seven deterministic tools.
 """
 
@@ -22,75 +22,6 @@ from src.assistant.tools.decision import (
 from src.assistant.tools.regional import CompareDistrictsTool, FilterAndRankCommunitiesTool
 
 logger = logging.getLogger(__name__)
-
-
-UNSUPPORTED_GEMINI_SCHEMA_KEYS = {
-    "examples",
-    "example",
-    "$schema",
-    "$defs",
-    "definitions",
-    "additionalProperties",
-}
-
-
-def sanitize_gemini_schema(schema: Any) -> Any:
-    """Recursively normalize a JSON Schema dictionary for Google Gemini Function Calling.
-
-    Complies with Google Gemini's OpenAPI 3.0 Schema protobuf subset:
-    - Recursively strips unsupported metadata (`examples`, `example`, `$schema`, `$defs`,
-      `definitions`, `additionalProperties`) that cause HTTP 400 INVALID_ARGUMENT.
-    - Flattens nullable unions (`anyOf` or `oneOf` with `type: "null"`) into concrete types
-      with `nullable: True`.
-    - Normalizes list-based types (`['string', 'null']`) to scalar type with `nullable: True`.
-    - Strictly preserves parameter names, types, descriptions, titles, required fields,
-      enums, nested properties, array items, and numeric/string constraints (minimum, maximum,
-      minLength, maxLength, pattern).
-    """
-    if not isinstance(schema, dict):
-        if isinstance(schema, list):
-            return [sanitize_gemini_schema(item) for item in schema]
-        return schema
-
-    schema_copy = deepcopy(schema)
-
-    # 1. Handle type as list (e.g. ['string', 'null'])
-    raw_type = schema_copy.get("type")
-    if isinstance(raw_type, list):
-        has_null = "null" in raw_type
-        non_null_types = [t for t in raw_type if t != "null"]
-        if non_null_types:
-            schema_copy["type"] = non_null_types[0]
-        if has_null:
-            schema_copy["nullable"] = True
-
-    # 2. Normalize anyOf / oneOf unions into a single schema with nullable flag
-    for union_key in ("anyOf", "oneOf"):
-        if union_key in schema_copy and isinstance(schema_copy[union_key], list):
-            variants = schema_copy[union_key]
-            has_null = any(isinstance(v, dict) and v.get("type") == "null" for v in variants)
-            non_null = [v for v in variants if isinstance(v, dict) and v.get("type") != "null"]
-            if non_null:
-                primary = deepcopy(non_null[0])
-                for pk, pv in primary.items():
-                    if pk not in schema_copy:
-                        schema_copy[pk] = pv
-                if has_null:
-                    schema_copy["nullable"] = True
-            del schema_copy[union_key]
-
-    # 3. Recursively clean remaining fields
-    cleaned: Dict[str, Any] = {}
-    for k, v in schema_copy.items():
-        if k in UNSUPPORTED_GEMINI_SCHEMA_KEYS:
-            continue
-        cleaned[k] = sanitize_gemini_schema(v)
-
-    # 4. Clean required array if present
-    if "required" in cleaned and isinstance(cleaned["required"], list):
-        cleaned["required"] = [str(r) for r in cleaned["required"]]
-
-    return cleaned
 
 
 class ToolRegistry:
@@ -214,32 +145,6 @@ class ToolRegistry:
                 }
             )
         return definitions
-
-    def export_gemini_tool_declarations(self) -> List[Dict[str, Any]]:
-        """Export tool declarations in Google Gemini Function Calling format.
-
-        Format:
-        [
-            {
-                "name": "lookup_community",
-                "description": "...",
-                "parameters": {...}
-            }
-        ]
-        """
-        declarations = []
-        for name in self.list_tools():
-            tool = self._tools[name]
-            raw_schema = deepcopy(tool.get_json_schema())
-            sanitized_parameters = sanitize_gemini_schema(raw_schema)
-            declarations.append(
-                {
-                    "name": tool.name,
-                    "description": tool.description,
-                    "parameters": sanitized_parameters,
-                }
-            )
-        return declarations
 
     def export_anthropic_tool_definitions(self) -> List[Dict[str, Any]]:
         """Export tool declarations in Anthropic Claude tool use format.

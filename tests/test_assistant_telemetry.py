@@ -293,7 +293,7 @@ def test_render_message_bubble_malformed_telemetry_does_not_crash_assistant_resp
         "role": "assistant",
         "content": "Tallur is in Band 4 Adequate Baseline with an authoritative AHP score of 74.34 / 100.0.",
         "is_fallback": True,
-        "fallback_reason": "GEMINI_API_KEY is not configured",
+        "fallback_reason": "Ollama daemon offline or unconfigured",
         "tools_executed": ["lookup_community"],
         "tool_records": [
             None,
@@ -356,7 +356,7 @@ def test_ahp_domain_sub_scores_presentation_with_canonical_keys():
 
     resp = format_community_assessment_response(
         query="Assess Tallur",
-        reason="GEMINI_API_KEY unconfigured",
+        reason="Ollama unconfigured",
         community_eval=community_eval,
         advisories=[],
     )
@@ -393,7 +393,7 @@ def test_ahp_domain_sub_scores_presentation_with_missing_keys():
 
     resp = format_community_assessment_response(
         query="Assess Sample Village",
-        reason="GEMINI_API_KEY unconfigured",
+        reason="Ollama unconfigured",
         community_eval=community_eval,
         advisories=[],
     )

@@ -1,7 +1,7 @@
 """LLM integration package for Cyclone Preparedness Intelligence Platform.
 
 Exposes:
-- `OpenRouterClient`, `GeminiClient`, and client exceptions.
+- `OllamaClient` (Qwen 2.5) and client exceptions.
 - Client factory `get_default_llm_client`.
 - `ToolCallingOrchestrator` managing the multi-turn loop.
 - Request, response, and message schemas (`ChatRequest`, `ChatResponse`, `ChatMessage`, `ToolExecutionRecord`).
@@ -9,20 +9,11 @@ Exposes:
 """
 
 from src.assistant.llm.client import (
-    GeminiAuthError,
-    GeminiClient,
-    GeminiClientError,
-    GeminiNetworkError,
-    GeminiRateLimitError,
-    GeminiResponseError,
-    GeminiTimeoutError,
-    OpenRouterAuthError,
-    OpenRouterClient,
-    OpenRouterClientError,
-    OpenRouterNetworkError,
-    OpenRouterRateLimitError,
-    OpenRouterResponseError,
-    OpenRouterTimeoutError,
+    OllamaClient,
+    OllamaClientError,
+    OllamaConnectionError,
+    OllamaResponseError,
+    OllamaTimeoutError,
     get_default_llm_client,
 )
 from src.assistant.llm.history import (
@@ -53,22 +44,12 @@ def __getattr__(name: str):
 
 
 __all__ = [
-    # Gemini Client & Exceptions
-    "GeminiClient",
-    "GeminiClientError",
-    "GeminiAuthError",
-    "GeminiRateLimitError",
-    "GeminiTimeoutError",
-    "GeminiNetworkError",
-    "GeminiResponseError",
-    # OpenRouter Client & Exceptions
-    "OpenRouterClient",
-    "OpenRouterClientError",
-    "OpenRouterAuthError",
-    "OpenRouterRateLimitError",
-    "OpenRouterTimeoutError",
-    "OpenRouterNetworkError",
-    "OpenRouterResponseError",
+    # Ollama Client & Exceptions
+    "OllamaClient",
+    "OllamaClientError",
+    "OllamaConnectionError",
+    "OllamaTimeoutError",
+    "OllamaResponseError",
     # Factory & History Helpers
     "get_default_llm_client",
     "compact_message_content",

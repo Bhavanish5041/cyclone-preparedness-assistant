@@ -7,7 +7,7 @@ Verifies:
 - K-Means archetype assignments (Dakshina Kannada & Udupi) and unassigned fallbacks (Uttara Kannada).
 - Bounded payload sizes and 100% JSON-serializable outputs.
 - Prevention of secret leakage and uncontrolled dataset dumps.
-- Multi-provider schema export parity (OpenAI, Gemini, Anthropic).
+- Multi-provider schema export parity (OpenAI, Anthropic).
 """
 
 import json
@@ -100,15 +100,7 @@ def test_registry_schema_exports(registry: ToolRegistry):
         assert "description" in fn
         assert "parameters" in fn
 
-    # 3. Gemini Declarations
-    gemini_tools = registry.export_gemini_tool_declarations()
-    assert len(gemini_tools) == 7
-    for gt in gemini_tools:
-        assert "name" in gt
-        assert "description" in gt
-        assert "parameters" in gt
-
-    # 4. Anthropic Tool Definitions
+    # 3. Anthropic Tool Definitions
     anthropic_tools = registry.export_anthropic_tool_definitions()
     assert len(anthropic_tools) == 7
     for at in anthropic_tools:

@@ -7,7 +7,7 @@ Supports:
 - Suggested question prompts for quick-fire operational inquiries.
 - Tool execution transparency with timing, arguments, and status.
 - Authoritative evidence cards (AHP score, priority band, ML surrogate disclaimer).
-- Deterministic fallback status indication when GEMINI_API_KEY is not configured or unavailable.
+- Deterministic fallback status indication when Ollama is not configured or unavailable.
 - Strictly zero emojis, zero em dashes, and zero invented operational facts.
 """
 
@@ -421,35 +421,12 @@ def render_assistant_page(client: DecisionSupportApiClient) -> None:
     )
 
     # System status telemetry banner
-    openrouter_key_set = bool(os.getenv("OPENROUTER_API_KEY", "").strip())
-    gemini_key_set = bool(os.getenv("GEMINI_API_KEY", "").strip())
-    explicit_provider = os.getenv("LLM_PROVIDER", "").strip().lower()
-
-    if explicit_provider == "gemini":
-        active_provider = "Gemini"
-        active_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-        is_active_configured = gemini_key_set
-        missing_key_name = "GEMINI_API_KEY"
-    elif explicit_provider == "openrouter":
-        active_provider = "OpenRouter"
-        active_model = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3.5-lightning:free")
-        is_active_configured = openrouter_key_set
-        missing_key_name = "OPENROUTER_API_KEY"
-    elif openrouter_key_set:
-        active_provider = "OpenRouter"
-        active_model = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3.5-lightning:free")
-        is_active_configured = True
-        missing_key_name = ""
-    elif gemini_key_set:
-        active_provider = "Gemini"
-        active_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-        is_active_configured = True
-        missing_key_name = ""
-    else:
-        active_provider = "OpenRouter"
-        active_model = os.getenv("OPENROUTER_MODEL", "nvidia/nemotron-3.5-lightning:free")
-        is_active_configured = False
-        missing_key_name = "OPENROUTER_API_KEY"
+    from src.assistant.llm.client import OllamaClient
+    ollama_client = OllamaClient()
+    is_active_configured = ollama_client.is_configured()
+    active_provider = "Qwen (Ollama)"
+    active_model = ollama_client.model
+    missing_reason = "Ollama daemon offline or unconfigured"
 
     status_col1, status_col2, status_col3 = st.columns([2, 1, 1])
     with status_col1:
@@ -457,7 +434,7 @@ def render_assistant_page(client: DecisionSupportApiClient) -> None:
             st.markdown(
                 f"""
                 <div style="background:#2B211B; border:1px solid #514033; border-radius:3px; padding:0.45rem 0.75rem; font-size:0.78rem; color:#BDAE9C;">
-                    <b>LLM Engine:</b> {active_provider} configured (<code>{active_model}</code>). Tool calling active.
+                    <b>LLM Engine:</b> {active_provider} active (<code>{active_model}</code>). Tool calling active.
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -466,7 +443,7 @@ def render_assistant_page(client: DecisionSupportApiClient) -> None:
             st.markdown(
                 f"""
                 <div style="background:#2B211B; border:1px solid #D48B47; border-radius:3px; padding:0.45rem 0.75rem; font-size:0.78rem; color:#BDAE9C;">
-                    <b style="color: #D48B47;">Deterministic Mode:</b> {missing_key_name} unconfigured. Operating via local decision-support matrix.
+                    <b style="color: #D48B47;">Deterministic Mode:</b> {missing_reason}. Operating via local decision-support matrix.
                 </div>
                 """,
                 unsafe_allow_html=True,

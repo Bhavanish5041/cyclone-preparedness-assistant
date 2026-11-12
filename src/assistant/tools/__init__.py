@@ -52,7 +52,6 @@ from src.assistant.tools.argument_extractor import (
 from src.assistant.tools.registry import (
     ToolRegistry,
     get_default_registry,
-    sanitize_gemini_schema,
 )
 
 __all__ = [
@@ -84,5 +83,4 @@ __all__ = [
     "resolve_community_row",
     "ToolRegistry",
     "get_default_registry",
-    "sanitize_gemini_schema",
 ]

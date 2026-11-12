@@ -1,4 +1,4 @@
-name: cyclone-prod
+name: cyclone-preparedness-assistant
 
 services:
   frontend:

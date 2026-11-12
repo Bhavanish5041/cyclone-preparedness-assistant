@@ -259,16 +259,87 @@ def http_probe(url: str, timeout: float = 5.0) -> Tuple[int, Dict[str, Any]]:
         return 0, {"error": str(e)}
 
 
+DEFAULT_PRODUCTION_PROJECT = "cyclone-preparedness-assistant"
+DEFAULT_SIMULATION_PROJECT = "cyclone-ci-test"
+
+
+def detect_existing_compose_project(
+    services: Tuple[str, ...] = ("api", "frontend", "dashboard"),
+) -> Optional[str]:
+    """Inspect running production containers to extract existing Compose project label."""
+    for svc in services:
+        meta = SERVICE_METADATA.get(svc)
+        if not meta:
+            continue
+        c_name = meta["container_name"]
+        cmd = [
+            "docker",
+            "inspect",
+            "--format",
+            '{{index .Config.Labels "com.docker.compose.project"}}',
+            c_name,
+        ]
+        proc = run_command(cmd, check=False)
+        if proc.returncode == 0 and isinstance(getattr(proc, "stdout", None), str) and proc.stdout.strip():
+            project = proc.stdout.strip()
+            if project and project != "<no value>":
+                return project
+    return None
+
+
+def resolve_compose_project(
+    compose_file: str = "docker-compose.yml",
+    is_simulation: bool = False,
+    requested_project: Optional[str] = None,
+    logger: Optional[logging.Logger] = None,
+) -> str:
+    """Determine the exact Compose project name to avoid container-name conflicts and preserve resources."""
+    # 1. Simulation always uses isolated test project
+    if is_simulation or "test" in compose_file:
+        return DEFAULT_SIMULATION_PROJECT
+
+    # 2. Explicitly passed project via CLI argument
+    if requested_project:
+        return str(requested_project).strip()
+
+    # 3. Environment variable override
+    if os.environ.get("COMPOSE_PROJECT_NAME"):
+        return os.environ["COMPOSE_PROJECT_NAME"].strip()
+
+    # 4. Dynamically detect from live production container labels
+    detected = detect_existing_compose_project()
+    if detected and isinstance(detected, str):
+        if logger:
+            logger.info(f"Detected active Compose project from container labels: '{detected}'")
+        return detected
+
+    # 5. Read top-level 'name:' from compose file if present
+    compose_path = PROJECT_ROOT / compose_file
+    if compose_path.is_file():
+        try:
+            with open(compose_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line_s = line.strip()
+                    if line_s.startswith("name:"):
+                        val = line_s.split(":", 1)[1].strip().strip("\"'")
+                        if val:
+                            return val
+        except Exception:
+            pass
+
+    return DEFAULT_PRODUCTION_PROJECT
+
+
 def get_container_info(container_name: str) -> Optional[Dict[str, Any]]:
     cmd = [
         "docker",
         "inspect",
         "--format",
-        '{"id":"{{.Id}}","image":"{{.Config.Image}}","imageId":"{{.Image}}","status":"{{.State.Status}}","health":"{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}"}',
+        '{"id":"{{.Id}}","image":"{{.Config.Image}}","imageId":"{{.Image}}","status":"{{.State.Status}}","health":"{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}","compose_project":"{{index .Config.Labels "com.docker.compose.project"}}"}',
         container_name,
     ]
     proc = run_command(cmd, check=False)
-    if proc.returncode != 0 or not proc.stdout.strip():
+    if proc.returncode != 0 or not isinstance(getattr(proc, "stdout", None), str) or not proc.stdout.strip():
         return None
     try:
         return json.loads(proc.stdout.strip())
@@ -348,10 +419,12 @@ def execute_preflight_checks(
 
 
 def record_current_deployment_state(
-    logger: logging.Logger, services: List[str]
+    logger: logging.Logger, services: List[str], project_name: Optional[str] = None
 ) -> Dict[str, Any]:
+    resolved_proj = project_name or resolve_compose_project(logger=logger)
     state = {
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "compose_project": resolved_proj,
         "services": {},
     }
     for svc in services:
@@ -361,15 +434,17 @@ def record_current_deployment_state(
         c_name = meta["container_name"]
         info = get_container_info(c_name)
         if info:
+            c_proj = info.get("compose_project") or resolved_proj
             state["services"][svc] = {
                 "container_name": c_name,
+                "compose_project": c_proj,
                 "image": info["image"],
                 "image_id": info["imageId"],
                 "status": info["status"],
                 "health": info["health"],
             }
             logger.info(
-                f"[BASELINE] Service '{svc}' running image: {info['image']} (ID: {info['imageId'][:12]})"
+                f"[BASELINE] Service '{svc}' running image: {info['image']} (ID: {info['imageId'][:12]}, Project: {c_proj})"
             )
             # Create an explicit local rollback-backup tag to prevent overwriting tags from corrupting rollback
             if info.get("imageId"):
@@ -384,7 +459,7 @@ def record_current_deployment_state(
         ROLLBACK_BACKUP_FILE.parent.mkdir(parents=True, exist_ok=True)
         with open(ROLLBACK_BACKUP_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=2)
-        logger.info(f"Rollback baseline state preserved at {ROLLBACK_BACKUP_FILE}")
+        logger.info(f"Rollback baseline state preserved at {ROLLBACK_BACKUP_FILE} (Project: {resolved_proj})")
     except Exception as e:
         logger.error(f"Failed to write rollback state backup: {e}")
 
@@ -502,15 +577,21 @@ def execute_rollback(
     logger: logging.Logger,
     rollback_services: List[str],
     compose_file: str = "docker-compose.yml",
+    project_name: Optional[str] = None,
 ) -> bool:
     logger.critical("🚨 INITIATING AUTOMATIC ROLLBACK TO PREVIOUS WORKING IMAGES 🚨")
     backup_file = ROLLBACK_BACKUP_FILE
     if not backup_file.exists() and Path("/tmp/cyclone_deploy_rollback_state.json").exists():
         backup_file = Path("/tmp/cyclone_deploy_rollback_state.json")
 
+    resolved_proj = (
+        project_name
+        or resolve_compose_project(compose_file=compose_file, is_simulation="test" in compose_file, logger=logger)
+    )
+
     if not backup_file.exists():
         logger.critical(f"Rollback backup file not found at {backup_file}. Attempting graceful restart.")
-        project_args = ["-p", "cyclone-ci-test"] if "test" in compose_file else ["-p", "cyclone-prod"]
+        project_args = ["-p", resolved_proj]
         run_command(["docker", "compose"] + project_args + ["-f", compose_file, "restart"] + rollback_services, check=False)
         return False
 
@@ -520,6 +601,11 @@ def execute_rollback(
     except Exception as e:
         logger.critical(f"Failed to read rollback backup file: {e}")
         return False
+
+    # Prefer compose_project from backup state if not explicitly specified
+    if not project_name and backup_state.get("compose_project"):
+        resolved_proj = backup_state["compose_project"]
+    project_args = ["-p", resolved_proj]
 
     services_data = backup_state.get("services", {})
     env = os.environ.copy()
@@ -553,9 +639,8 @@ def execute_rollback(
         if env_var and target_image:
             env[env_var] = target_image
 
-    project_args = ["-p", "cyclone-ci-test"] if "test" in compose_file else ["-p", "cyclone-prod"]
     cmd = ["docker", "compose"] + project_args + ["-f", compose_file, "up", "-d", "--no-deps"] + ordered_rollback
-    logger.info(f"Executing rollback compose cutover: {' '.join(cmd)}")
+    logger.info(f"Executing rollback compose cutover (project: {resolved_proj}): {' '.join(cmd)}")
     proc = subprocess.run(cmd, env=env, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
     if proc.returncode != 0:
         logger.error(f"Rollback compose command failed: {proc.stderr}")
@@ -582,6 +667,7 @@ def deploy_production(
     simulate: bool = False,
     simulate_failure: bool = False,
     health_timeout: int = 60,
+    project_name: Optional[str] = None,
     logger: Optional[logging.Logger] = None,
 ) -> int:
     if logger is None:
@@ -590,10 +676,19 @@ def deploy_production(
     # Normalize repo owner to lowercase per Docker OCI specification
     repo_owner = (repo_owner or "bhavanish5041").strip().lower()
 
+    compose_file = "docker-compose.test.yml" if simulate else "docker-compose.yml"
+    active_project = resolve_compose_project(
+        compose_file=compose_file,
+        is_simulation=simulate,
+        requested_project=project_name,
+        logger=logger,
+    )
+
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     logger.info("=" * 65)
     logger.info("CYCLONE INTEL: ZERO-DOWNTIME CONTINUOUS DEPLOYMENT ENGINE")
     logger.info(f"Execution Mode: {'SIMULATION (Isolated)' if simulate else 'PRODUCTION'}")
+    logger.info(f"Target Compose Project: {active_project}")
     logger.info(f"Target Image Tag: {image_tag}")
     logger.info(f"Target Commit SHA: {commit_sha or 'HEAD'}")
     logger.info(f"Repository Owner: {repo_owner}")
@@ -647,7 +742,6 @@ def deploy_production(
             return 0
 
         # 2. Comprehensive Preflight Checks (Executed prior to touching any container)
-        compose_file = "docker-compose.test.yml" if simulate else "docker-compose.yml"
         preflight_ok = execute_preflight_checks(
             logger=logger,
             image_tag=image_tag,
@@ -662,7 +756,7 @@ def deploy_production(
 
         # 3. Record Baseline State for Rollback BEFORE Modifying Any Containers
         if not simulate:
-            record_current_deployment_state(logger, changed_services)
+            record_current_deployment_state(logger, changed_services, project_name=active_project)
 
         # 4. Prepare Environment with Immutable Image References
         env = os.environ.copy()
@@ -685,7 +779,7 @@ def deploy_production(
         # Step B: Only when 'api' is healthy, cutover dependent services ('frontend', 'dashboard').
         # If ANY step fails, roll back ALL changed services to restore full consistency without partial updates.
         deployed_so_far: List[str] = []
-        project_args = ["-p", "cyclone-ci-test"] if simulate else ["-p", "cyclone-prod"]
+        project_args = ["-p", active_project]
 
         # Group services into ordered cutover batches: primary (api) first, then dependents
         batches: List[List[str]] = []
@@ -720,10 +814,10 @@ def deploy_production(
             if proc.returncode != 0:
                 logger.error(f"Docker compose up failed for batch {batch_services}: {proc.stderr}")
                 if simulate:
-                    run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
+                    run_command(["docker", "compose", "-p", active_project, "-f", compose_file, "down", "-v"], check=False)
                 else:
                     all_to_revert = list(dict.fromkeys(deployed_so_far + batch_services))
-                    execute_rollback(logger, all_to_revert, compose_file)
+                    execute_rollback(logger, all_to_revert, compose_file, project_name=active_project)
                 return 1
 
             deployed_so_far.extend(batch_services)
@@ -737,7 +831,7 @@ def deploy_production(
                 logger.error(f"Health check failure detected in batch {batch_services}!")
                 if simulate:
                     logger.info("[SIMULATION] Triggering simulated rollback teardown...")
-                    run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
+                    run_command(["docker", "compose", "-p", active_project, "-f", compose_file, "down", "-v"], check=False)
                     logger.info("[SIMULATION] Teardown complete. Failure was correctly caught and isolated.")
                     return 1
                 else:
@@ -747,13 +841,13 @@ def deploy_production(
                         f"Health check failed. Rolling back all touched services ({all_to_revert}) "
                         "to prevent partial deployment inconsistency."
                     )
-                    rollback_ok = execute_rollback(logger, all_to_revert, compose_file)
+                    rollback_ok = execute_rollback(logger, all_to_revert, compose_file, project_name=active_project)
                     return 1 if not rollback_ok else 2
 
         # 7. Record Deployment Success
         if simulate:
             logger.info("[SIMULATION] Simulation health checks passed! Tearing down isolated test stack...")
-            run_command(["docker", "compose", "-p", "cyclone-ci-test", "-f", compose_file, "down", "-v"], check=False)
+            run_command(["docker", "compose", "-p", active_project, "-f", compose_file, "down", "-v"], check=False)
             logger.info("[SIMULATION] Teardown complete. Zero production services modified.")
         else:
             digests = {}
@@ -768,6 +862,7 @@ def deploy_production(
                 "timestamp": timestamp,
                 "commit_sha": commit_sha or "HEAD",
                 "image_tag": image_tag,
+                "compose_project": active_project,
                 "image_digests": digests,
                 "deployed_services": changed_services,
                 "status": "SUCCESS",
@@ -802,6 +897,11 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true", help="Run deployment simulation in isolated stack")
     parser.add_argument("--simulate-failure", action="store_true", help="Simulate a deployment failure and rollback")
     parser.add_argument("--health-timeout", type=int, default=60, help="Health check timeout in seconds")
+    parser.add_argument(
+        "--project-name",
+        default=None,
+        help="Docker compose project name (default: auto-detected from running containers or docker-compose.yml)",
+    )
     parser.add_argument("--log-file", default=str(LOGS_DIR / "deployment.log"), help="Log file path")
 
     args = parser.parse_args()
@@ -816,6 +916,7 @@ if __name__ == "__main__":
         simulate=args.simulate,
         simulate_failure=args.simulate_failure,
         health_timeout=args.health_timeout,
+        project_name=args.project_name,
         logger=log,
     )
     sys.exit(0 if ret == 0 else 1)

@@ -13,7 +13,11 @@ htmlcov/
 .env.*
 !.env.example
 wandb/
+export/
+backups/
 data/raw/
+data/interim/
+data/cyclonelm/
 models/cyclonelm/
 frontend/node_modules/
 .DS_Store

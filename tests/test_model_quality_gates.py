@@ -97,6 +97,25 @@ def test_surrogate_concordance_rate(quality_evaluation_report):
     assert gate["measured"] >= ACCEPTANCE_THRESHOLDS["surrogate_concordance_rate"]
 
 
+def test_surrogate_quantitative_metrics_gates(quality_evaluation_report):
+    """Ensure surrogate model accuracy, macro F1, low-tier recall, and failure rate pass gates."""
+    qg = quality_evaluation_report["quality_gates"]
+    assert qg["surrogate_accuracy"]["passed"] is True
+    assert qg["surrogate_accuracy"]["measured"] >= ACCEPTANCE_THRESHOLDS["surrogate_accuracy"]
+
+    assert qg["surrogate_macro_f1"]["passed"] is True
+    assert qg["surrogate_macro_f1"]["measured"] >= ACCEPTANCE_THRESHOLDS["surrogate_macro_f1"]
+
+    assert qg["surrogate_low_tier_recall"]["passed"] is True
+    assert qg["surrogate_low_tier_recall"]["measured"] >= ACCEPTANCE_THRESHOLDS["surrogate_low_tier_recall"]
+
+    assert qg["surrogate_failure_rate"]["passed"] is True
+    assert qg["surrogate_failure_rate"]["measured"] == 0.0
+
+    assert qg["surrogate_schema_validity"]["passed"] is True
+    assert qg["surrogate_schema_validity"]["measured"] == 1.0
+
+
 def test_ahp_score_invariance_gate(quality_evaluation_report):
     """Ensure deterministic AHP composite scores and priority bands achieve 100% invariance."""
     gate = quality_evaluation_report["quality_gates"]["ahp_score_invariance"]

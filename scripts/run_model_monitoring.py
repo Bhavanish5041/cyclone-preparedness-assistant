@@ -19,7 +19,7 @@ import logging
 from pathlib import Path
 import sys
 from typing import Any, Dict, List
-
+import os
 import numpy as np
 import pandas as pd
 
@@ -46,7 +46,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("run_model_monitoring")
 
-DEFAULT_MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
+DEFAULT_MODELLING_PATH = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data/processed")) / "modelling_dataset.parquet"
 DEFAULT_PROBABILITIES_PATH = PROJECT_ROOT / "data/processed/village_preparedness_probabilities.parquet"
 
 

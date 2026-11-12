@@ -506,6 +506,42 @@ def load_registered_model(
                 f"Corrupted or incomplete artifact: missing required model file '{req_file.name}' in {download_dir}"
             )
 
+    # Verify cryptographic SHA256 checksums against authoritative local model registry
+    # Enforced when loading authoritative production baseline or active version
+    registry_file = DEFAULT_MODEL_DIR / "model_registry.json"
+    if registry_file.exists() and (download_dir == DEFAULT_MODEL_DIR or version_label in ("v1.0.0", "local-production")):
+        try:
+            with open(registry_file, "r", encoding="utf-8") as f:
+                reg_data = json.load(f)
+            v_model = reg_data.get("models", {}).get("village-preparedness-classifier", {})
+            active_v = v_model.get("active_version", "v1.0.0")
+            v_info = v_model.get("versions", {}).get(active_v, {})
+            expected_hashes = {
+                Path(af["path"]).name: af["sha256"]
+                for af in v_info.get("artifact_files", [])
+                if "sha256" in af
+            }
+            import hashlib
+            for req_file in [pipeline_file, encoder_file, meta_file]:
+                if req_file.name in expected_hashes:
+                    hasher = hashlib.sha256()
+                    with open(req_file, "rb") as rf:
+                        while chunk := rf.read(65536):
+                            hasher.update(chunk)
+                    computed = hasher.hexdigest()
+                    expected = expected_hashes[req_file.name]
+                    if computed != expected:
+                        raise ValueError(
+                            f"Cryptographic SHA256 checksum mismatch for artifact '{req_file.name}'. "
+                            f"Expected {expected}, computed {computed}. Refusing to load unverified model."
+                        )
+            if version_label == "local-production" and active_v:
+                version_label = active_v
+        except ValueError:
+            raise
+        except Exception as err:
+            logger.warning(f"Could not verify against local model registry manifest: {err}")
+
     # Load metadata
     try:
         with open(meta_file, "r", encoding="utf-8") as f:

@@ -247,7 +247,7 @@ def write_spatial_accessibility_report(
     md.append(
         "Prior to computing spatial metrics, a rigorous verification audit was conducted across the intermediate "
         "datasets created during Phase 1:\n\n"
-        "- **Boundary Polygons**: `622` administrative boundary polygons in [data/interim/coastal_karnataka_boundaries.parquet](file:///home/bhavanish/cyclone-preparedness-assistant/data/interim/coastal_karnataka_boundaries.parquet) (`EPSG:4326`).\n"
+        "- **Boundary Polygons**: `622` administrative boundary polygons in [data/interim/coastal_karnataka_boundaries.parquet](data/interim/coastal_karnataka_boundaries.parquet) (`EPSG:4326`).\n"
         "- **Reconciliation of Unmatched Polygons**: In the initial raw extraction, two boundary polygons had null `pc11_id` attributes in the SHRUG shapefile DBF table:\n"
         "  - `11-29-569-05523-608856` (Udupi)\n"
         "  - `11-29-575-05564-617728` (Dakshina Kannada)\n"
@@ -334,11 +334,11 @@ def write_spatial_accessibility_report(
     md.append("\n---\n")
     md.append("## 5. Artifacts & Generated Figures")
     md.append(
-        "- **Derived Dataset**: [data/processed/coastal_spatial_accessibility_features.parquet](file:///home/bhavanish/cyclone-preparedness-assistant/data/processed/coastal_spatial_accessibility_features.parquet) (GeoParquet, 622 rows, 35 attributes).\n"
-        "- **Tabular Copy**: [data/processed/coastal_spatial_accessibility_features.csv](file:///home/bhavanish/cyclone-preparedness-assistant/data/processed/coastal_spatial_accessibility_features.csv).\n"
-        "- **Figure 1**: [reports/figures/geodesic_distance_phc_chc_choropleth.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/geodesic_distance_phc_chc_choropleth.png) — Choropleth map of distance to nearest PHC/CHC.\n"
-        "- **Figure 2**: [reports/figures/geodesic_distance_hospital_choropleth.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/geodesic_distance_hospital_choropleth.png) — Choropleth map of distance to nearest Hospital.\n"
-        "- **Figure 3**: [reports/figures/accessibility_distance_distribution.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/accessibility_distance_distribution.png) — Grouped boxplot and kernel density distributions."
+        "- **Derived Dataset**: [data/processed/coastal_spatial_accessibility_features.parquet](data/processed/coastal_spatial_accessibility_features.parquet) (GeoParquet, 622 rows, 35 attributes).\n"
+        "- **Tabular Copy**: [data/processed/coastal_spatial_accessibility_features.csv](data/processed/coastal_spatial_accessibility_features.csv).\n"
+        "- **Figure 1**: [reports/figures/geodesic_distance_phc_chc_choropleth.png](reports/figures/geodesic_distance_phc_chc_choropleth.png) — Choropleth map of distance to nearest PHC/CHC.\n"
+        "- **Figure 2**: [reports/figures/geodesic_distance_hospital_choropleth.png](reports/figures/geodesic_distance_hospital_choropleth.png) — Choropleth map of distance to nearest Hospital.\n"
+        "- **Figure 3**: [reports/figures/accessibility_distance_distribution.png](reports/figures/accessibility_distance_distribution.png) — Grouped boxplot and kernel density distributions."
     )
 
     md.append("\n---\n")

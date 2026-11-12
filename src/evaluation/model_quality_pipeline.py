@@ -38,6 +38,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 import httpx
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
 
 from src.assistant.decision_support import DecisionSupportService
 from src.assistant.llm.client import OllamaClient
@@ -69,6 +70,11 @@ ACCEPTANCE_THRESHOLDS = {
     "refusal_recall": 1.00,              # Must be 100%
     "max_avg_latency_ms": 250.0,         # Deterministic pipeline <250ms
     "surrogate_concordance_rate": 0.85,  # Surrogate tier concordance >85%
+    "surrogate_accuracy": 0.90,          # Verified test baseline: 0.9433
+    "surrogate_macro_f1": 0.85,          # Verified test baseline: 0.9060
+    "surrogate_low_tier_recall": 0.70,   # Verified test baseline: 0.7391
+    "surrogate_failure_rate": 0.00,      # Invariant: 0.0 failures
+    "surrogate_schema_validity": 1.00,   # Invariant: 100% valid 26-feature schema
 }
 
 
@@ -413,6 +419,31 @@ class ModelQualityPipeline:
                 "threshold": ACCEPTANCE_THRESHOLDS["surrogate_concordance_rate"],
                 "passed": bool(surrogate_metrics.get("concordance_rate", 0.0) >= ACCEPTANCE_THRESHOLDS["surrogate_concordance_rate"]),
             },
+            "surrogate_accuracy": {
+                "measured": surrogate_metrics.get("test_accuracy", 0.0),
+                "threshold": ACCEPTANCE_THRESHOLDS["surrogate_accuracy"],
+                "passed": bool(surrogate_metrics.get("test_accuracy", 0.0) >= ACCEPTANCE_THRESHOLDS["surrogate_accuracy"]),
+            },
+            "surrogate_macro_f1": {
+                "measured": surrogate_metrics.get("test_macro_f1", 0.0),
+                "threshold": ACCEPTANCE_THRESHOLDS["surrogate_macro_f1"],
+                "passed": bool(surrogate_metrics.get("test_macro_f1", 0.0) >= ACCEPTANCE_THRESHOLDS["surrogate_macro_f1"]),
+            },
+            "surrogate_low_tier_recall": {
+                "measured": surrogate_metrics.get("low_tier_recall", 0.0),
+                "threshold": ACCEPTANCE_THRESHOLDS["surrogate_low_tier_recall"],
+                "passed": bool(surrogate_metrics.get("low_tier_recall", 0.0) >= ACCEPTANCE_THRESHOLDS["surrogate_low_tier_recall"]),
+            },
+            "surrogate_failure_rate": {
+                "measured": surrogate_metrics.get("prediction_failure_rate", 1.0),
+                "threshold": ACCEPTANCE_THRESHOLDS["surrogate_failure_rate"],
+                "passed": bool(surrogate_metrics.get("prediction_failure_rate", 1.0) == ACCEPTANCE_THRESHOLDS["surrogate_failure_rate"]),
+            },
+            "surrogate_schema_validity": {
+                "measured": surrogate_metrics.get("schema_validity_rate", 0.0),
+                "threshold": ACCEPTANCE_THRESHOLDS["surrogate_schema_validity"],
+                "passed": bool(surrogate_metrics.get("schema_validity_rate", 0.0) == ACCEPTANCE_THRESHOLDS["surrogate_schema_validity"]),
+            },
         }
 
         all_gates_passed = all(g["passed"] for g in gate_checks.values())
@@ -550,33 +581,83 @@ class ModelQualityPipeline:
         }
 
     def _evaluate_surrogate_model(self) -> Dict[str, Any]:
-        """Evaluate Logistic Regression surrogate on held-out dataset records."""
+        """Evaluate Logistic Regression surrogate on held-out test split records."""
         meta_path = PROJECT_ROOT / "models" / "logistic_regression_metadata.json"
-        if not meta_path.exists():
-            return {"status": "metadata_not_found"}
+        data_path = PROJECT_ROOT / "data" / "processed" / "modelling_dataset.parquet"
+        if not meta_path.exists() or not data_path.exists():
+            return {"status": "metadata_or_data_not_found"}
 
         with open(meta_path, "r", encoding="utf-8") as f:
             meta = json.load(f)
 
-        v_res = meta.get("validation_results", {})
-        test_m = v_res.get("test_metrics", {})
+        test_indices = meta.get("split_indices", {}).get("test", [])
+        features = meta.get("features", [])
+
+        # Load verified registered model
+        model = load_registered_model(artifact_address="village-preparedness-classifier:v1.0.0")
+        df_modelling = pd.read_parquet(data_path)
+
+        X_test = df_modelling.iloc[test_indices][features].copy()
+        y_test = df_modelling.iloc[test_indices]["preparedness_tier"].copy()
+
+        # Schema validity check
+        schema_valid = (
+            len(features) == 26
+            and list(X_test.columns) == features
+            and not X_test.isna().any().any()
+            and not np.isinf(X_test.select_dtypes(include=[np.number])).any().any()
+        )
+
+        failure_count = 0
+        try:
+            y_pred = model.predict(X_test)
+            proba = model.predict_proba(X_test)
+            if len(y_pred) != len(y_test) or len(proba.get("prob_high", [])) != len(y_test):
+                failure_count += 1
+        except Exception:
+            failure_count = len(y_test)
+            y_pred = ["Medium"] * len(y_test)
+
+        acc = float(accuracy_score(y_test, y_pred))
+        macro_f1 = float(f1_score(y_test, y_pred, average="macro"))
+        weighted_f1 = float(f1_score(y_test, y_pred, average="weighted"))
+
+        # Per-class precision, recall, and F1
+        classes = ["High", "Low", "Medium"]
+        prec_per_class = {c: float(p) for c, p in zip(classes, precision_score(y_test, y_pred, labels=classes, average=None, zero_division=0))}
+        rec_per_class = {c: float(r) for c, r in zip(classes, recall_score(y_test, y_pred, labels=classes, average=None, zero_division=0))}
+        f1_per_class = {c: float(f) for c, f in zip(classes, f1_score(y_test, y_pred, labels=classes, average=None, zero_division=0))}
+
+        cm = confusion_matrix(y_test, y_pred, labels=classes).tolist()
+        low_recall = rec_per_class.get("Low", 0.0)
 
         # Calculate overall concordance on ranked units
-        df = self.service.ranked_df
+        df_ranked = self.service.ranked_df
         concordance = 0.0
-        if "predicted_preparedness_tier" in df.columns:
+        if "predicted_preparedness_tier" in df_ranked.columns:
             matches = (
-                df["preparedness_tier"].astype(str).str.lower()
-                == df["predicted_preparedness_tier"].astype(str).str.lower()
+                df_ranked["preparedness_tier"].astype(str).str.lower()
+                == df_ranked["predicted_preparedness_tier"].astype(str).str.lower()
             ).sum()
-            concordance = round(float(matches / len(df)), 4)
+            concordance = round(float(matches / len(df_ranked)), 4)
 
         return {
             "model_identifier": "village-preparedness-classifier",
             "model_type": "Multinomial Logistic Regression (Surrogate)",
-            "test_accuracy": test_m.get("accuracy", 0.88),
-            "test_macro_f1": test_m.get("macro_f1", 0.85),
-            "test_weighted_f1": test_m.get("weighted_f1", 0.88),
+            "test_sample_count": len(test_indices),
+            "test_accuracy": round(acc, 4),
+            "test_macro_f1": round(macro_f1, 4),
+            "test_weighted_f1": round(weighted_f1, 4),
+            "low_tier_recall": round(low_recall, 4),
+            "precision_per_class": {k: round(v, 4) for k, v in prec_per_class.items()},
+            "recall_per_class": {k: round(v, 4) for k, v in rec_per_class.items()},
+            "f1_per_class": {k: round(v, 4) for k, v in f1_per_class.items()},
+            "confusion_matrix": {
+                "classes": classes,
+                "matrix": cm,
+            },
+            "prediction_failure_rate": round(failure_count / len(test_indices), 4),
+            "schema_validity_rate": 1.0 if schema_valid else 0.0,
             "concordance_rate": concordance,
             "methodology_distinction": (
                 "SCIENTIFIC DISTINCTION MANDATE: The Logistic Regression model is an empirical surrogate "
@@ -713,9 +794,28 @@ class ModelQualityPipeline:
             "",
             "## 4. Surrogate Classifier & Clustering Methodological Disclaimers",
             "",
-            "### A. Logistic Regression Tier Surrogate",
-            f"- **Test Accuracy:** `{surr.get('test_accuracy')}` | **Macro F1:** `{surr.get('test_macro_f1')}`",
-            f"- **AHP Tier Concordance:** `{surr.get('concordance_rate') * 100:.1f}%`",
+            "### A. Logistic Regression Tier Surrogate (Held-out Test Evaluation)",
+            f"- **Evaluation Dataset:** `{surr.get('test_sample_count', 282)}` held-out test units (separated from training split)",
+            f"- **Test Accuracy:** `{surr.get('test_accuracy') * 100:.2f}%` (Acceptance Threshold: >= 90.0%)",
+            f"- **Macro F1 Score:** `{surr.get('test_macro_f1'):.4f}` | **Weighted F1 Score:** `{surr.get('test_weighted_f1'):.4f}`",
+            f"- **Low-Tier Critical Recall:** `{surr.get('low_tier_recall', 0.0) * 100:.2f}%` (Acceptance Threshold: >= 70.0%)",
+            f"- **AHP Tier Concordance (Overall):** `{surr.get('concordance_rate') * 100:.2f}%` (Acceptance Threshold: >= 85.0%)",
+            f"- **Prediction Failure Rate:** `{surr.get('prediction_failure_rate', 0.0) * 100:.2f}%` (Invariant: 0.0%)",
+            f"- **Schema Validity Rate:** `{surr.get('schema_validity_rate', 1.0) * 100:.2f}%` (26 canonical features)",
+            "",
+            "#### Per-Class Performance Breakdown",
+            "| Class | Precision | Recall | F1-Score |",
+            "| :--- | :--- | :--- | :--- |",
+            f"| **High** | `{surr.get('precision_per_class', {}).get('High', 'N/A')}` | `{surr.get('recall_per_class', {}).get('High', 'N/A')}` | `{surr.get('f1_per_class', {}).get('High', 'N/A')}` |",
+            f"| **Medium** | `{surr.get('precision_per_class', {}).get('Medium', 'N/A')}` | `{surr.get('recall_per_class', {}).get('Medium', 'N/A')}` | `{surr.get('f1_per_class', {}).get('Medium', 'N/A')}` |",
+            f"| **Low** | `{surr.get('precision_per_class', {}).get('Low', 'N/A')}` | `{surr.get('recall_per_class', {}).get('Low', 'N/A')}` | `{surr.get('f1_per_class', {}).get('Low', 'N/A')}` |",
+            "",
+            "#### Confusion Matrix (Held-out Test Split)",
+            "```",
+            f"Classes: {surr.get('confusion_matrix', {}).get('classes', ['High', 'Low', 'Medium'])}",
+            f"Matrix:  {surr.get('confusion_matrix', {}).get('matrix', [])}",
+            "```",
+            "",
             "> [!IMPORTANT]",
             f"> {surr.get('methodology_distinction')}",
             "",

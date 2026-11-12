@@ -133,6 +133,10 @@ def run_clustering_tracking(
         entity=entity,
         mode=mode,
         fallback_json_path=manifest_path,
+        model=kmeans_models[4][2],
+        scaler=scaler,
+        X_scaled=X_scaled,
+        df=enriched_gdf,
     )
 
 

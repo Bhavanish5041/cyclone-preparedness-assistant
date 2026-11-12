@@ -13,6 +13,7 @@ Phase 2.3 Demonstration:
 import argparse
 import json
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Optional
@@ -37,7 +38,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("demo_registered_model")
 
-DEFAULT_MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
+DEFAULT_MODELLING_PATH = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data/processed")) / "modelling_dataset.parquet"
 DEFAULT_METADATA_PATH = PROJECT_ROOT / "models/logistic_regression_metadata.json"
 
 

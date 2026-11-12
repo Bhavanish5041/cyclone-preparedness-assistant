@@ -1,6 +1,6 @@
 # CYCLONE INTEL: Model Quality & Invariance Verification Report
 
-**Timestamp (UTC):** `2026-11-11T04:03:24.286693+00:00`  
+**Timestamp (UTC):** `2026-11-12T18:02:24.323421+00:00`  
 **Pipeline Status:** `PASSED ✅`  
 **Total Evaluation Samples:** `130`  
 
@@ -26,6 +26,11 @@
 | **Refusal Precision** | `1.0` | `>= 1.0` | **PASS ✅** |
 | **Refusal Recall** | `1.0` | `>= 1.0` | **PASS ✅** |
 | **Surrogate Concordance Rate** | `0.9537` | `>= 0.85` | **PASS ✅** |
+| **Surrogate Accuracy** | `0.9433` | `>= 0.9` | **PASS ✅** |
+| **Surrogate Macro F1** | `0.906` | `>= 0.85` | **PASS ✅** |
+| **Surrogate Low Tier Recall** | `0.7391` | `>= 0.7` | **PASS ✅** |
+| **Surrogate Failure Rate** | `0.0` | `== 0.0` | **PASS ✅** |
+| **Surrogate Schema Validity** | `1.0` | `>= 1.0` | **PASS ✅** |
 
 ---
 
@@ -47,35 +52,54 @@
 ## 3. Disaggregated Latency & Resource Utilization
 
 ### A. Deterministic Pipeline Latency (Intent Parsing + Extraction + Refusal Gate)
-- **Mean Latency:** `29.02 ms`
-- **Median Latency:** `22.62 ms`
-- **95th Percentile Latency (p95):** `64.43 ms`
-- **Min / Max Latency:** `0.0 ms` / `139.17 ms`
+- **Mean Latency:** `28.56 ms`
+- **Median Latency:** `22.78 ms`
+- **95th Percentile Latency (p95):** `63.98 ms`
+- **Min / Max Latency:** `0.0 ms` / `127.17 ms`
 
 ### B. Deterministic Tool Execution Latency (AHP Scoring & Spatial Assessment)
-- **Mean Execution Latency:** `4.0 ms`
-- **Median Execution Latency:** `3.99 ms`
-- **95th Percentile Latency (p95):** `4.3 ms`
+- **Mean Execution Latency:** `4.01 ms`
+- **Median Execution Latency:** `4.07 ms`
+- **95th Percentile Latency (p95):** `4.25 ms`
 
 ### C. Actual Qwen2.5-0.5B Inference Latency (Local Ollama Engine)
 - **Model:** `qwen2.5:0.5b-instruct`
-- **Mean Generation Latency:** `1592.07 ms` (~1.59s)
-- **Median Generation Latency:** `1259.54 ms`
-- **95th Percentile Latency (p95):** `2637.2` ms
-- **Throughput:** ~`16.96 tokens/sec` on CPU
+- **Mean Generation Latency:** `646.61 ms` (~0.65s)
+- **Median Generation Latency:** `714.22 ms`
+- **95th Percentile Latency (p95):** `730.56` ms
+- **Throughput:** ~`39.69 tokens/sec` on CPU
 
 ### D. Memory Consumption
-- **Initial Process Resident Memory (RSS):** `713.88 MB`
-- **Final Process Resident Memory (RSS):** `713.88 MB`
-- **Net Memory Delta:** `0.0 MB`
+- **Initial Process Resident Memory (RSS):** `522.23 MB`
+- **Final Process Resident Memory (RSS):** `522.48 MB`
+- **Net Memory Delta:** `0.25 MB`
 
 ---
 
 ## 4. Surrogate Classifier & Clustering Methodological Disclaimers
 
-### A. Logistic Regression Tier Surrogate
-- **Test Accuracy:** `0.9432624113475178` | **Macro F1:** `0.9060227871307046`
-- **AHP Tier Concordance:** `95.4%`
+### A. Logistic Regression Tier Surrogate (Held-out Test Evaluation)
+- **Evaluation Dataset:** `282` held-out test units (separated from training split)
+- **Test Accuracy:** `94.33%` (Acceptance Threshold: >= 90.0%)
+- **Macro F1 Score:** `0.9060` | **Weighted F1 Score:** `0.9422`
+- **Low-Tier Critical Recall:** `73.91%` (Acceptance Threshold: >= 70.0%)
+- **AHP Tier Concordance (Overall):** `95.37%` (Acceptance Threshold: >= 85.0%)
+- **Prediction Failure Rate:** `0.00%` (Invariant: 0.0%)
+- **Schema Validity Rate:** `100.00%` (26 canonical features)
+
+#### Per-Class Performance Breakdown
+| Class | Precision | Recall | F1-Score |
+| :--- | :--- | :--- | :--- |
+| **High** | `0.9659` | `0.9444` | `0.9551` |
+| **Medium** | `0.9371` | `0.9704` | `0.9535` |
+| **Low** | `0.8947` | `0.7391` | `0.8095` |
+
+#### Confusion Matrix (Held-out Test Split)
+```
+Classes: ['High', 'Low', 'Medium']
+Matrix:  [[85, 0, 5], [0, 17, 6], [3, 2, 164]]
+```
+
 > [!IMPORTANT]
 > SCIENTIFIC DISTINCTION MANDATE: The Logistic Regression model is an empirical surrogate approximating deterministic AHP preparedness tiers (High, Medium, Low) across 26 infrastructural features. Surrogate probabilities (prob_high, prob_medium, prob_low) are NOT calibrated physical cyclone-risk probabilities, storm surge forecasts, or casualty predictions. Deterministic AHP assessments maintain absolute operational precedence.
 

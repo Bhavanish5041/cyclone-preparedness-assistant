@@ -9,6 +9,7 @@ and tags each prediction with in-sample vs out-of-sample provenance.
 import argparse
 import json
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Union
@@ -24,11 +25,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger("predict_preparedness_probs")
 
-DEFAULT_MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
-DEFAULT_MODEL_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/models/logistic_regression_tier.joblib")
-DEFAULT_ENCODER_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/models/label_encoder.joblib")
-DEFAULT_METADATA_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/models/logistic_regression_metadata.json")
-DEFAULT_OUTPUT_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/village_preparedness_probabilities.parquet")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data" / "processed"))
+MODEL_DIR = Path(os.environ.get("CYCLONE_MODEL_DIR", PROJECT_ROOT / "models"))
+
+DEFAULT_MODELLING_PATH = DATA_DIR / "modelling_dataset.parquet"
+DEFAULT_MODEL_PATH = MODEL_DIR / "logistic_regression_tier.joblib"
+DEFAULT_ENCODER_PATH = MODEL_DIR / "label_encoder.joblib"
+DEFAULT_METADATA_PATH = MODEL_DIR / "logistic_regression_metadata.json"
+DEFAULT_OUTPUT_PATH = DATA_DIR / "village_preparedness_probabilities.parquet"
 
 PROBABILITY_DISCLAIMER = (
     "DISCLAIMER: Predicted class probabilities (prob_low, prob_medium, prob_high) represent "

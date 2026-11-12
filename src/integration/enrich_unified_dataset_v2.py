@@ -11,6 +11,7 @@ and writes data/processed/unified_village_preparedness_v2.parquet (and .csv).
 
 import argparse
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Dict, List, Optional, Union
@@ -25,9 +26,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger("enrich_unified_v2")
 
-DEFAULT_UNIFIED_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/unified_village_preparedness.parquet")
-DEFAULT_PROBABILITIES_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/village_preparedness_probabilities.parquet")
-DEFAULT_OUTPUT_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/unified_village_preparedness_v2.parquet")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data" / "processed"))
+
+DEFAULT_UNIFIED_PATH = DATA_DIR / "unified_village_preparedness.parquet"
+DEFAULT_PROBABILITIES_PATH = DATA_DIR / "village_preparedness_probabilities.parquet"
+DEFAULT_OUTPUT_PATH = DATA_DIR / "unified_village_preparedness_v2.parquet"
 
 
 def enrich_unified_dataset_v2(

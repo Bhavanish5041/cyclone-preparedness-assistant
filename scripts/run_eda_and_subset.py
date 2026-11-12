@@ -430,11 +430,11 @@ def write_eda_report(
     md.append("\n---\n")
     md.append("## 5. Artifacts & Generated Figures")
     md.append(
-        "- **Figure 1**: [reports/figures/coastal_karnataka_healthcare_coverage.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/coastal_karnataka_healthcare_coverage.png) — Spatial distribution of healthcare facilities classified by response tier.\n"
-        "- **Figure 2**: [reports/figures/facility_counts_by_district_and_type.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/facility_counts_by_district_and_type.png) — Facility classification breakdown.\n"
-        "- **Figure 3**: [reports/figures/census_infrastructure_water_roads.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/census_infrastructure_water_roads.png) — Water access and drainage infrastructure.\n"
-        "- **Figure 4**: [reports/figures/population_vulnerability_distribution.png](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/population_vulnerability_distribution.png) — Population scale and SC/ST distributions.\n"
-        "- **Interactive Map**: [reports/figures/coastal_preparedness_interactive_map.html](file:///home/bhavanish/cyclone-preparedness-assistant/reports/figures/coastal_preparedness_interactive_map.html) — Interactive Folium web map."
+        "- **Figure 1**: [reports/figures/coastal_karnataka_healthcare_coverage.png](reports/figures/coastal_karnataka_healthcare_coverage.png) — Spatial distribution of healthcare facilities classified by response tier.\n"
+        "- **Figure 2**: [reports/figures/facility_counts_by_district_and_type.png](reports/figures/facility_counts_by_district_and_type.png) — Facility classification breakdown.\n"
+        "- **Figure 3**: [reports/figures/census_infrastructure_water_roads.png](reports/figures/census_infrastructure_water_roads.png) — Water access and drainage infrastructure.\n"
+        "- **Figure 4**: [reports/figures/population_vulnerability_distribution.png](reports/figures/population_vulnerability_distribution.png) — Population scale and SC/ST distributions.\n"
+        "- **Interactive Map**: [reports/figures/coastal_preparedness_interactive_map.html](reports/figures/coastal_preparedness_interactive_map.html) — Interactive Folium web map."
     )
 
     md.append("\n---\n")

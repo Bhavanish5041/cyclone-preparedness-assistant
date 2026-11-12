@@ -13,7 +13,7 @@ import pytest
 from unittest.mock import AsyncMock, patch
 
 from src.assistant.decision_support import DecisionSupportService
-from src.assistant.llm.client import GeminiClient
+from src.assistant.llm.client import OllamaClient
 from src.assistant.llm.orchestrator import (
     MAX_TOTAL_TOOL_CALLS,
     MAX_TOOL_ROUNDS,
@@ -216,68 +216,26 @@ def test_orchestrator_multi_tool_chain_exceeding_four_calls(registry: ToolRegist
     confirming all 5 execute cleanly within the 8-call budget.
     """
     async def _run():
-        mock_client = AsyncMock(spec=GeminiClient)
+        import json
+        mock_client = AsyncMock(spec=OllamaClient)
         mock_client.is_configured.return_value = True
-        mock_client.model = "gemini-3.5-flash"
+        mock_client.model = "qwen2.5:0.5b-instruct"
 
-        # Round 1: Model requests 3 tools
-        resp_round1 = {
-            "candidates": [
-                {
-                    "content": {
-                        "role": "model",
-                        "parts": [
-                            {"functionCall": {"name": "lookup_community", "args": {"query": "Tallur"}}},
-                            {"functionCall": {"name": "explain_preparedness_assessment", "args": {"identifier": "608691"}}},
-                            {"functionCall": {"name": "analyze_infrastructure_and_exposure", "args": {"identifier": "608691"}}},
-                        ],
-                    }
-                }
-            ]
-        }
+        qwen_intent_json = json.dumps({
+            "intents": [
+                "lookup_community",
+                "explain_preparedness_assessment",
+                "analyze_infrastructure_and_exposure",
+                "get_intervention_recommendations",
+                "explain_vulnerability_archetype",
+            ],
+            "arguments": {"identifier": "Tallur", "archetype_id": 3},
+            "needs_clarification": False,
+            "clarification_question": None,
+        })
+        synthesis_text = "Comprehensive multi-tool assessment completed for Tallur across 5 tools."
 
-        # Round 2: Model requests 2 more tools (total 5 calls)
-        resp_round2 = {
-            "candidates": [
-                {
-                    "content": {
-                        "role": "model",
-                        "parts": [
-                            {"functionCall": {"name": "get_intervention_recommendations", "args": {"identifier": "608691"}}},
-                            {"functionCall": {"name": "explain_vulnerability_archetype", "args": {"archetype_id": 3}}},
-                        ],
-                    }
-                }
-            ]
-        }
-
-        # Round 3: Model finishes and generates final briefing text
-        resp_round3 = {
-            "candidates": [
-                {
-                    "content": {
-                        "role": "model",
-                        "parts": [
-                            {"text": "Comprehensive multi-tool assessment completed for Tallur across 5 tools."}
-                        ],
-                    }
-                }
-            ]
-        }
-
-        mock_client.generate_content.side_effect = [resp_round1, resp_round2, resp_round3]
-
-        def mock_extract_fc(resp_json):
-            parts = resp_json.get("candidates", [{}])[0].get("content", {}).get("parts", [])
-            return [p["functionCall"] for p in parts if "functionCall" in p]
-
-        def mock_extract_text(resp_json):
-            parts = resp_json.get("candidates", [{}])[0].get("content", {}).get("parts", [])
-            texts = [p["text"] for p in parts if "text" in p]
-            return "\n".join(texts) if texts else None
-
-        mock_client.extract_function_calls.side_effect = mock_extract_fc
-        mock_client.extract_text_response.side_effect = mock_extract_text
+        mock_client.generate.side_effect = [qwen_intent_json, synthesis_text]
 
         orch = ToolCallingOrchestrator(client=mock_client, registry=registry)
         req = ChatRequest(message="Run comprehensive 5-tool audit on Tallur.")

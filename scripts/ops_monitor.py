@@ -126,7 +126,7 @@ def get_systemd_status() -> dict[str, str]:
 
 def get_public_url() -> str | None:
     """Find current trycloudflare.com URL from journalctl."""
-    code, out = run_cmd(["journalctl", "--user", "-u", "cyclone-tunnel.service", "-n", "40", "--no-pager"])
+    code, out = run_cmd(["journalctl", "--user", "-u", "cyclone-tunnel.service", "-n", "300", "--no-pager"])
     if code == 0 and out:
         for line in reversed(out.splitlines()):
             if "trycloudflare.com" in line:

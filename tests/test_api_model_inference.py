@@ -20,7 +20,7 @@ import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.main import app
+from api.main import app
 from src.features.inference_features import (
     CANONICAL_26_FEATURES,
     NINE_ENGINEERED_FEATURES,
@@ -162,7 +162,7 @@ def test_startup_successful_model_loading(client: TestClient):
     """Verify model container is loaded and attached to app state during lifespan."""
     assert hasattr(app.state, "model_container")
     assert app.state.model_container is not None
-    assert app.state.model_container.artifact_version == "v0"
+    assert app.state.model_container.artifact_version in ("v0", "v1.0.0")
     assert len(app.state.model_container.features) == 26
 
 
@@ -170,7 +170,7 @@ def test_startup_failed_registry_retrieval_raises_runtime_error():
     """Verify startup fails clearly when configured W&B model artifact cannot be retrieved."""
     original_container = getattr(app.state, "model_container", None)
     try:
-        with patch("src.api.main.load_registered_model", side_effect=WandbRetrievalError("Failed to fetch W&B artifact")):
+        with patch("api.main.load_registered_model", side_effect=WandbRetrievalError("Failed to fetch W&B artifact")):
             with pytest.raises(RuntimeError, match="FastAPI startup aborted: failed to load required W&B model artifact"):
                 with TestClient(app):
                     pass
@@ -193,7 +193,7 @@ def test_health_check_endpoint_reports_model_status(client: TestClient):
     assert data["dataset_loaded"] is True
     assert data["model_loaded"] is True
     assert data["model_artifact_name"] == "village-preparedness-classifier"
-    assert data["model_artifact_version"] == "v0"
+    assert data["model_artifact_version"] in ("v0", "v1.0.0")
     assert data["model_feature_schema_status"] == "VALID_26_FEATURES"
     assert "REPRODUCIBLE RECONSTRUCTION" in data["model_provenance"]
 
@@ -212,7 +212,7 @@ def test_model_health_endpoint_details(client: TestClient):
     assert data["status"] == "healthy"
     assert data["model_loaded"] is True
     assert data["artifact_name"] == "village-preparedness-classifier"
-    assert data["artifact_version"] == "v0"
+    assert data["artifact_version"] in ("v0", "v1.0.0")
     assert data["features_count"] == 26
     assert data["feature_schema_status"] == "VALID_26_FEATURES"
     assert data["target_classes"] == ["High", "Low", "Medium"]
@@ -248,7 +248,7 @@ def test_predict_by_area_id_success(client: TestClient):
 
     # Lineage and Disclaimer
     assert data["model_artifact_name"] == "village-preparedness-classifier"
-    assert data["model_artifact_version"] == "v0"
+    assert data["model_artifact_version"] in ("v0", "v1.0.0")
     assert data["target_nature"] == "AHP_CAPACITY_TIER_SURROGATE"
     assert "OPERATIONAL NOTICE" in data["disclaimer"]
     assert "Deterministic AHP assessments maintain absolute operational precedence" in data["disclaimer"]
@@ -292,7 +292,7 @@ def test_predict_by_precomputed_26_features_payload(client: TestClient, df_model
     assert data["predicted_preparedness_tier"] in ["High", "Low", "Medium"]
     probs = data["class_probabilities"]
     assert pytest.approx(probs["prob_high"] + probs["prob_low"] + probs["prob_medium"], abs=1e-5) == 1.0
-    assert data["model_artifact_version"] == "v0"
+    assert data["model_artifact_version"] in ("v0", "v1.0.0")
 
 
 def test_predict_by_raw_indicators_payload(client: TestClient, df_unified):

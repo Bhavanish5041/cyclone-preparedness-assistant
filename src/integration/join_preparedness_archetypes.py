@@ -10,6 +10,7 @@ restores canonical village and town names, and assigns explicit coverage status 
 
 import argparse
 import logging
+import os
 from pathlib import Path
 import sys
 from typing import Optional, Tuple, Union
@@ -25,9 +26,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger("join_preparedness_archetypes")
 
-DEFAULT_PREPAREDNESS_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/master_village_preparedness.parquet")
-DEFAULT_ARCHETYPES_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/coastal_vulnerability_archetypes.parquet")
-DEFAULT_OUTPUT_PATH = Path("/home/bhavanish/cyclone-preparedness-assistant/data/processed/unified_village_preparedness.parquet")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data" / "processed"))
+
+DEFAULT_PREPAREDNESS_PATH = DATA_DIR / "master_village_preparedness.parquet"
+DEFAULT_ARCHETYPES_PATH = DATA_DIR / "coastal_vulnerability_archetypes.parquet"
+DEFAULT_OUTPUT_PATH = DATA_DIR / "unified_village_preparedness.parquet"
 
 INTEGRATION_DISCLAIMER = (
     "DISCLAIMER: This dataset integrates the AHP/MCDA preparedness index with descriptive "

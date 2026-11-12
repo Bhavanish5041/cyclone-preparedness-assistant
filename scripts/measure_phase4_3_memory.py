@@ -6,7 +6,7 @@ Measures:
 3. GIS Explorer Memory: Streamlit AppTest rendering GIS map & controls.
 4. Community Profile Memory: Streamlit AppTest rendering Granular Community Profiles.
 5. Assistant Initialization Memory: Streamlit AppTest navigating to Cyclone Assistant.
-6. Assistant Request Memory (Mocked LLM): Executing a mocked Gemini tool-calling interaction.
+6. Assistant Request Memory (Mocked LLM): Executing a mocked Qwen tool-calling interaction.
 7. Assistant Request Memory (Deterministic Fallback): Executing direct local decision-matrix evaluation.
 8. Peak Memory: Process VmHWM (High Water Mark) and margin against Render Free 512 MiB ceiling.
 """
@@ -169,7 +169,7 @@ def main():
             },
             is_fallback=False,
             conversation_status=ConversationStatus.COMPLETED,
-            model_name="gemini-2.5-flash",
+            model_name="qwen2.5:0.5b-instruct",
             total_duration_ms=420.0,
             scientific_precedence_note="AHP is authoritative.",
         )
@@ -188,7 +188,7 @@ def main():
     print(f"6. Assistant Mocked LLM Request Memory: {assistant_mock_req_mib:.2f} MiB ({assistant_mock_req_mib/RENDER_FREE_LIMIT_MIB*100:.1f}%) [Duration: {mock_req_dur_ms:.1f} ms]")
     measurements.append({
         "stage": "assistant_mock_llm_request",
-        "description": "Executing conversational turn with mocked Gemini tool-calling response (reusing singleton service)",
+        "description": "Executing conversational turn with mocked Qwen tool-calling response (reusing singleton service)",
         "rss_mib": assistant_mock_req_mib,
         "percent_of_512mib": round(assistant_mock_req_mib / RENDER_FREE_LIMIT_MIB * 100, 2),
         "duration_ms": mock_req_dur_ms,

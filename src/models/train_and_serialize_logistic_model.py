@@ -12,6 +12,7 @@ Validates test accuracy == 0.9433 and macro F1 == 0.9060 before saving artifacts
 from datetime import datetime, timezone
 import json
 import logging
+import os
 from pathlib import Path
 import platform
 import sys
@@ -42,8 +43,9 @@ logging.basicConfig(
 logger = logging.getLogger("serialize_logistic_model")
 
 # File paths
-DEFAULT_MODELLING_PATH = Path("/home/bhavanish/cyclone-preparedness/data/processed/modelling_dataset.parquet")
-DEFAULT_MODEL_DIR = Path("/home/bhavanish/cyclone-preparedness-assistant/models")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MODELLING_PATH = Path(os.environ.get("CYCLONE_DATA_DIR", PROJECT_ROOT / "data" / "processed")) / "modelling_dataset.parquet"
+DEFAULT_MODEL_DIR = Path(os.environ.get("CYCLONE_MODEL_DIR", PROJECT_ROOT / "models"))
 PIPELINE_OUTPUT_PATH = DEFAULT_MODEL_DIR / "logistic_regression_tier.joblib"
 ENCODER_OUTPUT_PATH = DEFAULT_MODEL_DIR / "label_encoder.joblib"
 METADATA_OUTPUT_PATH = DEFAULT_MODEL_DIR / "logistic_regression_metadata.json"

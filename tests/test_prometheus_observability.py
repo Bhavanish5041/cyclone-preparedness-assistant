@@ -18,7 +18,7 @@ from fastapi.testclient import TestClient
 import pytest
 import yaml
 
-from src.api.main import app
+from api.main import app
 from src.monitoring.prometheus_metrics import (
     ALLOWED_AGREEMENT_STATUSES,
     ALLOWED_ERROR_TYPES,
@@ -137,7 +137,10 @@ def test_model_loaded_and_info_gauges(client: TestClient):
     text = metrics_resp.text
 
     assert "cyclone_model_loaded 1.0" in text
-    assert 'cyclone_model_info{artifact_name="village-preparedness-classifier",artifact_version="v0"} 1.0' in text
+    assert (
+        'cyclone_model_info{artifact_name="village-preparedness-classifier",artifact_version="v1.0.0"} 1.0' in text
+        or 'cyclone_model_info{artifact_name="village-preparedness-classifier",artifact_version="v0"} 1.0' in text
+    )
 
 
 def test_boundary_case_tracking():

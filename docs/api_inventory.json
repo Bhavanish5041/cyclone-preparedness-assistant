@@ -1,0 +1,3595 @@
+{
+  "metadata": {
+    "title": "Cyclone Preparedness Decision Intelligence API",
+    "version": "2.0.0",
+    "description": "Production RESTful API for evidence-based spatial decision support and cyclone preparedness intelligence across coastal Karnataka (Dakshina Kannada, Udupi, and Uttara Kannada). Grounded in deterministic AHP criteria, Census 2011 baselines, MoHFW healthcare registries, and 4-tier operational priority allocations.",
+    "total_endpoints": 37,
+    "generated_at_utc": "2026-11-11T12:00:00Z",
+    "logical_groups": [
+      "health_and_readiness",
+      "dashboard",
+      "communities",
+      "geospatial_and_maps",
+      "districts",
+      "analytics",
+      "priority_bands",
+      "vulnerability_clusters",
+      "infrastructure_and_interventions",
+      "model_inference",
+      "model_registry",
+      "assistant",
+      "legacy_v1"
+    ]
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/",
+      "tag": "Navigation",
+      "purpose": "Redirect root traffic to interactive Swagger UI documentation.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "307 Temporary Redirect -> /docs",
+      "status_codes": [
+        307
+      ],
+      "authentication_required": false,
+      "example_request": "curl -i http://localhost:8000/",
+      "example_response": "HTTP/1.1 307 Temporary Redirect\nLocation: /docs",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/clusters",
+      "tag": "Analytics & Models",
+      "purpose": "K-Means vulnerability archetypes and UK fallback catalog",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "assigned_count": {
+            "type": "integer",
+            "title": "Assigned Count"
+          },
+          "unassigned_count": {
+            "type": "integer",
+            "title": "Unassigned Count"
+          },
+          "clusters": {
+            "items": {
+              "$ref": "#/components/schemas/ClusterDetail"
+            },
+            "type": "array",
+            "title": "Clusters"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_units",
+          "assigned_count",
+          "unassigned_count",
+          "clusters",
+          "disclaimer"
+        ],
+        "title": "ClustersAnalyticsResponse",
+        "description": "Analytics on K-Means vulnerability archetypes and UK fallback."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/analytics/clusters",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/analytics/clusters\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/model-performance",
+      "tag": "Analytics & Models",
+      "purpose": "Surrogate Logistic Regression evaluation metrics and confusion matrix",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "model_type": {
+            "type": "string",
+            "title": "Model Type"
+          },
+          "framework": {
+            "type": "string",
+            "title": "Framework"
+          },
+          "features_count": {
+            "type": "integer",
+            "title": "Features Count"
+          },
+          "features": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Features"
+          },
+          "split_info": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Split Info"
+          },
+          "train_metrics": {
+            "$ref": "#/components/schemas/ModelMetrics"
+          },
+          "val_metrics": {
+            "$ref": "#/components/schemas/ModelMetrics"
+          },
+          "test_metrics": {
+            "$ref": "#/components/schemas/ModelMetrics"
+          },
+          "test_confusion_matrix": {
+            "$ref": "#/components/schemas/ConfusionMatrixData"
+          },
+          "test_classification_report": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Test Classification Report"
+          },
+          "concordance_rate_overall": {
+            "type": "number",
+            "title": "Concordance Rate Overall"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_name",
+          "model_type",
+          "framework",
+          "features_count",
+          "features",
+          "split_info",
+          "train_metrics",
+          "val_metrics",
+          "test_metrics",
+          "test_confusion_matrix",
+          "test_classification_report",
+          "concordance_rate_overall",
+          "disclaimer"
+        ],
+        "title": "ModelPerformanceResponse",
+        "description": "Logistic regression surrogate model performance and metadata."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/analytics/model-performance",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/analytics/model-performance\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/preparedness",
+      "tag": "Analytics & Models",
+      "purpose": "Authoritative AHP preparedness distribution",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "tier_distribution": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Tier Distribution"
+          },
+          "score_summary": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Score Summary"
+          },
+          "domain_averages": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Domain Averages"
+          },
+          "district_averages": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "District Averages"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_units",
+          "tier_distribution",
+          "score_summary",
+          "domain_averages",
+          "district_averages",
+          "disclaimer"
+        ],
+        "title": "PreparednessAnalyticsResponse",
+        "description": "Analytics on AHP preparedness scores and domain indicators."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/analytics/preparedness",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/analytics/preparedness\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "analytics"
+    },
+    {
+      "method": "GET",
+      "path": "/api/analytics/priority-bands",
+      "tag": "Analytics & Models",
+      "purpose": "Operational priority band distributions and deficit triggers",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "band_distribution": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Band Distribution"
+          },
+          "trigger_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Trigger Counts"
+          },
+          "district_band_crosstab": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "District Band Crosstab"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_units",
+          "band_distribution",
+          "trigger_counts",
+          "district_band_crosstab",
+          "disclaimer"
+        ],
+        "title": "PriorityBandsAnalyticsResponse",
+        "description": "Analytics on 4 operational priority bands and deficit triggers."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/analytics/priority-bands",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/analytics/priority-bands\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "analytics"
+    },
+    {
+      "method": "POST",
+      "path": "/api/assistant/chat",
+      "tag": "Decision Support Assistant",
+      "purpose": "Conversational decision support turn with deterministic tool grounding",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Message",
+            "description": "User question or incident command prompt for the assistant.",
+            "examples": [
+              "Why is Tallur classified as Band 4 Adequate despite coastal proximity?",
+              "Compare preparedness between Dakshina Kannada and Udupi.",
+              "What are the recommended interventions for Edmoge?"
+            ]
+          },
+          "conversation_history": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation History",
+            "description": "Recent conversation history for multi-turn context (maximum 10 turns)."
+          },
+          "community_identifier": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Community Identifier",
+            "description": "Optional Census PC11 ID, SHRID, or village name for contextual focus.",
+            "examples": [
+              "608691",
+              "Tallur",
+              "Edmoge"
+            ]
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature",
+            "description": "Optional sampling temperature override (default 0.0 for deterministic grounding)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ChatRequest",
+        "description": "Request payload for /api/v1/assistant/chat."
+      },
+      "response_schema": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer",
+            "description": "Grounded natural language assessment or advisory memo."
+          },
+          "tools_executed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools Executed",
+            "description": "Names of all tools executed during this conversation turn."
+          },
+          "tool_records": {
+            "items": {
+              "$ref": "#/components/schemas/ToolExecutionRecord"
+            },
+            "type": "array",
+            "title": "Tool Records",
+            "description": "Audit records for all tool executions during this turn."
+          },
+          "structured_evidence": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structured Evidence",
+            "description": "Structured dictionary of factual evidence extracted from executed tools."
+          },
+          "is_fallback": {
+            "type": "boolean",
+            "title": "Is Fallback",
+            "description": "True if deterministic fallback was activated (e.g. Ollama daemon offline or unconfigured).",
+            "default": false
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason",
+            "description": "Reason why deterministic fallback was activated if applicable."
+          },
+          "conversation_status": {
+            "$ref": "#/components/schemas/ConversationStatus",
+            "description": "'COMPLETED', 'FALLBACK', or 'ERROR'.",
+            "default": "COMPLETED"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name",
+            "description": "Exact model identifier used for response generation (e.g., 'qwen2.5:0.5b-instruct')."
+          },
+          "total_duration_ms": {
+            "type": "number",
+            "title": "Total Duration Ms",
+            "description": "Total round-trip processing duration in milliseconds."
+          },
+          "scientific_precedence_note": {
+            "type": "string",
+            "title": "Scientific Precedence Note",
+            "description": "Mandatory scientific governance notice reinforcing AHP precedence and Census baseline limitations."
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "total_duration_ms",
+          "scientific_precedence_note"
+        ],
+        "title": "ChatResponse",
+        "description": "Response payload returned by the conversational decision support engine."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/assistant/chat \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"message\": \"Explain why Tallur is classified as Band 4.\"}'",
+      "example_response": "{\n  \"answer\": \"Tallur (PC11: 608691, Udupi) achieves an authoritative AHP composite preparedness score of 74.34, categorizing it in the High preparedness tier and Priority Band 4 (Adequate).\",\n  \"tools_executed\": [\n    \"explain_preparedness_assessment\"\n  ],\n  \"tool_records\": [\n    {\n      \"tool_name\": \"explain_preparedness_assessment\",\n      \"success\": true,\n      \"execution_time_ms\": 1.8\n    }\n  ],\n  \"is_fallback\": false,\n  \"scientific_precedence_note\": \"AHP composite preparedness score maintains authoritative operational precedence.\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "assistant"
+    },
+    {
+      "method": "GET",
+      "path": "/api/assistant/tools",
+      "tag": "Decision Support Assistant",
+      "purpose": "List registered deterministic tools and execution schemas",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "type": "array",
+        "title": "Response List Assistant Tools Api Assistant Tools Get"
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/assistant/tools",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/assistant/tools\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "assistant"
+    },
+    {
+      "method": "GET",
+      "path": "/api/communities",
+      "tag": "Communities",
+      "purpose": "Search, filter, and paginate communities",
+      "path_parameters": [],
+      "query_parameters": [
+        {
+          "name": "search",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Search by village name, PC11 ID, or SHRID",
+            "title": "Search"
+          },
+          "description": "Search by village name, PC11 ID, or SHRID"
+        },
+        {
+          "name": "district",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')",
+            "title": "District"
+          },
+          "description": "Filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')"
+        },
+        {
+          "name": "tier",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by AHP preparedness tier ('High', 'Medium', 'Low')",
+            "title": "Tier"
+          },
+          "description": "Filter by AHP preparedness tier ('High', 'Medium', 'Low')"
+        },
+        {
+          "name": "priority_band",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by priority band ('BAND_1_CRITICAL', 'BAND_2_SPECIALIZED', 'BAND_3_MODERATE', 'BAND_4_ADEQUATE')",
+            "title": "Priority Band"
+          },
+          "description": "Filter by priority band ('BAND_1_CRITICAL', 'BAND_2_SPECIALIZED', 'BAND_3_MODERATE', 'BAND_4_ADEQUATE')"
+        },
+        {
+          "name": "archetype_id",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by archetype ID (0, 1, 2, 3 or -1 for unassigned)",
+            "title": "Archetype Id"
+          },
+          "description": "Filter by archetype ID (0, 1, 2, 3 or -1 for unassigned)"
+        },
+        {
+          "name": "sort_by",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "description": "Field to sort by ('priority_rank', 'preparedness_score', 'dist_coast_km', 'population', 'village_name')",
+            "default": "priority_rank",
+            "title": "Sort By"
+          },
+          "description": "Field to sort by ('priority_rank', 'preparedness_score', 'dist_coast_km', 'population', 'village_name')"
+        },
+        {
+          "name": "sort_order",
+          "required": false,
+          "schema": {
+            "type": "string",
+            "pattern": "^(asc|desc)$",
+            "description": "Sort order ('asc' or 'desc')",
+            "default": "asc",
+            "title": "Sort Order"
+          },
+          "description": "Sort order ('asc' or 'desc')"
+        },
+        {
+          "name": "page",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Page number starting from 1",
+            "default": 1,
+            "title": "Page"
+          },
+          "description": "Page number starting from 1"
+        },
+        {
+          "name": "limit",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1,
+            "description": "Items per page (max 100)",
+            "default": 20,
+            "title": "Limit"
+          },
+          "description": "Items per page (max 100)"
+        }
+      ],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CommunityListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "page",
+          "limit",
+          "total_pages",
+          "items"
+        ],
+        "title": "CommunitiesListResponse",
+        "description": "Paginated list of communities."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s 'http://localhost:8000/api/communities?district=Udupi&priority_band=BAND_4_ADEQUATE&limit=2'",
+      "example_response": "{\n  \"items\": [\n    {\n      \"area_id\": \"608691\",\n      \"village_name\": \"Tallur\",\n      \"district_name\": \"Udupi\",\n      \"preparedness_score\": 74.34,\n      \"preparedness_tier\": \"High\",\n      \"priority_band\": \"BAND_4_ADEQUATE\",\n      \"vulnerability_archetype_id\": 3\n    }\n  ],\n  \"total\": 123,\n  \"page\": 1,\n  \"limit\": 2,\n  \"pages\": 62\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "communities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/communities/{community_id}",
+      "tag": "Communities",
+      "purpose": "Retrieve granular community inspection dossier",
+      "path_parameters": [
+        {
+          "name": "community_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "title": "Community Id"
+          },
+          "description": ""
+        }
+      ],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "area_id": {
+            "type": "string",
+            "title": "Area Id"
+          },
+          "pc11_id": {
+            "type": "string",
+            "title": "Pc11 Id"
+          },
+          "shrid2": {
+            "type": "string",
+            "title": "Shrid2"
+          },
+          "village_name": {
+            "type": "string",
+            "title": "Village Name"
+          },
+          "district_name": {
+            "type": "string",
+            "title": "District Name"
+          },
+          "subdistrict_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subdistrict Name"
+          },
+          "unit_type": {
+            "type": "string",
+            "title": "Unit Type",
+            "default": "VILLAGE"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "preparedness_score": {
+            "type": "number",
+            "title": "Preparedness Score"
+          },
+          "preparedness_tier": {
+            "type": "string",
+            "title": "Preparedness Tier"
+          },
+          "score_medical": {
+            "type": "number",
+            "title": "Score Medical"
+          },
+          "score_shelters": {
+            "type": "number",
+            "title": "Score Shelters"
+          },
+          "score_infrastructure": {
+            "type": "number",
+            "title": "Score Infrastructure"
+          },
+          "score_early_warning": {
+            "type": "number",
+            "title": "Score Early Warning"
+          },
+          "score_socioeconomic": {
+            "type": "number",
+            "title": "Score Socioeconomic"
+          },
+          "priority_band": {
+            "type": "string",
+            "title": "Priority Band"
+          },
+          "priority_rank": {
+            "type": "integer",
+            "title": "Priority Rank"
+          },
+          "band_rank": {
+            "type": "integer",
+            "title": "Band Rank"
+          },
+          "triggers_activated": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Triggers Activated"
+          },
+          "primary_deficit_rationale": {
+            "type": "string",
+            "title": "Primary Deficit Rationale"
+          },
+          "actionable_advisories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Actionable Advisories"
+          },
+          "predicted_preparedness_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Preparedness Tier"
+          },
+          "prob_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prob High"
+          },
+          "prob_medium": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prob Medium"
+          },
+          "prob_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prob Low"
+          },
+          "probability_margin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Probability Margin"
+          },
+          "is_boundary_case": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Boundary Case"
+          },
+          "ahp_agreement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahp Agreement"
+          },
+          "ahp_precedence_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahp Precedence Note"
+          },
+          "ml_disclaimer": {
+            "type": "string",
+            "title": "Ml Disclaimer"
+          },
+          "vulnerability_archetype_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vulnerability Archetype Id"
+          },
+          "vulnerability_archetype_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vulnerability Archetype Label"
+          },
+          "cluster_assignment_status": {
+            "type": "string",
+            "title": "Cluster Assignment Status"
+          },
+          "archetype_intervention_need": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archetype Intervention Need"
+          },
+          "population": {
+            "type": "integer",
+            "title": "Population"
+          },
+          "households": {
+            "type": "integer",
+            "title": "Households"
+          },
+          "pop_density_sqkm": {
+            "type": "number",
+            "title": "Pop Density Sqkm"
+          },
+          "vulnerable_pop_share": {
+            "type": "number",
+            "title": "Vulnerable Pop Share"
+          },
+          "sc_share": {
+            "type": "number",
+            "title": "Sc Share"
+          },
+          "st_share": {
+            "type": "number",
+            "title": "St Share"
+          },
+          "dist_coast_km": {
+            "type": "number",
+            "title": "Dist Coast Km"
+          },
+          "elevation_mean": {
+            "type": "number",
+            "title": "Elevation Mean"
+          },
+          "dist_nearest_shelter_km": {
+            "type": "number",
+            "title": "Dist Nearest Shelter Km"
+          },
+          "n_shelters_10km": {
+            "type": "integer",
+            "title": "N Shelters 10Km"
+          },
+          "dist_nearest_hospital_km": {
+            "type": "number",
+            "title": "Dist Nearest Hospital Km"
+          },
+          "dist_nearest_phc_km": {
+            "type": "number",
+            "title": "Dist Nearest Phc Km"
+          },
+          "has_phc_or_chc": {
+            "type": "boolean",
+            "title": "Has Phc Or Chc"
+          },
+          "road_connectivity_score": {
+            "type": "number",
+            "title": "Road Connectivity Score"
+          },
+          "drinking_water_score": {
+            "type": "number",
+            "title": "Drinking Water Score"
+          },
+          "has_pucca_road": {
+            "type": "boolean",
+            "title": "Has Pucca Road"
+          },
+          "bus_connectivity": {
+            "type": "boolean",
+            "title": "Bus Connectivity"
+          },
+          "tauktae_affected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tauktae Affected"
+          },
+          "provenance_and_limitations": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Provenance And Limitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "area_id",
+          "pc11_id",
+          "shrid2",
+          "village_name",
+          "district_name",
+          "lat",
+          "lon",
+          "preparedness_score",
+          "preparedness_tier",
+          "score_medical",
+          "score_shelters",
+          "score_infrastructure",
+          "score_early_warning",
+          "score_socioeconomic",
+          "priority_band",
+          "priority_rank",
+          "band_rank",
+          "triggers_activated",
+          "primary_deficit_rationale",
+          "actionable_advisories",
+          "ml_disclaimer",
+          "cluster_assignment_status",
+          "population",
+          "households",
+          "pop_density_sqkm",
+          "vulnerable_pop_share",
+          "sc_share",
+          "st_share",
+          "dist_coast_km",
+          "elevation_mean",
+          "dist_nearest_shelter_km",
+          "n_shelters_10km",
+          "dist_nearest_hospital_km",
+          "dist_nearest_phc_km",
+          "has_phc_or_chc",
+          "road_connectivity_score",
+          "drinking_water_score",
+          "has_pucca_road",
+          "bus_connectivity",
+          "provenance_and_limitations"
+        ],
+        "title": "CommunityDetailResponse",
+        "description": "Comprehensive administrative unit inspection dossier."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/communities/608691",
+      "example_response": "{\n  \"area_id\": \"608691\",\n  \"village_name\": \"Tallur\",\n  \"district_name\": \"Udupi\",\n  \"pc11_id\": \"608691\",\n  \"preparedness_score\": 74.34,\n  \"preparedness_tier\": \"High\",\n  \"priority_band\": \"BAND_4_ADEQUATE\",\n  \"vulnerability_archetype_id\": 3,\n  \"domain_scores\": {\n    \"medical\": 82.5,\n    \"shelters\": 45.0,\n    \"infrastructure\": 85.0,\n    \"early_warning\": 90.0,\n    \"socioeconomic\": 88.0\n  }\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "communities"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dashboard/overview",
+      "tag": "Dashboard",
+      "purpose": "Regional command-center executive summary",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units",
+            "description": "Total revenue villages and census towns",
+            "default": 1879
+          },
+          "districts_count": {
+            "type": "integer",
+            "title": "Districts Count",
+            "description": "Count of coastal Karnataka districts",
+            "default": 3
+          },
+          "assigned_clusters_count": {
+            "type": "integer",
+            "title": "Assigned Clusters Count",
+            "description": "Units assigned to K-Means archetypes (DK & Udupi)",
+            "default": 622
+          },
+          "unassigned_clusters_count": {
+            "type": "integer",
+            "title": "Unassigned Clusters Count",
+            "description": "Units in Uttara Kannada using fallback",
+            "default": 1257
+          },
+          "priority_band_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Priority Band Counts",
+            "description": "Authoritative priority band counts (BAND_1_CRITICAL, BAND_2_SPECIALIZED, BAND_3_MODERATE, BAND_4_ADEQUATE)"
+          },
+          "preparedness_tier_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Preparedness Tier Counts",
+            "description": "Deterministic AHP capacity tier counts (High, Medium, Low)"
+          },
+          "cluster_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Cluster Counts",
+            "description": "Vulnerability cluster counts"
+          },
+          "districts": {
+            "items": {
+              "$ref": "#/components/schemas/DistrictOverviewItem"
+            },
+            "type": "array",
+            "title": "Districts",
+            "description": "Per-district aggregations"
+          },
+          "infrastructure_highlights": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Infrastructure Highlights",
+            "description": "Aggregated infrastructure numbers (population, shelters, healthcare)"
+          },
+          "data_disclaimer": {
+            "type": "string",
+            "title": "Data Disclaimer",
+            "description": "Scientific governance and vintage disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "priority_band_counts",
+          "preparedness_tier_counts",
+          "cluster_counts",
+          "districts",
+          "infrastructure_highlights",
+          "data_disclaimer"
+        ],
+        "title": "DashboardOverviewResponse",
+        "description": "Authoritative regional dashboard overview across all 1,879 administrative units."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/dashboard/overview",
+      "example_response": "{\n  \"total_units\": 1879,\n  \"districts_count\": 3,\n  \"assigned_clusters_count\": 622,\n  \"unassigned_clusters_count\": 1257,\n  \"priority_band_counts\": {\n    \"BAND_1_CRITICAL\": 155,\n    \"BAND_2_SPECIALIZED\": 829,\n    \"BAND_3_MODERATE\": 299,\n    \"BAND_4_ADEQUATE\": 596\n  },\n  \"preparedness_tier_counts\": {\n    \"High\": 596,\n    \"Medium\": 1128,\n    \"Low\": 155\n  },\n  \"infrastructure_highlights\": {\n    \"total_population\": 4680000,\n    \"pucca_road_pct\": 78.5,\n    \"coastal_units_under_5km\": 249\n  }\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "dashboard"
+    },
+    {
+      "method": "GET",
+      "path": "/api/districts",
+      "tag": "Districts",
+      "purpose": "List all 3 coastal districts and comparative profiles",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_districts": {
+            "type": "integer",
+            "title": "Total Districts",
+            "default": 3
+          },
+          "districts": {
+            "items": {
+              "$ref": "#/components/schemas/DistrictSummary"
+            },
+            "type": "array",
+            "title": "Districts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "districts"
+        ],
+        "title": "DistrictListResponse",
+        "description": "List of all 3 coastal districts."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/districts",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/districts\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "districts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/districts/{district_id}",
+      "tag": "Districts",
+      "purpose": "Retrieve granular district intelligence dossier",
+      "path_parameters": [
+        {
+          "name": "district_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "description": "District name or slug (e.g. 'udupi', 'dakshina-kannada', 'uttara-kannada')",
+            "title": "District Id"
+          },
+          "description": "District name or slug (e.g. 'udupi', 'dakshina-kannada', 'uttara-kannada')"
+        }
+      ],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "district_name": {
+            "type": "string",
+            "title": "District Name"
+          },
+          "district_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Code"
+          },
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units"
+          },
+          "mean_preparedness_score": {
+            "type": "number",
+            "title": "Mean Preparedness Score"
+          },
+          "min_preparedness_score": {
+            "type": "number",
+            "title": "Min Preparedness Score"
+          },
+          "max_preparedness_score": {
+            "type": "number",
+            "title": "Max Preparedness Score"
+          },
+          "band_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Band Counts"
+          },
+          "tier_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Tier Counts"
+          },
+          "cluster_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Cluster Counts"
+          },
+          "mean_dist_coast_km": {
+            "type": "number",
+            "title": "Mean Dist Coast Km"
+          },
+          "mean_dist_nearest_shelter_km": {
+            "type": "number",
+            "title": "Mean Dist Nearest Shelter Km"
+          },
+          "mean_dist_nearest_hospital_km": {
+            "type": "number",
+            "title": "Mean Dist Nearest Hospital Km"
+          },
+          "mean_dist_nearest_phc_km": {
+            "type": "number",
+            "title": "Mean Dist Nearest Phc Km"
+          },
+          "pct_pucca_road": {
+            "type": "number",
+            "title": "Pct Pucca Road"
+          },
+          "pct_drinking_water_secure": {
+            "type": "number",
+            "title": "Pct Drinking Water Secure"
+          },
+          "total_population": {
+            "type": "integer",
+            "title": "Total Population"
+          },
+          "total_households": {
+            "type": "integer",
+            "title": "Total Households"
+          },
+          "mean_vulnerable_pop_share": {
+            "type": "number",
+            "title": "Mean Vulnerable Pop Share"
+          },
+          "subdistricts": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SubdistrictSummary"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subdistricts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "district_name",
+          "total_units",
+          "mean_preparedness_score",
+          "min_preparedness_score",
+          "max_preparedness_score",
+          "band_counts",
+          "tier_counts",
+          "cluster_counts",
+          "mean_dist_coast_km",
+          "mean_dist_nearest_shelter_km",
+          "mean_dist_nearest_hospital_km",
+          "mean_dist_nearest_phc_km",
+          "pct_pucca_road",
+          "pct_drinking_water_secure",
+          "total_population",
+          "total_households",
+          "mean_vulnerable_pop_share"
+        ],
+        "title": "DistrictSummary",
+        "description": "Comprehensive district summary model."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/districts/{district_id}",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/districts/{district_id}\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "districts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "tag": "Health & Status",
+      "purpose": "System health, dataset readiness, and model status",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Response Health Check Api Health Get"
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/health",
+      "example_response": "{\n  \"status\": \"healthy\",\n  \"dataset_loaded\": true,\n  \"total_units\": 1879,\n  \"total_villages\": 1845,\n  \"total_census_towns\": 34,\n  \"districts\": [\n    \"Dakshina Kannada\",\n    \"Udupi\",\n    \"Uttara Kannada\"\n  ],\n  \"archetypes_count\": 4,\n  \"version\": \"2.0.0\",\n  \"model_loaded\": true,\n  \"model_artifact_name\": \"village-preparedness-classifier\",\n  \"model_artifact_version\": \"v1.0.0\",\n  \"model_feature_schema_status\": \"VALID_26_FEATURES\",\n  \"model_provenance\": \"REPRODUCIBLE RECONSTRUCTION (70/15/15 experiment)\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health/ready",
+      "tag": "Health & Status",
+      "purpose": "System readiness probe for container orchestrators",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "additionalProperties": true,
+        "type": "object",
+        "title": "Response Readiness Probe Api Health Ready Get"
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/health/ready",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/health/ready\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/api/maps/communities",
+      "tag": "Maps & Geospatial",
+      "purpose": "Retrieve spatial points for interactive map",
+      "path_parameters": [],
+      "query_parameters": [
+        {
+          "name": "district",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')",
+            "title": "District"
+          },
+          "description": "Filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')"
+        },
+        {
+          "name": "tier",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by preparedness tier ('High', 'Medium', 'Low')",
+            "title": "Tier"
+          },
+          "description": "Filter by preparedness tier ('High', 'Medium', 'Low')"
+        },
+        {
+          "name": "priority_band",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by priority band ('BAND_1_CRITICAL', etc.)",
+            "title": "Priority Band"
+          },
+          "description": "Filter by priority band ('BAND_1_CRITICAL', etc.)"
+        },
+        {
+          "name": "archetype_id",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by archetype ID (0, 1, 2, 3 or -1 for unassigned)",
+            "title": "Archetype Id"
+          },
+          "description": "Filter by archetype ID (0, 1, 2, 3 or -1 for unassigned)"
+        }
+      ],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/MapCommunityPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "points"
+        ],
+        "title": "MapCommunitiesResponse",
+        "description": "Geo-data payload for all or filtered communities."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/maps/communities",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/maps/communities\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "geospatial_and_maps"
+    },
+    {
+      "method": "POST",
+      "path": "/api/models/predict",
+      "tag": "Models & Inference",
+      "purpose": "Generate village preparedness tier prediction and boundary case analysis",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "area_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Id",
+            "description": "Optional Census PC11 ID, SHRID, or village name to extract registered feature vector.",
+            "examples": [
+              "Sasihithlu",
+              "603256",
+              "Tallur"
+            ]
+          },
+          "features": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Features",
+            "description": "Optional raw 26-feature dictionary. If omitted, features are loaded from registered area_id."
+          }
+        },
+        "type": "object",
+        "title": "ModelPredictionRequest",
+        "description": "Input payload for surrogate model tier inference."
+      },
+      "response_schema": {
+        "properties": {
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "area_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Id"
+          },
+          "village_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village Name"
+          },
+          "district_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Name"
+          },
+          "predicted_tier": {
+            "type": "string",
+            "title": "Predicted Tier"
+          },
+          "probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Probabilities"
+          },
+          "confidence_score": {
+            "type": "number",
+            "title": "Confidence Score"
+          },
+          "is_boundary_case": {
+            "type": "boolean",
+            "title": "Is Boundary Case"
+          },
+          "boundary_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary Reason"
+          },
+          "deterministic_ahp_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deterministic Ahp Tier"
+          },
+          "deterministic_ahp_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deterministic Ahp Score"
+          },
+          "ahp_agreement": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahp Agreement"
+          },
+          "operational_precedence_note": {
+            "type": "string",
+            "title": "Operational Precedence Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_name",
+          "model_version",
+          "predicted_tier",
+          "probabilities",
+          "confidence_score",
+          "is_boundary_case",
+          "operational_precedence_note"
+        ],
+        "title": "ModelPredictionResponse",
+        "description": "Calibrated village preparedness tier prediction and boundary analysis."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/models/predict \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"area_id\": \"608691\"}'",
+      "example_response": "{\n  \"model_identifier\": \"village-preparedness-classifier\",\n  \"artifact_version\": \"v1.0.0\",\n  \"predicted_preparedness_tier\": \"High\",\n  \"surrogate_probabilities\": {\n    \"High\": 0.892,\n    \"Medium\": 0.104,\n    \"Low\": 0.004\n  },\n  \"methodology_note\": \"Surrogate model outputs represent empirical approximations of AHP preparedness tiers, NOT physical hazard probabilities.\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "model_inference"
+    },
+    {
+      "method": "GET",
+      "path": "/api/models/registry",
+      "tag": "Models & Inference",
+      "purpose": "List all models registered in the local Git-compatible registry",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "registry_version": {
+            "type": "string",
+            "title": "Registry Version"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/ModelRegistryItem"
+            },
+            "type": "array",
+            "title": "Models"
+          },
+          "artifact_verification_status": {
+            "type": "string",
+            "title": "Artifact Verification Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "registry_version",
+          "models",
+          "artifact_verification_status"
+        ],
+        "title": "ModelRegistryResponse",
+        "description": "Catalog of registered models and active versions."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/models/registry",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/models/registry\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "model_registry"
+    },
+    {
+      "method": "GET",
+      "path": "/api/models/registry/{model_id}",
+      "tag": "Models & Inference",
+      "purpose": "Retrieve detailed metadata and schema for a registered model",
+      "path_parameters": [
+        {
+          "name": "model_id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "title": "Model Id"
+          },
+          "description": ""
+        }
+      ],
+      "query_parameters": [
+        {
+          "name": "version",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional version (defaults to active production)",
+            "title": "Version"
+          },
+          "description": "Optional version (defaults to active production)"
+        }
+      ],
+      "request_body_schema": null,
+      "response_schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Response Get Registered Model Details Api Models Registry  Model Id  Get"
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/models/registry/{model_id}",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/models/registry/{model_id}\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "model_registry"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/compare",
+      "tag": "Policy Simulation",
+      "purpose": "Compare baseline and counterfactual policy scenarios",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "scenario_a_name": {
+            "type": "string",
+            "title": "Scenario A Name",
+            "default": "Scenario A (e.g. Equal Weights)"
+          },
+          "scenario_a_weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "scenario_b_name": {
+            "type": "string",
+            "title": "Scenario B Name",
+            "default": "Scenario B (e.g. Hazard Focused)"
+          },
+          "scenario_b_weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "top_divergent_count": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Top Divergent Count",
+            "description": "Number of top rank-shifting units to report",
+            "default": 15
+          }
+        },
+        "type": "object",
+        "title": "ScenarioComparisonRequest",
+        "description": "Request payload to compare rankings between two weighting scenarios."
+      },
+      "response_schema": {
+        "properties": {
+          "scenario_a_name": {
+            "type": "string",
+            "title": "Scenario A Name"
+          },
+          "scenario_b_name": {
+            "type": "string",
+            "title": "Scenario B Name"
+          },
+          "spearman_rank_correlation": {
+            "type": "number",
+            "title": "Spearman Rank Correlation"
+          },
+          "kendall_tau_correlation": {
+            "type": "number",
+            "title": "Kendall Tau Correlation"
+          },
+          "mean_absolute_rank_shift": {
+            "type": "number",
+            "title": "Mean Absolute Rank Shift"
+          },
+          "max_rank_shift": {
+            "type": "integer",
+            "title": "Max Rank Shift"
+          },
+          "top_divergent_units": {
+            "items": {
+              "$ref": "#/components/schemas/RankDivergenceItem"
+            },
+            "type": "array",
+            "title": "Top Divergent Units"
+          },
+          "methodological_note": {
+            "type": "string",
+            "title": "Methodological Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_a_name",
+          "scenario_b_name",
+          "spearman_rank_correlation",
+          "kendall_tau_correlation",
+          "mean_absolute_rank_shift",
+          "max_rank_shift",
+          "top_divergent_units",
+          "methodological_note"
+        ],
+        "title": "ScenarioComparisonResponse",
+        "description": "Response payload comparing two prioritization scenarios."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/simulation/compare \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/simulation/compare\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "infrastructure_and_interventions"
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulation/prioritize",
+      "tag": "Policy Simulation",
+      "purpose": "Compute MCDA rankings under custom weights",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "scenario_name": {
+            "type": "string",
+            "title": "Scenario Name",
+            "description": "Descriptive scenario name",
+            "default": "custom_scenario"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "top_n": {
+            "type": "integer",
+            "maximum": 622.0,
+            "minimum": 1.0,
+            "title": "Top N",
+            "description": "Number of top units to return",
+            "default": 20
+          },
+          "district_filter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Filter",
+            "description": "Optional filter by district ('Dakshina Kannada' or 'Udupi')"
+          }
+        },
+        "type": "object",
+        "title": "PrioritizationScenarioRequest",
+        "description": "Request payload for custom prioritization weighting scenario."
+      },
+      "response_schema": {
+        "properties": {
+          "scenario_name": {
+            "type": "string",
+            "title": "Scenario Name"
+          },
+          "weights_applied": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Weights Applied"
+          },
+          "include_population_scale": {
+            "type": "boolean",
+            "title": "Include Population Scale"
+          },
+          "total_units_evaluated": {
+            "type": "integer",
+            "title": "Total Units Evaluated"
+          },
+          "score_statistics": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Score Statistics"
+          },
+          "top_units": {
+            "items": {
+              "$ref": "#/components/schemas/UnitSummary"
+            },
+            "type": "array",
+            "title": "Top Units"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_name",
+          "weights_applied",
+          "include_population_scale",
+          "total_units_evaluated",
+          "score_statistics",
+          "top_units",
+          "disclaimer"
+        ],
+        "title": "PrioritizationScenarioResponse",
+        "description": "Response payload for custom prioritization weighting scenario."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/simulation/prioritize \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/simulation/prioritize\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "infrastructure_and_interventions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/archetypes",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Retrieve catalog of all four discovered vulnerability archetypes and intervention guidance",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_archetypes": {
+            "type": "integer",
+            "title": "Total Archetypes"
+          },
+          "archetypes": {
+            "items": {
+              "$ref": "#/components/schemas/ArchetypeSummary"
+            },
+            "type": "array",
+            "title": "Archetypes"
+          },
+          "clustering_methodology": {
+            "type": "string",
+            "title": "Clustering Methodology"
+          },
+          "clustering_disclaimer": {
+            "type": "string",
+            "title": "Clustering Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_archetypes",
+          "archetypes",
+          "clustering_methodology",
+          "clustering_disclaimer"
+        ],
+        "title": "ArchetypeCatalogResponse",
+        "description": "Catalog of all discovered vulnerability archetypes."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/archetypes",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/archetypes\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "vulnerability_clusters"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/assistant/chat",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Conversational decision support assistant with deterministic tool grounding",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Message",
+            "description": "User question or incident command prompt for the assistant.",
+            "examples": [
+              "Why is Tallur classified as Band 4 Adequate despite coastal proximity?",
+              "Compare preparedness between Dakshina Kannada and Udupi.",
+              "What are the recommended interventions for Edmoge?"
+            ]
+          },
+          "conversation_history": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ChatMessage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation History",
+            "description": "Recent conversation history for multi-turn context (maximum 10 turns)."
+          },
+          "community_identifier": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Community Identifier",
+            "description": "Optional Census PC11 ID, SHRID, or village name for contextual focus.",
+            "examples": [
+              "608691",
+              "Tallur",
+              "Edmoge"
+            ]
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature",
+            "description": "Optional sampling temperature override (default 0.0 for deterministic grounding)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ChatRequest",
+        "description": "Request payload for /api/v1/assistant/chat."
+      },
+      "response_schema": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer",
+            "description": "Grounded natural language assessment or advisory memo."
+          },
+          "tools_executed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools Executed",
+            "description": "Names of all tools executed during this conversation turn."
+          },
+          "tool_records": {
+            "items": {
+              "$ref": "#/components/schemas/ToolExecutionRecord"
+            },
+            "type": "array",
+            "title": "Tool Records",
+            "description": "Audit records for all tool executions during this turn."
+          },
+          "structured_evidence": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Structured Evidence",
+            "description": "Structured dictionary of factual evidence extracted from executed tools."
+          },
+          "is_fallback": {
+            "type": "boolean",
+            "title": "Is Fallback",
+            "description": "True if deterministic fallback was activated (e.g. Ollama daemon offline or unconfigured).",
+            "default": false
+          },
+          "fallback_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Reason",
+            "description": "Reason why deterministic fallback was activated if applicable."
+          },
+          "conversation_status": {
+            "$ref": "#/components/schemas/ConversationStatus",
+            "description": "'COMPLETED', 'FALLBACK', or 'ERROR'.",
+            "default": "COMPLETED"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name",
+            "description": "Exact model identifier used for response generation (e.g., 'qwen2.5:0.5b-instruct')."
+          },
+          "total_duration_ms": {
+            "type": "number",
+            "title": "Total Duration Ms",
+            "description": "Total round-trip processing duration in milliseconds."
+          },
+          "scientific_precedence_note": {
+            "type": "string",
+            "title": "Scientific Precedence Note",
+            "description": "Mandatory scientific governance notice reinforcing AHP precedence and Census baseline limitations."
+          }
+        },
+        "type": "object",
+        "required": [
+          "answer",
+          "total_duration_ms",
+          "scientific_precedence_note"
+        ],
+        "title": "ChatResponse",
+        "description": "Response payload returned by the conversational decision support engine."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/v1/assistant/chat \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/v1/assistant/chat\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decision-support/summary",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Retrieve regional summary of priority bands, trigger counts, and model concordance",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_units": {
+            "type": "integer",
+            "title": "Total Units",
+            "description": "Total administrative units in regional coverage",
+            "default": 1879
+          },
+          "band_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Band Counts",
+            "description": "Count of units per priority band"
+          },
+          "district_band_breakdown": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "District Band Breakdown",
+            "description": "Priority bands by district"
+          },
+          "model_agreement_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Model Agreement Counts",
+            "description": "FULL_AGREEMENT vs BORDERLINE_DISAGREEMENT"
+          },
+          "provenance_agreement": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provenance Agreement",
+            "description": "Agreement metrics separated by train (in-sample) vs validation/test (out-of-sample) splits"
+          },
+          "uttara_kannada_trigger_breakdown": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Uttara Kannada Trigger Breakdown",
+            "description": "Trigger counts for unassigned UK units"
+          },
+          "methodological_disclaimer": {
+            "type": "string",
+            "title": "Methodological Disclaimer",
+            "description": "Methodological disclaimer on advisory planning nature"
+          }
+        },
+        "type": "object",
+        "required": [
+          "band_counts",
+          "district_band_breakdown",
+          "model_agreement_counts",
+          "uttara_kannada_trigger_breakdown",
+          "methodological_disclaimer"
+        ],
+        "title": "RegionalDecisionSummaryResponse",
+        "description": "Regional summary of operational priority bands, trigger counts, and model agreement."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/decision-support/summary",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/decision-support/summary\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decision-support/units",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Retrieve paginated decision evaluations with optional district and priority band filtering",
+      "path_parameters": [],
+      "query_parameters": [
+        {
+          "name": "district",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')",
+            "examples": [
+              "Uttara Kannada",
+              "Dakshina Kannada",
+              "Udupi"
+            ],
+            "title": "District"
+          },
+          "description": "Optional filter by district ('Dakshina Kannada', 'Udupi', 'Uttara Kannada')"
+        },
+        {
+          "name": "priority_band",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional filter by priority band ('BAND_1_CRITICAL', 'BAND_2_SPECIALIZED', 'BAND_3_MODERATE', 'BAND_4_ADEQUATE')",
+            "examples": [
+              "BAND_1_CRITICAL",
+              "BAND_2_SPECIALIZED"
+            ],
+            "title": "Priority Band"
+          },
+          "description": "Optional filter by priority band ('BAND_1_CRITICAL', 'BAND_2_SPECIALIZED', 'BAND_3_MODERATE', 'BAND_4_ADEQUATE')"
+        },
+        {
+          "name": "limit",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "maximum": 1879,
+            "minimum": 1,
+            "description": "Maximum number of units to return per page",
+            "default": 50,
+            "title": "Limit"
+          },
+          "description": "Maximum number of units to return per page"
+        },
+        {
+          "name": "offset",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Offset index for pagination",
+            "default": 0,
+            "title": "Offset"
+          },
+          "description": "Offset index for pagination"
+        }
+      ],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "total_evaluated": {
+            "type": "integer",
+            "title": "Total Evaluated",
+            "description": "Total units evaluated in dataset (1,879)"
+          },
+          "total_matching": {
+            "type": "integer",
+            "title": "Total Matching",
+            "description": "Total units matching query filters"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit",
+            "description": "Page size limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset",
+            "description": "Offset index"
+          },
+          "units": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionSupportEvaluation"
+            },
+            "type": "array",
+            "title": "Units",
+            "description": "Matching evaluated units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_evaluated",
+          "total_matching",
+          "limit",
+          "offset",
+          "units"
+        ],
+        "title": "DecisionEvaluationListResponse",
+        "description": "Paginated list of decision-support evaluations."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/decision-support/units",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/decision-support/units\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decision-support/units/{identifier}",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Retrieve full decision-support evaluation and grounded advisories for an administrative unit",
+      "path_parameters": [
+        {
+          "name": "identifier",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Census PC11 ID (e.g. '608720'), SHRID (e.g. '11-29-569-05522-608720'), or village name",
+            "examples": [
+              "608720",
+              "Tallur",
+              "Bappalgundi"
+            ],
+            "title": "Identifier"
+          },
+          "description": "Census PC11 ID (e.g. '608720'), SHRID (e.g. '11-29-569-05522-608720'), or village name"
+        }
+      ],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "shrid2": {
+            "type": "string",
+            "title": "Shrid2",
+            "description": "Canonical SHRUG primary identifier"
+          },
+          "pc11_id": {
+            "type": "string",
+            "title": "Pc11 Id",
+            "description": "Census of India 2011 identifier"
+          },
+          "village_name": {
+            "type": "string",
+            "title": "Village Name",
+            "description": "Official revenue village or town name"
+          },
+          "district_name": {
+            "type": "string",
+            "title": "District Name",
+            "description": "Dakshina Kannada, Udupi, or Uttara Kannada"
+          },
+          "subdistrict_name": {
+            "type": "string",
+            "title": "Subdistrict Name",
+            "description": "Taluk / Subdistrict name"
+          },
+          "unit_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Type",
+            "description": "VILLAGE, TOWN, or None (1,257 nulls in UK)"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat",
+            "description": "Representative point latitude (WGS84)"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon",
+            "description": "Representative point longitude (WGS84)"
+          },
+          "preparedness_score": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Preparedness Score",
+            "description": "Deterministic AHP index [0.0 - 100.0]"
+          },
+          "preparedness_tier": {
+            "type": "string",
+            "title": "Preparedness Tier",
+            "description": "Deterministic AHP baseline tier: Low, Medium, or High"
+          },
+          "domain_scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Domain Scores",
+            "description": "AHP standardized domain scores: score_medical, score_shelters, score_infrastructure, score_early_warning, score_socioeconomic"
+          },
+          "predicted_preparedness_tier": {
+            "type": "string",
+            "title": "Predicted Preparedness Tier",
+            "description": "Model-predicted tier (Logistic Regression)"
+          },
+          "class_probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Class Probabilities",
+            "description": "Uncalibrated probabilities: prob_low, prob_medium, prob_high"
+          },
+          "max_class_probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.3333,
+            "title": "Max Class Probability",
+            "description": "Highest class probability"
+          },
+          "probability_margin": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability Margin",
+            "description": "Margin: highest minus second-highest class"
+          },
+          "prediction_provenance": {
+            "type": "string",
+            "title": "Prediction Provenance",
+            "description": "Data split: TRAIN_IN_SAMPLE (1,315), VAL_OUT_OF_SAMPLE (282), or TEST_OUT_OF_SAMPLE (282)"
+          },
+          "model_agreement_status": {
+            "type": "string",
+            "title": "Model Agreement Status",
+            "description": "FULL_AGREEMENT (1,792) or BORDERLINE_DISAGREEMENT (87)"
+          },
+          "is_boundary_case": {
+            "type": "boolean",
+            "title": "Is Boundary Case",
+            "description": "True if probability_margin < 0.10 or max_class_probability < 0.60 (provisional flag)"
+          },
+          "vulnerability_archetype_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vulnerability Archetype Id",
+            "description": "0, 1, 2, 3, or None (1,257 nulls in UK)"
+          },
+          "vulnerability_archetype_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vulnerability Archetype Label",
+            "description": "Archetype label or None (1,257 nulls in UK)"
+          },
+          "cluster_assignment_status": {
+            "type": "string",
+            "title": "Cluster Assignment Status",
+            "description": "'ASSIGNED' (DK & Udupi, N=622) or 'UNASSIGNED_OUT_OF_STUDY_AREA' (UK, N=1,257)"
+          },
+          "provisional_priority_band": {
+            "type": "string",
+            "title": "Provisional Priority Band",
+            "description": "BAND_1_CRITICAL, BAND_2_SPECIALIZED, BAND_3_MODERATE, or BAND_4_ADEQUATE"
+          },
+          "band_rank": {
+            "type": "integer",
+            "maximum": 1879.0,
+            "minimum": 1.0,
+            "title": "Band Rank",
+            "description": "Within-band deterministic rank (1 = highest priority)"
+          },
+          "overall_priority_rank": {
+            "type": "integer",
+            "maximum": 1879.0,
+            "minimum": 1.0,
+            "title": "Overall Priority Rank",
+            "description": "Overall deterministic priority rank (1 = highest intervention priority)"
+          },
+          "priority_explanation": {
+            "type": "string",
+            "title": "Priority Explanation",
+            "description": "Transparent textual synthesis of priority factors"
+          },
+          "recommended_advisories": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionItem"
+            },
+            "type": "array",
+            "title": "Recommended Advisories",
+            "description": "List of evidence-grounded advisories"
+          },
+          "has_unverified_indicators": {
+            "type": "boolean",
+            "title": "Has Unverified Indicators",
+            "description": "True if any required indicator was null/missing",
+            "default": false
+          },
+          "advisory_disclaimer": {
+            "type": "string",
+            "title": "Advisory Disclaimer",
+            "description": "Advisory disclaimer reinforcing decision-support nature of recommendations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shrid2",
+          "pc11_id",
+          "village_name",
+          "district_name",
+          "subdistrict_name",
+          "lat",
+          "lon",
+          "preparedness_score",
+          "preparedness_tier",
+          "domain_scores",
+          "predicted_preparedness_tier",
+          "class_probabilities",
+          "max_class_probability",
+          "probability_margin",
+          "prediction_provenance",
+          "model_agreement_status",
+          "is_boundary_case",
+          "cluster_assignment_status",
+          "provisional_priority_band",
+          "band_rank",
+          "overall_priority_rank",
+          "priority_explanation",
+          "recommended_advisories",
+          "advisory_disclaimer"
+        ],
+        "title": "DecisionSupportEvaluation",
+        "description": "Complete decision-support evaluation for an administrative unit."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/decision-support/units/{identifier}",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/decision-support/units/{identifier}\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/model/health",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Check registered model health, active artifact version, and schema integrity",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Model service health state",
+            "default": "healthy"
+          },
+          "model_loaded": {
+            "type": "boolean",
+            "title": "Model Loaded",
+            "description": "Whether the registered model container is active"
+          },
+          "artifact_name": {
+            "type": "string",
+            "title": "Artifact Name",
+            "description": "Registered W&B artifact name"
+          },
+          "artifact_version": {
+            "type": "string",
+            "title": "Artifact Version",
+            "description": "Exact active artifact version or alias"
+          },
+          "artifact_source": {
+            "type": "string",
+            "title": "Artifact Source",
+            "description": "Qualified artifact source identifier"
+          },
+          "features_count": {
+            "type": "integer",
+            "title": "Features Count",
+            "description": "Expected feature vector dimension",
+            "default": 26
+          },
+          "feature_schema_status": {
+            "type": "string",
+            "title": "Feature Schema Status",
+            "description": "Validation status of the 26 canonical features"
+          },
+          "target_classes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Classes",
+            "description": "Target preparedness classes: High, Low, Medium"
+          },
+          "model_provenance": {
+            "type": "string",
+            "title": "Model Provenance",
+            "description": "Lineage and reconstruction provenance"
+          },
+          "target_nature": {
+            "type": "string",
+            "title": "Target Nature",
+            "description": "Operational nature of target",
+            "default": "AHP_CAPACITY_TIER_SURROGATE"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_loaded",
+          "artifact_name",
+          "artifact_version",
+          "artifact_source",
+          "feature_schema_status",
+          "target_classes",
+          "model_provenance"
+        ],
+        "title": "ModelHealthResponse",
+        "description": "Status and metadata of the active registered W&B model artifact."
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/model/health",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/model/health\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/model/predict",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Generate village preparedness tier prediction using registered model",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "area_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Id",
+            "description": "Area identifier (SHRID, PC11 ID, or village name) to load from unified dataset",
+            "examples": [
+              "11-29-575-05562-617533",
+              "617533",
+              "Panjikal"
+            ]
+          },
+          "features": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Features",
+            "description": "Direct dictionary of feature values (either 26 canonical features or raw indicators for engineering)"
+          }
+        },
+        "type": "object",
+        "title": "ModelPredictionRequest",
+        "description": "Request payload for model inference."
+      },
+      "response_schema": {
+        "properties": {
+          "area_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Id",
+            "description": "Queried or resolved area identifier"
+          },
+          "village_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Village Name",
+            "description": "Village name if resolved"
+          },
+          "district_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Name",
+            "description": "District name if resolved"
+          },
+          "predicted_preparedness_tier": {
+            "type": "string",
+            "title": "Predicted Preparedness Tier",
+            "description": "Model-predicted tier: High, Low, or Medium"
+          },
+          "class_probabilities": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Class Probabilities",
+            "description": "Calibrated tier probabilities strictly summing to 1.0 (prob_high, prob_low, prob_medium)"
+          },
+          "probability_margin": {
+            "type": "number",
+            "title": "Probability Margin",
+            "description": "Margin: highest minus second-highest class probability"
+          },
+          "max_probability": {
+            "type": "number",
+            "title": "Max Probability",
+            "description": "Maximum class probability"
+          },
+          "is_boundary_case": {
+            "type": "boolean",
+            "title": "Is Boundary Case",
+            "description": "True if margin < 0.10 or max_probability < 0.60"
+          },
+          "deterministic_ahp_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deterministic Ahp Tier",
+            "description": "Authoritative baseline AHP tier if known"
+          },
+          "deterministic_ahp_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deterministic Ahp Score",
+            "description": "Authoritative baseline AHP score if known"
+          },
+          "ahp_agreement_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahp Agreement Status",
+            "description": "FULL_AGREEMENT (model tier == AHP tier) or BORDERLINE_DISAGREEMENT (model tier != AHP tier)"
+          },
+          "ahp_precedence_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ahp Precedence Note",
+            "description": "Operational precedence note reinforcing that deterministic AHP classification cannot be downgraded"
+          },
+          "model_artifact_name": {
+            "type": "string",
+            "title": "Model Artifact Name",
+            "description": "Registered W&B model artifact name"
+          },
+          "model_artifact_version": {
+            "type": "string",
+            "title": "Model Artifact Version",
+            "description": "Active W&B artifact version or alias"
+          },
+          "model_provenance": {
+            "type": "string",
+            "title": "Model Provenance",
+            "description": "Model lineage and provenance statement"
+          },
+          "target_nature": {
+            "type": "string",
+            "title": "Target Nature",
+            "description": "Operational nature of prediction target",
+            "default": "AHP_CAPACITY_TIER_SURROGATE"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer",
+            "description": "Mandatory operational disclaimer clarifying surrogate capacity nature"
+          }
+        },
+        "type": "object",
+        "required": [
+          "predicted_preparedness_tier",
+          "class_probabilities",
+          "probability_margin",
+          "max_probability",
+          "is_boundary_case",
+          "model_artifact_name",
+          "model_artifact_version",
+          "model_provenance",
+          "disclaimer"
+        ],
+        "title": "ModelPredictionResponse",
+        "description": "Calibrated model prediction and diagnostic response payload."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/v1/model/predict \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/v1/model/predict\"\n}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "model_inference"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/prioritization/compare",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Compare rankings between two weighting scenarios and analyze rank divergence",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "scenario_a_name": {
+            "type": "string",
+            "title": "Scenario A Name",
+            "default": "Scenario A (e.g. Equal Weights)"
+          },
+          "scenario_a_weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "scenario_b_name": {
+            "type": "string",
+            "title": "Scenario B Name",
+            "default": "Scenario B (e.g. Hazard Focused)"
+          },
+          "scenario_b_weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "top_divergent_count": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Top Divergent Count",
+            "description": "Number of top rank-shifting units to report",
+            "default": 15
+          }
+        },
+        "type": "object",
+        "title": "ScenarioComparisonRequest",
+        "description": "Request payload to compare rankings between two weighting scenarios."
+      },
+      "response_schema": {
+        "properties": {
+          "scenario_a_name": {
+            "type": "string",
+            "title": "Scenario A Name"
+          },
+          "scenario_b_name": {
+            "type": "string",
+            "title": "Scenario B Name"
+          },
+          "spearman_rank_correlation": {
+            "type": "number",
+            "title": "Spearman Rank Correlation"
+          },
+          "kendall_tau_correlation": {
+            "type": "number",
+            "title": "Kendall Tau Correlation"
+          },
+          "mean_absolute_rank_shift": {
+            "type": "number",
+            "title": "Mean Absolute Rank Shift"
+          },
+          "max_rank_shift": {
+            "type": "integer",
+            "title": "Max Rank Shift"
+          },
+          "top_divergent_units": {
+            "items": {
+              "$ref": "#/components/schemas/RankDivergenceItem"
+            },
+            "type": "array",
+            "title": "Top Divergent Units"
+          },
+          "methodological_note": {
+            "type": "string",
+            "title": "Methodological Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_a_name",
+          "scenario_b_name",
+          "spearman_rank_correlation",
+          "kendall_tau_correlation",
+          "mean_absolute_rank_shift",
+          "max_rank_shift",
+          "top_divergent_units",
+          "methodological_note"
+        ],
+        "title": "ScenarioComparisonResponse",
+        "description": "Response payload comparing two prioritization scenarios."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/v1/prioritization/compare \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/v1/prioritization/compare\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/prioritization/scenario",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Compute priority scores and deterministic rankings under custom weights",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": {
+        "properties": {
+          "scenario_name": {
+            "type": "string",
+            "title": "Scenario Name",
+            "description": "Descriptive scenario name",
+            "default": "custom_scenario"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/WeightConfiguration"
+          },
+          "top_n": {
+            "type": "integer",
+            "maximum": 622.0,
+            "minimum": 1.0,
+            "title": "Top N",
+            "description": "Number of top units to return",
+            "default": 20
+          },
+          "district_filter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Filter",
+            "description": "Optional filter by district ('Dakshina Kannada' or 'Udupi')"
+          }
+        },
+        "type": "object",
+        "title": "PrioritizationScenarioRequest",
+        "description": "Request payload for custom prioritization weighting scenario."
+      },
+      "response_schema": {
+        "properties": {
+          "scenario_name": {
+            "type": "string",
+            "title": "Scenario Name"
+          },
+          "weights_applied": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Weights Applied"
+          },
+          "include_population_scale": {
+            "type": "boolean",
+            "title": "Include Population Scale"
+          },
+          "total_units_evaluated": {
+            "type": "integer",
+            "title": "Total Units Evaluated"
+          },
+          "score_statistics": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Score Statistics"
+          },
+          "top_units": {
+            "items": {
+              "$ref": "#/components/schemas/UnitSummary"
+            },
+            "type": "array",
+            "title": "Top Units"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario_name",
+          "weights_applied",
+          "include_population_scale",
+          "total_units_evaluated",
+          "score_statistics",
+          "top_units",
+          "disclaimer"
+        ],
+        "title": "PrioritizationScenarioResponse",
+        "description": "Response payload for custom prioritization weighting scenario."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -X POST http://localhost:8000/api/v1/prioritization/scenario \\\n  -H \"Content-Type: application/json\" \\\n  -d '{}'",
+      "example_response": "{\n  \"status\": \"success\",\n  \"path\": \"/api/v1/prioritization/scenario\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/search",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Search administrative units by name, Census ID, or SHRID",
+      "path_parameters": [],
+      "query_parameters": [
+        {
+          "name": "query",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Search term matching village/town name, Census PC11 ID, or SHRID",
+            "examples": [
+              "Tallur",
+              "608720",
+              "11-29-569"
+            ],
+            "title": "Query"
+          },
+          "description": "Search term matching village/town name, Census PC11 ID, or SHRID"
+        },
+        {
+          "name": "district",
+          "required": false,
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional filter by district name ('Dakshina Kannada' or 'Udupi')",
+            "examples": [
+              "Udupi",
+              "Dakshina Kannada"
+            ],
+            "title": "District"
+          },
+          "description": "Optional filter by district name ('Dakshina Kannada' or 'Udupi')"
+        },
+        {
+          "name": "limit",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 1,
+            "description": "Maximum number of matching units to return",
+            "default": 15,
+            "title": "Limit"
+          },
+          "description": "Maximum number of matching units to return"
+        }
+      ],
+      "request_body_schema": null,
+      "response_schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/UnitSummary"
+        },
+        "title": "Response Search Units Api V1 Units Search Get"
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/units/search",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/units/search\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/units/{identifier}",
+      "tag": "Legacy Compatibility (v1)",
+      "purpose": "Retrieve granular indicators, dimension scores, and archetype guidance for a unit",
+      "path_parameters": [
+        {
+          "name": "identifier",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Census 2011 PC11 ID (e.g. '608720'), SHRID (e.g. '11-29-569-05522-608720'), or exact unit name",
+            "examples": [
+              "608720",
+              "Tallur"
+            ],
+            "title": "Identifier"
+          },
+          "description": "Census 2011 PC11 ID (e.g. '608720'), SHRID (e.g. '11-29-569-05522-608720'), or exact unit name"
+        }
+      ],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "properties": {
+          "shrid2": {
+            "type": "string",
+            "title": "Shrid2"
+          },
+          "pc11_id": {
+            "type": "string",
+            "title": "Pc11 Id"
+          },
+          "unit_name": {
+            "type": "string",
+            "title": "Unit Name"
+          },
+          "unit_type": {
+            "type": "string",
+            "title": "Unit Type"
+          },
+          "district_name": {
+            "type": "string",
+            "title": "District Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "dimension_scores": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Dimension Scores",
+            "description": "Four independent normalized dimension scores (healthcare, demographic, infrastructure, coastal)"
+          },
+          "raw_indicators": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Raw Indicators",
+            "description": "Raw physical indicators (distances in km, population counts, facility names)"
+          },
+          "priority_score": {
+            "type": "number",
+            "title": "Priority Score"
+          },
+          "priority_rank": {
+            "type": "integer",
+            "title": "Priority Rank"
+          },
+          "archetype": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Archetype",
+            "description": "Archetype assignment, descriptive profile, and recommended intervention guidance"
+          },
+          "provenance_and_limitations": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Provenance And Limitations",
+            "description": "Vintages (Census 2011, MoHFW 2015-19, NE 10m 2022) and explicit operational caveats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "shrid2",
+          "pc11_id",
+          "unit_name",
+          "unit_type",
+          "district_name",
+          "latitude",
+          "longitude",
+          "dimension_scores",
+          "raw_indicators",
+          "priority_score",
+          "priority_rank",
+          "archetype",
+          "provenance_and_limitations"
+        ],
+        "title": "UnitDetailResponse",
+        "description": "Granular inspection record for a single administrative unit."
+      },
+      "status_codes": [
+        200,
+        422
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/api/v1/units/{identifier}",
+      "example_response": "{\n  \"status\": \"success\",\n  \"endpoint\": \"/api/v1/units/{identifier}\"\n}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "legacy_v1"
+    },
+    {
+      "method": "GET",
+      "path": "/docs",
+      "tag": "Documentation",
+      "purpose": "Interactive Swagger UI for endpoint exploration and testing.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "text/html",
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl http://localhost:8000/docs",
+      "example_response": "<!DOCTYPE html><html><head><title>Swagger UI</title>...",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "tag": "Health & Status",
+      "purpose": "Direct system health, dataset readiness, and model status",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "object",
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl -s http://localhost:8000/health",
+      "example_response": "{\n  \"status\": \"healthy\",\n  \"dataset_loaded\": true,\n  \"total_units\": 1879,\n  \"total_villages\": 1845,\n  \"total_census_towns\": 34,\n  \"districts\": [\n    \"Dakshina Kannada\",\n    \"Udupi\",\n    \"Uttara Kannada\"\n  ],\n  \"archetypes_count\": 4,\n  \"version\": \"2.0.0\",\n  \"model_loaded\": true,\n  \"model_artifact_name\": \"village-preparedness-classifier\",\n  \"model_artifact_version\": \"v1.0.0\",\n  \"model_feature_schema_status\": \"VALID_26_FEATURES\",\n  \"model_provenance\": \"REPRODUCIBLE RECONSTRUCTION (70/15/15 experiment)\"\n}",
+      "used_by_frontend": true,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "tag": "Observability",
+      "purpose": "Prometheus operational metrics exposition endpoint with bounded cardinality.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "text/plain (Prometheus exposition format)",
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl http://localhost:8000/metrics",
+      "example_response": "# HELP http_requests_total Total HTTP requests\n# TYPE http_requests_total counter\nhttp_requests_total{endpoint=\"/health\",method=\"GET\",status=\"200\"} 12",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "tag": "Documentation",
+      "purpose": "Machine-readable OpenAPI 3.1 specification for tooling and client generation.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "application/json (OpenAPI 3.1.0)",
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl http://localhost:8000/openapi.json",
+      "example_response": "{\"openapi\": \"3.1.0\", \"info\": {\"title\": \"Cyclone Preparedness Decision Intelligence API\"}}",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/ready",
+      "tag": "Health & Status",
+      "purpose": "Root readiness probe for container orchestration confirming dataset and surrogate model are loaded.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "ready": {
+            "type": "boolean"
+          },
+          "dataset_loaded": {
+            "type": "boolean"
+          },
+          "model_loaded": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl http://localhost:8000/ready",
+      "example_response": "{\"ready\": true, \"dataset_loaded\": true, \"model_loaded\": true, \"version\": \"2.0.0\"}",
+      "used_by_frontend": false,
+      "internal_only": true,
+      "group": "health_and_readiness"
+    },
+    {
+      "method": "GET",
+      "path": "/redoc",
+      "tag": "Documentation",
+      "purpose": "ReDoc responsive documentation browser.",
+      "path_parameters": [],
+      "query_parameters": [],
+      "request_body_schema": null,
+      "response_schema": "text/html",
+      "status_codes": [
+        200
+      ],
+      "authentication_required": false,
+      "example_request": "curl http://localhost:8000/redoc",
+      "example_response": "<!DOCTYPE html><html><head><title>ReDoc</title>...",
+      "used_by_frontend": false,
+      "internal_only": false,
+      "group": "health_and_readiness"
+    }
+  ]
+}

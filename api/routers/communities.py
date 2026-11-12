@@ -81,6 +81,12 @@ def list_communities(
 
     items = []
     for _, row in page_df.iterrows():
+        raw_unit_type = row.get("unit_type")
+        unit_type = (
+            "VILLAGE"
+            if pd.isna(raw_unit_type) or str(raw_unit_type).strip().lower() in ("nan", "none", "")
+            else str(raw_unit_type).strip()
+        )
         items.append(
             CommunityListItem(
                 area_id=str(row["area_id"]),
@@ -89,7 +95,7 @@ def list_communities(
                 village_name=str(row["village_name"]),
                 district_name=str(row["district_name"]),
                 subdistrict_name=str(row["subdistrict_name"]) if pd.notna(row.get("subdistrict_name")) else None,
-                unit_type=str(row.get("unit_type", "VILLAGE")),
+                unit_type=unit_type,
                 lat=round(float(row["lat"]), 6),
                 lon=round(float(row["lon"]), 6),
                 preparedness_score=round(float(row["preparedness_score"]), 2),
@@ -174,6 +180,13 @@ def get_community_detail(
         ),
     }
 
+    raw_unit_type = row.get("unit_type")
+    unit_type = (
+        "VILLAGE"
+        if pd.isna(raw_unit_type) or str(raw_unit_type).strip().lower() in ("nan", "none", "")
+        else str(raw_unit_type).strip()
+    )
+
     return CommunityDetailResponse(
         area_id=str(row["area_id"]),
         pc11_id=str(row["pc11_id"]),
@@ -181,7 +194,7 @@ def get_community_detail(
         village_name=str(row["village_name"]),
         district_name=str(row["district_name"]),
         subdistrict_name=str(row["subdistrict_name"]) if pd.notna(row.get("subdistrict_name")) else None,
-        unit_type=str(row.get("unit_type", "VILLAGE")),
+        unit_type=unit_type,
         lat=round(float(row["lat"]), 6),
         lon=round(float(row["lon"]), 6),
         preparedness_score=round(float(row["preparedness_score"]), 2),

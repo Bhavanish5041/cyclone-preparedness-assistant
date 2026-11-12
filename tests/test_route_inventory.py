@@ -36,7 +36,10 @@ def client() -> TestClient:
 
 @pytest.fixture(scope="module")
 def inventory_data():
-    """Load the generated API inventory JSON file."""
+    """Load the generated API inventory JSON file (auto-generating if missing)."""
+    if not INVENTORY_PATH.is_file():
+        from scripts.generate_api_documentation import generate_inventory
+        generate_inventory()
     assert INVENTORY_PATH.is_file(), f"Missing API inventory file at {INVENTORY_PATH}"
     with open(INVENTORY_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -44,7 +47,10 @@ def inventory_data():
 
 @pytest.fixture(scope="module")
 def markdown_content():
-    """Load the generated Markdown API reference file."""
+    """Load the generated Markdown API reference file (auto-generating if missing)."""
+    if not MARKDOWN_PATH.is_file():
+        from scripts.generate_api_documentation import generate_inventory
+        generate_inventory()
     assert MARKDOWN_PATH.is_file(), f"Missing API reference file at {MARKDOWN_PATH}"
     with open(MARKDOWN_PATH, "r", encoding="utf-8") as f:
         return f.read()

@@ -6,6 +6,7 @@ from api.routers.communities import router as communities_router
 from api.routers.dashboard import router as dashboard_router
 from api.routers.districts import router as districts_router
 from api.routers.health import router as health_router
+from api.routers.legacy_v1 import router as legacy_v1_router
 from api.routers.maps import router as maps_router
 from api.routers.models import router as models_router
 from api.routers.simulation import router as simulation_router
@@ -17,6 +18,7 @@ __all__ = [
     "dashboard_router",
     "districts_router",
     "health_router",
+    "legacy_v1_router",
     "maps_router",
     "models_router",
     "simulation_router",

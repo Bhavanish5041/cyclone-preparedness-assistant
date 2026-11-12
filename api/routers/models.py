@@ -68,7 +68,7 @@ def predict_model_tier(
             X_aligned = engineer_inference_features(request.features)
         except ValueError as err:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Feature validation failed: {err}",
             )
 
@@ -104,13 +104,13 @@ def predict_model_tier(
             X_aligned = engineer_inference_features(row.to_dict())
         except ValueError as err:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Feature engineering failed for record: {err}",
             )
 
     else:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Request must provide either 'area_id' (village name or Census PC11 ID) or a 'features' dictionary.",
         )
 

@@ -51,7 +51,7 @@ cyclone-preparedness-assistant/
 │   │   ├── maps.py                 # Folium & Leaflet map builders
 │   │   ├── theme.py                # CSS styles and HTML UI helpers
 │   │   ├── llm/                    # Conversational AI orchestration
-│   │   │   ├── client.py           # OpenRouter & Gemini HTTP clients
+│   │   │   ├── client.py           # Local Ollama HTTP client (Qwen 2.5)
 │   │   │   ├── history.py          # Message history compaction & management
 │   │   │   ├── orchestrator.py     # Multi-turn tool execution orchestrator
 │   │   │   ├── prompts.py          # System instructions & response templates
@@ -159,7 +159,7 @@ Centralized registry containing 7 deterministic analytical tools:
 | **Scenario Analysis** (`scenario_analysis.py`) | - MCDA weight customization sliders (Health, Demo, Infra, Coast)<br>- Population scale toggle<br>- Dynamic re-ranking & distribution statistics<br>- Baseline vs Simulated policy comparison<br>- Spearman rank correlation & rank shift metrics<br>- Rank displacement scatter plot | **District & Policy Intelligence** (`/districts`, `/policy-simulator`) |
 | **Vulnerability Archetypes** (`archetypes.py`) | - 4 K-Means cluster deep-dive cards<br>- 622 DK/Udupi assigned vs 1,257 UK fallback accounting<br>- Radar / multi-bar dimension deficit comparison<br>- Intervention guidance by archetype | **Analytics & Model Intelligence** (`/analytics`) |
 | **Reports and Export** (`reports.py`) | - Regional executive summary dossier<br>- Priority action lists exportable to CSV/JSON<br>- District briefing profiles<br>- Single community printable dossier | **Reports & Export** (`/reports`) |
-| **Cyclone Assistant** (`chat_assistant.py`) | - Multi-turn conversational interface<br>- Suggested inquiry prompts<br>- Live tool execution telemetry (timing, inputs, status)<br>- Authoritative ground truth reconciliation block<br>- Provider status indicator (Gemini / OpenRouter / Deterministic Fallback) | **CycloneLM Assistant** (`/assistant`) |
+| **Cyclone Assistant** (`chat_assistant.py`) | - Multi-turn conversational interface<br>- Suggested inquiry prompts<br>- Live tool execution telemetry (timing, inputs, status)<br>- Authoritative ground truth reconciliation block<br>- Provider status indicator (Qwen / Deterministic Fallback) | **CycloneLM Assistant** (`/assistant`) |
 | **AI Readiness** (`ai_readiness.py`) | - Architectural specification and RAG blueprint<br>- Governance guardrails distinguishing generation from calculation | Integrated into Assistant and Architecture docs |
 
 ---

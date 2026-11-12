@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { DashboardPage } from '../pages/DashboardPage';
 import { DistrictsPage } from '../pages/DistrictsPage';
 import { AssistantPage } from '../pages/AssistantPage';
+import { CommunitiesPage } from '../pages/CommunitiesPage';
 import * as api from '../services/api';
 
 const createTestQueryClient = () =>
@@ -127,5 +128,89 @@ describe('Page Integration Tests', () => {
       screen.getByText('Explain why Tallur has its current priority classification.')
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Ask an operational/)).toBeInTheDocument();
+  });
+
+  it('renders CommunitiesPage with authoritative community records and filters', async () => {
+    vi.spyOn(api, 'fetchCommunities').mockResolvedValueOnce({
+      total: 1879,
+      page: 1,
+      limit: 20,
+      total_pages: 94,
+      items: [
+        {
+          area_id: '608678',
+          pc11_id: '608678',
+          shrid2: '11-29-569-00000-608678',
+          village_name: 'Tallur',
+          district_name: 'Udupi',
+          subdistrict_name: 'Kundapura',
+          unit_type: 'VILLAGE',
+          lat: 13.6358,
+          lon: 74.7089,
+          preparedness_score: 65.4,
+          preparedness_tier: 'High',
+          priority_band: 'BAND_4_ADEQUATE',
+          priority_rank: 1800,
+          band_rank: 500,
+          vulnerability_archetype_id: 3,
+          vulnerability_archetype_label: 'Low Vulnerability / High Preparedness',
+          population: 3450,
+          dist_coast_km: 4.2,
+          dist_nearest_shelter_km: 1.8,
+          dist_nearest_hospital_km: 5.1,
+        },
+      ],
+    });
+
+    render(
+      <QueryClientProvider client={createTestQueryClient()}>
+        <BrowserRouter>
+          <CommunitiesPage />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+
+    expect(await screen.findByText('Tallur')).toBeInTheDocument();
+    expect(screen.getByText('Community Explorer')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Search by community name/)).toBeInTheDocument();
+    expect(screen.getByText('1,879')).toBeInTheDocument();
+  });
+
+  it('renders CommunitiesPage empty state when no matching communities', async () => {
+    vi.spyOn(api, 'fetchCommunities').mockResolvedValueOnce({
+      total: 0,
+      page: 1,
+      limit: 20,
+      total_pages: 1,
+      items: [],
+    });
+
+    render(
+      <QueryClientProvider client={createTestQueryClient()}>
+        <BrowserRouter>
+          <CommunitiesPage />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+
+    expect(await screen.findByText('No communities match your criteria')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Try modifying search query, district filter/)
+    ).toBeInTheDocument();
+  });
+
+  it('renders CommunitiesPage error state when API fails with Failed to fetch', async () => {
+    vi.spyOn(api, 'fetchCommunities').mockRejectedValueOnce(new Error('Failed to fetch'));
+
+    render(
+      <QueryClientProvider client={createTestQueryClient()}>
+        <BrowserRouter>
+          <CommunitiesPage />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+
+    expect(await screen.findByText('Error loading community table')).toBeInTheDocument();
+    expect(screen.getByText('Failed to fetch')).toBeInTheDocument();
   });
 });

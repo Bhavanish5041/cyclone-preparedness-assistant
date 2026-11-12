@@ -42,9 +42,9 @@ The migration decouples the presentation layer from the analytical core:
 | `ALLOWED_ORIGINS` | Optional | `http://localhost:5173,http://localhost:3000` | Comma-separated CORS origins |
 | `WANDB_MODEL_ARTIFACT` | Optional | `village-preparedness-classifier:v0` | Artifact identifier for W&B model |
 | `WANDB_CACHE_DIR` | Optional | `.wandb_artifacts_cache` | Local directory for cached model artifacts |
-| `GEMINI_API_KEY` | Optional | `""` | Google Gemini API key for conversational AI |
-| `OPENROUTER_API_KEY` | Optional | `""` | OpenRouter API key for Nemotron / alternative LLMs |
-| `CYCLONELM_API_URL` | Optional | `""` | Future endpoint for dedicated CycloneLM inference |
+| `LLM_PROVIDER` | Optional | `ollama` | Production conversational AI provider |
+| `OLLAMA_BASE_URL` | Optional | `http://127.0.0.1:11434` | Endpoint for local Ollama daemon (Qwen 2.5) |
+| `OLLAMA_MODEL` | Optional | `qwen2.5:0.5b-instruct` | Local model identifier |
 
 ### Frontend (`frontend/`)
 | Variable | Required | Default | Description |

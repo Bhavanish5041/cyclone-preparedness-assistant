@@ -68,7 +68,7 @@ def run_clustering_tracking(
     gdf = gpd.read_parquet(input_parquet)
 
     # 1. Feature extraction
-    X_scaled, _ = extract_clustering_features(gdf, standardize=True)
+    X_scaled, scaler = extract_clustering_features(gdf, standardize=True)
 
     # 2. Benchmark grid
     experiment_records = []

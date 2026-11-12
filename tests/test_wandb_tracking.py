@@ -412,3 +412,53 @@ def test_log_clustering_experiments_offline_artifacts(tmp_path: Path):
     assert (model_dir / "kmeans_k4_model.joblib").exists()
     assert (model_dir / "kmeans_metadata.json").exists()
     assert manifest_path.exists()
+
+
+def test_run_clustering_tracking_scaler_pipeline(tmp_path: Path):
+    """Regression test: verify run_clustering_tracking extracts fitted scaler and passes it to log_clustering_experiments."""
+    import geopandas as gpd
+    from shapely.geometry import Point
+    from sklearn.preprocessing import StandardScaler
+    from scripts.run_wandb_tracking import run_clustering_tracking
+    from src.models.clustering import CLUSTERING_DIMENSION_COLUMNS
+
+    parquet_path = tmp_path / "baseline_clustering_input.parquet"
+    manifest_path = tmp_path / "manifest.json"
+    n_samples = 30
+    synth_data = {col: [0.05 * (i % 15) for i in range(n_samples)] for col in CLUSTERING_DIMENSION_COLUMNS}
+    synth_data["district_name"] = ["Dakshina Kannada"] * (n_samples // 2) + ["Udupi"] * (n_samples - n_samples // 2)
+    gdf = gpd.GeoDataFrame(synth_data, geometry=[Point(74.8, 13.0) for _ in range(n_samples)])
+    gdf.to_parquet(parquet_path)
+
+    with patch("scripts.run_wandb_tracking.log_clustering_experiments") as mock_log_clustering:
+        mock_log_clustering.return_value = {"status": "success", "artifact_name": "coastal-vulnerability-kmeans"}
+        res = run_clustering_tracking(
+            input_parquet=parquet_path,
+            project_name="cyclone-test-wandb",
+            entity="test-entity",
+            mode="disabled",
+            manifest_path=manifest_path,
+        )
+
+        assert mock_log_clustering.called
+        kwargs = mock_log_clustering.call_args[1]
+
+        # Verify scaler was passed and correctly fitted
+        assert "scaler" in kwargs
+        scaler = kwargs["scaler"]
+        assert isinstance(scaler, StandardScaler)
+        assert hasattr(scaler, "mean_")
+        assert len(scaler.mean_) == len(CLUSTERING_DIMENSION_COLUMNS)
+
+        # Verify model was passed and matches k=4
+        assert "model" in kwargs
+        model = kwargs["model"]
+        assert hasattr(model, "cluster_centers_")
+        assert model.n_clusters == 4
+        assert model.cluster_centers_.shape[1] == len(CLUSTERING_DIMENSION_COLUMNS)
+
+        # Verify scaled feature matrix matches dimensions
+        assert "X_scaled" in kwargs
+        assert kwargs["X_scaled"].shape == (n_samples, len(CLUSTERING_DIMENSION_COLUMNS))
+        assert res["status"] == "success"
+

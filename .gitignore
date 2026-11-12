@@ -47,6 +47,7 @@ dist/
 !models/label_encoder.joblib
 !models/render_artifact/*.joblib
 !models/cyclonelm/v0.8/intent/*.joblib
+!models/kmeans_*.joblib
 
 # Local logs, scratch, backups, and Colab exports
 logs/

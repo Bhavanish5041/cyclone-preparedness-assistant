@@ -12,11 +12,16 @@ import logging
 from pathlib import Path
 import sys
 
+# Ensure repository root and src/ are in sys.path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+for path_entry in [str(PROJECT_ROOT), str(PROJECT_ROOT / "src")]:
+    if path_entry not in sys.path:
+        sys.path.insert(0, path_entry)
+
 from src.models.clustering import train_kmeans_model
 from src.models.quality_checks import QualityGateRunner
 from src.models.registry.local_registry import LocalModelRegistry
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
 COASTAL_PATH = PROJECT_ROOT / "data" / "processed" / "coastal_prioritization_baseline.parquet"
 MODELS_DIR = PROJECT_ROOT / "models"
 

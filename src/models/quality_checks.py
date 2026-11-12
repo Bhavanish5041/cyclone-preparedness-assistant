@@ -49,8 +49,12 @@ from sklearn.metrics import (
     silhouette_score,
 )
 
-# Project paths
+# Project paths and module search path configuration
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+for path_entry in [str(PROJECT_ROOT), str(PROJECT_ROOT / "src")]:
+    if path_entry not in sys.path:
+        sys.path.insert(0, path_entry)
+
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "configs" / "model_quality_gates.json"
 DEFAULT_REPORT_JSON = PROJECT_ROOT / "reports" / "model_quality_gate_report.json"
 DEFAULT_REPORT_MD = PROJECT_ROOT / "reports" / "model_quality_gate_summary.md"

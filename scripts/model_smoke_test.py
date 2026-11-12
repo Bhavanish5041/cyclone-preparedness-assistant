@@ -24,6 +24,9 @@ import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+for path_entry in [str(PROJECT_ROOT), str(PROJECT_ROOT / "src")]:
+    if path_entry not in sys.path:
+        sys.path.insert(0, path_entry)
 LR_MODEL_PATH = PROJECT_ROOT / "models" / "logistic_regression_tier.joblib"
 LR_ENCODER_PATH = PROJECT_ROOT / "models" / "label_encoder.joblib"
 LR_META_PATH = PROJECT_ROOT / "models" / "logistic_regression_metadata.json"

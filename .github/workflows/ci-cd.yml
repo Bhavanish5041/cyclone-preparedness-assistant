@@ -14,6 +14,9 @@ on:
 permissions:
   contents: read
 
+env:
+  PYTHONPATH: .
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -161,6 +164,8 @@ jobs:
           cp -r models/render_artifact/. "$CACHE_DEST"/
 
       - name: Run Central Model Risk & Quality Gates Verification
+        env:
+          PYTHONPATH: .
         run: |
           python src/models/quality_checks.py \
             --config configs/model_quality_gates.json \

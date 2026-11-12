@@ -66,6 +66,31 @@ def test_ci_workflow_top_level_metadata(ci_workflow_data):
     assert "master" in triggers["pull_request"]["branches"]
 
 
+def test_stage_1_installs_pyyaml_before_validation(ci_workflow_data):
+    """Verify Stage 1 installs pyyaml validation dependencies before YAML syntax validation."""
+    assert (PROJECT_ROOT / "requirements-ci.txt").is_file(), "requirements-ci.txt must exist"
+    reqs = (PROJECT_ROOT / "requirements-ci.txt").read_text(encoding="utf-8")
+    assert "pyyaml" in reqs.lower(), "requirements-ci.txt must contain pyyaml"
+
+    stage1 = ci_workflow_data["jobs"]["stage-1-repo-config-validation"]
+    steps = stage1.get("steps", [])
+
+    install_idx = None
+    validate_idx = None
+    for i, step in enumerate(steps):
+        run_cmd = step.get("run", "")
+        if "requirements-ci.txt" in run_cmd or ("pip install" in run_cmd and "pyyaml" in run_cmd):
+            install_idx = i
+        if "import yaml" in run_cmd:
+            validate_idx = i
+
+    assert install_idx is not None, "Stage 1 must have an installation step for CI validation dependencies"
+    assert validate_idx is not None, "Stage 1 must have a YAML syntax validation step"
+    assert install_idx < validate_idx, (
+        f"Validation dependencies install step (index {install_idx}) must precede YAML validation (index {validate_idx})"
+    )
+
+
 def test_ci_workflow_10_stages_and_dependencies(ci_workflow_data):
     """Verify all 10 pipeline stages and their strict dependency ordering."""
     jobs = ci_workflow_data.get("jobs", {})

@@ -1,3 +1,4 @@
 # Pinned CI Stage 1 Validation Dependencies
 # Lightweight dependency set for fast configuration and syntax validation
 pyyaml==6.0.3
+flake8==7.5.0

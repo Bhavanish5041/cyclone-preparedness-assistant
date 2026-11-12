@@ -17,7 +17,12 @@ import pandas as pd
 import pytest
 
 from src.features.prioritization import DEFAULT_SCENARIOS
-from src.models.clustering import log_clustering_experiments_wandb
+from src.models.clustering import (
+    compute_archetype_profiles,
+    extract_clustering_features,
+    fit_and_evaluate_clustering,
+    log_clustering_experiments_wandb,
+)
 from src.tracking.wandb_logger import (
     is_wandb_authenticated,
     log_clustering_experiments,
@@ -275,3 +280,135 @@ def test_log_clustering_experiments_wandb_backward_compatibility():
                     mode="online",
                 )
                 assert res_online is True
+
+
+def test_log_clustering_experiments_with_artifacts_and_visualizations_mocked(tmp_path: Path):
+    """Verify full end-to-end W&B logging with artifact packaging, PCA projections, and population tables."""
+    # Synthetic dataset
+    np.random.seed(42)
+    n = 40
+    dummy_df = pd.DataFrame(
+        {
+            "shrid2": [f"shrid_{i}" for i in range(n)],
+            "pc11_id": [f"pc11_{i}" for i in range(n)],
+            "unit_name": [f"Village_{i}" for i in range(n)],
+            "district_name": ["Dakshina Kannada" if i % 2 == 0 else "Udupi" for i in range(n)],
+            "dim_healthcare_deficit": np.random.uniform(0.1, 0.9, n),
+            "dim_demographic_vulnerability": np.random.uniform(0.1, 0.8, n),
+            "dim_infrastructure_deficit": np.random.uniform(0.2, 0.9, n),
+            "dim_coastal_exposure": np.random.uniform(0.0, 1.0, n),
+            "total_population": [1200 + i * 50 for i in range(n)],
+            "sc_population": [50 + i * 2 for i in range(n)],
+            "st_population": [20 + i for i in range(n)],
+            "sc_st_ratio": [0.10 + i * 0.005 for i in range(n)],
+        }
+    )
+
+    X_scaled, scaler = extract_clustering_features(dummy_df, standardize=True)
+    labels, metrics, model = fit_and_evaluate_clustering(X_scaled, algorithm="kmeans", n_clusters=4, random_state=42)
+    dummy_df["vulnerability_archetype_id"] = labels
+    dummy_df["vulnerability_archetype_label"] = [f"Cluster {c}" for c in labels]
+
+    profiles_df = compute_archetype_profiles(dummy_df, labels)
+    sample_experiments = [
+        {
+            "algorithm": "kmeans",
+            "n_clusters": 4,
+            "random_state": 42,
+            "silhouette": metrics.silhouette,
+            "davies_bouldin": metrics.davies_bouldin,
+            "calinski_harabasz": metrics.calinski_harabasz,
+            "inertia": metrics.inertia,
+            "cluster_sizes": metrics.cluster_sizes,
+            "cluster_balance_ratio": metrics.cluster_balance_ratio,
+        }
+    ]
+
+    mock_run = MagicMock()
+    mock_run.id = "mock_kmeans_run_999"
+    mock_run.url = "https://wandb.ai/mock/project/runs/mock_kmeans_run_999"
+
+    mock_artifact = MagicMock()
+    mock_artifact.version = "v1"
+    mock_artifact.url = "https://wandb.ai/mock/project/artifacts/model/coastal-vulnerability-kmeans/v1"
+    mock_run.log_artifact.return_value = mock_artifact
+
+    figures_dir = tmp_path / "figures"
+    model_dir = tmp_path / "models"
+    manifest_path = tmp_path / "test_manifest.json"
+
+    with patch("wandb.init", return_value=mock_run) as mock_init:
+        with patch("wandb.Table") as mock_table:
+            with patch("wandb.Image") as mock_image:
+                with patch("wandb.Artifact") as mock_artifact_cls:
+                    res = log_clustering_experiments(
+                        experiments_data=sample_experiments,
+                        archetype_profiles_df=profiles_df,
+                        project_name="cyclone-test-project",
+                        mode="online",
+                        fallback_json_path=manifest_path,
+                        model=model,
+                        scaler=scaler,
+                        X_scaled=X_scaled,
+                        df=dummy_df,
+                        figures_dir=figures_dir,
+                        model_dir=model_dir,
+                        artifact_name="coastal-vulnerability-kmeans",
+                    )
+
+                    assert res["status"] == "online"
+                    assert res["synced"] is True
+                    assert res["artifact_name"] == "coastal-vulnerability-kmeans"
+                    assert res["artifact_version"] == "v1"
+
+                    # Check artifact was staged and logged
+                    mock_artifact_cls.assert_called_once()
+                    assert mock_artifact_cls.call_args[1]["name"] == "coastal-vulnerability-kmeans"
+                    assert mock_artifact_cls.call_args[1]["type"] == "model"
+                    mock_run.log_artifact.assert_called_once()
+
+                    # Check cluster assignments table logged
+                    table_logged_keys = [call[0][0] for call in mock_run.log.call_args_list if isinstance(call[0][0], dict)]
+                    all_keys = set().union(*table_logged_keys)
+                    assert "cluster_assignments_table" in all_keys
+                    assert "discovered_archetypes_table" in all_keys
+
+                    # Check local files were saved
+                    assert (model_dir / "kmeans_k4_model.joblib").exists()
+                    assert (model_dir / "kmeans_scaler.joblib").exists()
+                    assert (model_dir / "kmeans_metadata.json").exists()
+
+                    # Check figures generated
+                    assert (figures_dir / "kmeans_k4_pca_projection.png").exists()
+                    assert (figures_dir / "kmeans_k4_cluster_distribution.png").exists()
+
+
+def test_log_clustering_experiments_offline_artifacts(tmp_path: Path):
+    """Verify that offline mode saves local artifacts and manifest without making network calls."""
+    from sklearn.preprocessing import StandardScaler
+
+    X = np.random.randn(20, 4)
+    labels, metrics, model = fit_and_evaluate_clustering(X, algorithm="kmeans", n_clusters=4, random_state=42)
+    scaler = StandardScaler().fit(X)
+    df_mini = pd.DataFrame(X, columns=[f"dim_{i}" for i in range(4)])
+    df_mini["district_name"] = ["Dakshina Kannada"] * 20
+    profiles = compute_archetype_profiles(df_mini, labels, dimension_cols=[f"dim_{i}" for i in range(4)])
+
+    model_dir = tmp_path / "models_offline"
+    manifest_path = tmp_path / "manifest.json"
+
+    res = log_clustering_experiments(
+        experiments_data=[{"algorithm": "kmeans", "n_clusters": 4}],
+        archetype_profiles_df=profiles,
+        mode="offline",
+        fallback_json_path=manifest_path,
+        model=model,
+        scaler=scaler,
+        model_dir=model_dir,
+    )
+
+    assert res["status"] == "offline"
+    assert res["synced"] is False
+    assert (model_dir / "kmeans_k4_model.joblib").exists()
+    assert (model_dir / "kmeans_metadata.json").exists()
+    assert manifest_path.exists()

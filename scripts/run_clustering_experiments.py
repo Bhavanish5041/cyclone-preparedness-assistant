@@ -183,12 +183,32 @@ def main() -> None:
         entity=args.wandb_entity,
         mode=effective_wandb_mode,
         fallback_json_path=args.experiments_json,
+        model=kmeans_models[selected_k][2],
+        scaler=scaler,
+        X_scaled=X_scaled,
+        df=enriched_gdf,
     )
 
     # 8. Save Enriched Output Datasets
-    args.output_parquet.parent.mkdir(parents=True, exist_ok=True)
-    enriched_gdf.to_parquet(args.output_parquet)
-    logger.info(f"Saved {len(enriched_gdf)} archetype-labeled records to {args.output_parquet}")
+    # Avoid rewriting if existing assignments match to preserve registered model artifact SHA256
+    should_write_parquet = True
+    if args.output_parquet.exists():
+        try:
+            existing_df = gpd.read_parquet(args.output_parquet)
+            if "vulnerability_archetype_id" in existing_df.columns and np.array_equal(
+                existing_df["vulnerability_archetype_id"].to_numpy(), final_labels
+            ):
+                should_write_parquet = False
+                logger.info(
+                    f"Existing {args.output_parquet} cluster assignments match; preserving registered artifact SHA256."
+                )
+        except Exception:
+            should_write_parquet = True
+
+    if should_write_parquet:
+        args.output_parquet.parent.mkdir(parents=True, exist_ok=True)
+        enriched_gdf.to_parquet(args.output_parquet)
+        logger.info(f"Saved {len(enriched_gdf)} archetype-labeled records to {args.output_parquet}")
 
     if args.output_csv is not None:
         args.output_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -237,6 +257,10 @@ def main() -> None:
     print(f"Total Runs Logged: {wandb_res.get('run_count', 0)}")
     if wandb_res.get("summary_run_url"):
         print(f"Summary Workspace URL: {wandb_res['summary_run_url']}")
+    if wandb_res.get("artifact_name"):
+        print(f"Registered Artifact: {wandb_res['artifact_name']} ({wandb_res.get('artifact_version', 'latest')})")
+        if wandb_res.get("artifact_url"):
+            print(f"Artifact URL: {wandb_res['artifact_url']}")
     for r in wandb_res.get("runs", []):
         if r.get("url"):
             print(f"  - {r['name']}: {r['url']}")

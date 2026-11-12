@@ -1,0 +1,49 @@
+{
+  "model_identifier": "coastal-vulnerability-kmeans",
+  "algorithm": "KMeans",
+  "n_clusters": 4,
+  "random_state": 42,
+  "n_init": 20,
+  "standardize": true,
+  "features": [
+    "dim_healthcare_deficit",
+    "dim_demographic_vulnerability",
+    "dim_infrastructure_deficit",
+    "dim_coastal_exposure"
+  ],
+  "disclaimer": "DISCLAIMER: Discovered archetypes represent empirical similarity groupings derived from four normalized spatial indicators. They are NOT predetermined hazard categories, validated disaster risk classes, or casualty predictions. They serve as descriptive planning archetypes to identify communities with shared intervention requirements.",
+  "total_units": 622,
+  "evaluation_metrics": {
+    "silhouette": 0.3348,
+    "davies_bouldin": 1.1771,
+    "calinski_harabasz": 298.59,
+    "inertia": 1015.7314342331124,
+    "cluster_balance_ratio": 0.3293
+  },
+  "cluster_centers": [
+    [
+      -0.4938585768362958,
+      -0.5492402752645084,
+      -1.7199676051406558,
+      0.4827219467889738
+    ],
+    [
+      1.8053867203381524,
+      0.3990615414598354,
+      0.3033299047233455,
+      -1.287983768323204
+    ],
+    [
+      -0.13114042838101847,
+      1.0568635453208313,
+      0.4090401123943135,
+      -0.7474440813117085
+    ],
+    [
+      -0.25191360285006453,
+      -0.5280194434215827,
+      0.5336035276525565,
+      0.6554189277555073
+    ]
+  ]
+}

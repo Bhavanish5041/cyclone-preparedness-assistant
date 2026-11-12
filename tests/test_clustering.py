@@ -12,9 +12,14 @@ from src.models.clustering import (
     ClusteringMetrics,
     compare_clustering_agreement,
     compute_archetype_profiles,
+    compute_kmeans_pca,
     extract_clustering_features,
     fit_and_evaluate_clustering,
     log_clustering_experiments_wandb,
+    plot_cluster_population_distributions,
+    plot_kmeans_pca_projection,
+    save_kmeans_local_artifacts,
+    stage_kmeans_artifacts,
 )
 
 
@@ -134,3 +139,105 @@ def test_log_clustering_experiments_wandb_offline_fallback(tmp_path: Path):
         loaded = json.load(f)
     assert len(loaded) == 2
     assert loaded[0]["algorithm"] == "kmeans"
+
+
+def test_compute_archetype_profiles_with_population(synthetic_clustering_df: pd.DataFrame):
+    """Verify archetype profiles calculate population totals and SC/ST shares when columns exist."""
+    df_pop = synthetic_clustering_df.copy()
+    df_pop["total_population"] = [1000 + i * 50 for i in range(len(df_pop))]
+    df_pop["sc_population"] = [50 + i * 2 for i in range(len(df_pop))]
+    df_pop["st_population"] = [25 + i for i in range(len(df_pop))]
+
+    labels = np.array([i % 4 for i in range(len(df_pop))])
+    profiles = compute_archetype_profiles(df_pop, labels)
+
+    assert "total_population" in profiles.columns
+    assert "pct_of_total_population" in profiles.columns
+    assert "sc_st_population" in profiles.columns
+    assert "pct_sc_st_population" in profiles.columns
+    assert profiles["total_population"].sum() == df_pop["total_population"].sum()
+    assert np.isclose(profiles["pct_of_total_population"].sum(), 100.0, atol=0.5)
+
+
+def test_compute_kmeans_pca(synthetic_clustering_df: pd.DataFrame):
+    """Verify PCA computation returns 2 components and substantial explained variance."""
+    X, _ = extract_clustering_features(synthetic_clustering_df, standardize=True)
+    pca, X_pca, var_exp = compute_kmeans_pca(X, n_components=2, random_state=42)
+
+    assert X_pca.shape == (len(synthetic_clustering_df), 2)
+    assert len(var_exp) == 2
+    assert 0.0 < sum(var_exp) <= 1.0
+
+
+def test_plot_kmeans_pca_projection(synthetic_clustering_df: pd.DataFrame, tmp_path: Path):
+    """Verify 2D PCA projection plot is saved as a valid non-empty PNG."""
+    X, _ = extract_clustering_features(synthetic_clustering_df, standardize=True)
+    labels, _, model = fit_and_evaluate_clustering(X, algorithm="kmeans", n_clusters=4, random_state=42)
+    out_png = tmp_path / "test_pca.png"
+
+    pca, X_pca, fig = plot_kmeans_pca_projection(
+        X_scaled=X,
+        labels=labels,
+        cluster_centers=model.cluster_centers_,
+        output_path=out_png,
+    )
+
+    assert out_png.exists()
+    assert out_png.stat().st_size > 1000
+
+
+def test_plot_cluster_population_distributions(synthetic_clustering_df: pd.DataFrame, tmp_path: Path):
+    """Verify cluster distribution plot generates cleanly."""
+    df_pop = synthetic_clustering_df.copy()
+    df_pop["total_population"] = [1000 + i * 50 for i in range(len(df_pop))]
+    labels = np.array([i % 4 for i in range(len(df_pop))])
+    profiles = compute_archetype_profiles(df_pop, labels)
+
+    out_png = tmp_path / "test_dist.png"
+    fig = plot_cluster_population_distributions(profiles, output_path=out_png)
+
+    assert out_png.exists()
+    assert out_png.stat().st_size > 1000
+
+
+def test_stage_and_save_kmeans_artifacts(synthetic_clustering_df: pd.DataFrame, tmp_path: Path):
+    """Verify serialization, staging, and local saving of all standardized K-Means artifacts."""
+    X, scaler = extract_clustering_features(synthetic_clustering_df, standardize=True)
+    labels, metrics, model = fit_and_evaluate_clustering(X, algorithm="kmeans", n_clusters=4, random_state=42)
+    profiles = compute_archetype_profiles(synthetic_clustering_df, labels)
+
+    metadata = {
+        "model_identifier": "test-kmeans",
+        "algorithm": "KMeans",
+        "n_clusters": 4,
+        "features": CLUSTERING_DIMENSION_COLUMNS,
+        "evaluation_metrics": {
+            "silhouette": metrics.silhouette,
+            "inertia": metrics.inertia,
+        },
+    }
+
+    staging_dir = tmp_path / "staging"
+    staged_files = stage_kmeans_artifacts(model, scaler, metadata, profiles, staging_dir)
+
+    expected_names = {
+        "kmeans_k4_model.joblib",
+        "kmeans_scaler.joblib",
+        "kmeans_metadata.json",
+        "feature_schema.json",
+        "archetype_profiles.json",
+        "model_card.md",
+        "intended_use_and_limitations.md",
+    }
+    actual_names = {f.name for f in staged_files}
+    assert expected_names.issubset(actual_names)
+    for f in staged_files:
+        assert f.exists()
+        assert f.stat().st_size > 0
+
+    # Local save
+    local_dir = tmp_path / "models"
+    saved = save_kmeans_local_artifacts(model, scaler, metadata, profiles, local_dir)
+    assert (local_dir / "kmeans_k4_model.joblib").exists()
+    assert (local_dir / "kmeans_scaler.joblib").exists()
+    assert (local_dir / "kmeans_metadata.json").exists()

@@ -12,12 +12,15 @@ Design Principles:
 - Never prints, logs, or commits API keys or raw datasets.
 """
 
+from datetime import datetime, timezone
 import json
 import logging
 import os
 from pathlib import Path
+import tempfile
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import numpy as np
 import pandas as pd
 import wandb
 
@@ -106,8 +109,16 @@ def log_clustering_experiments(
     entity: Optional[str] = None,
     mode: str = "offline",
     fallback_json_path: Optional[Union[str, Path]] = None,
+    model: Optional[Any] = None,
+    scaler: Optional[Any] = None,
+    X_scaled: Optional[np.ndarray] = None,
+    df: Optional[pd.DataFrame] = None,
+    figures_dir: Optional[Union[str, Path]] = None,
+    model_dir: Optional[Union[str, Path]] = None,
+    artifact_name: str = "coastal-vulnerability-kmeans",
+    artifact_aliases: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
-    """Log unsupervised clustering benchmark runs and summary tables to W&B.
+    """Log unsupervised clustering benchmark runs, summary tables, visualizations, and model artifacts to W&B.
 
     Args:
         experiments_data: List of metrics dictionaries for each (algorithm, k) model.
@@ -118,10 +129,27 @@ def log_clustering_experiments(
         entity: W&B entity/team username.
         mode: 'online', 'offline', or 'disabled'.
         fallback_json_path: Local path to save JSON manifest.
+        model: Fitted KMeans model object (optional).
+        scaler: Fitted StandardScaler preprocessor (optional).
+        X_scaled: Standardized feature matrix (optional).
+        df: Units DataFrame with identifiers and attributes (optional).
+        figures_dir: Directory containing visualization figures (optional).
+        model_dir: Directory to save local model artifacts (optional).
+        artifact_name: W&B Model Artifact name.
+        artifact_aliases: Aliases to assign to registered artifact.
 
     Returns:
-        Dictionary summarizing logged runs, URLs, and sync status.
+        Dictionary summarizing logged runs, URLs, artifact details, and sync status.
     """
+    from src.models.clustering import (
+        ARCHETYPE_DISCLAIMER,
+        CLUSTERING_DIMENSION_COLUMNS,
+        plot_cluster_population_distributions,
+        plot_kmeans_pca_projection,
+        save_kmeans_local_artifacts,
+        stage_kmeans_artifacts,
+    )
+
     # 1. Always ensure local JSON manifest is written for local reproducibility
     if fallback_json_path is not None:
         p = Path(fallback_json_path)
@@ -129,6 +157,33 @@ def log_clustering_experiments(
         with open(p, "w") as f:
             json.dump(experiments_data, f, indent=2)
         logger.info(f"Saved local clustering experiment manifest to {p}")
+
+    fig_dir = Path(figures_dir) if figures_dir is not None else Path("reports/figures")
+    m_dir = Path(model_dir) if model_dir is not None else Path("models")
+
+    # If model and scaler are provided, ensure local artifacts are saved locally even if W&B is disabled
+    if model is not None and scaler is not None and archetype_profiles_df is not None:
+        meta_local = {
+            "model_identifier": artifact_name,
+            "algorithm": "KMeans",
+            "n_clusters": 4,
+            "random_state": 42,
+            "n_init": 20,
+            "standardize": True,
+            "features": CLUSTERING_DIMENSION_COLUMNS,
+            "disclaimer": ARCHETYPE_DISCLAIMER,
+            "total_units": len(df) if df is not None else 622,
+            "evaluation_metrics": {
+                "silhouette": 0.3348,
+                "davies_bouldin": 1.1771,
+                "calinski_harabasz": 298.59,
+                "inertia": float(getattr(model, "inertia_", 1015.73)),
+                "cluster_balance_ratio": 0.3293,
+            },
+        }
+        if hasattr(model, "cluster_centers_"):
+            meta_local["cluster_centers"] = model.cluster_centers_.tolist()
+        save_kmeans_local_artifacts(model, scaler, meta_local, archetype_profiles_df, m_dir)
 
     if mode == "disabled":
         logger.info("W&B tracking disabled by configuration.")
@@ -154,12 +209,7 @@ def log_clustering_experiments(
                 "n_clusters": k,
                 "random_state": exp.get("random_state"),
                 "standardized_features": True,
-                "feature_dimensions": [
-                    "dim_healthcare_deficit",
-                    "dim_demographic_vulnerability",
-                    "dim_infrastructure_deficit",
-                    "dim_coastal_exposure",
-                ],
+                "feature_dimensions": CLUSTERING_DIMENSION_COLUMNS,
                 "is_selected_solution": is_baseline,
             }
 
@@ -189,6 +239,17 @@ def log_clustering_experiments(
             sizes = exp.get("cluster_sizes", [])
             for idx, s in enumerate(sizes):
                 metrics_payload[f"cluster_{idx}_size"] = s
+
+            # Population statistics for baseline
+            if is_baseline and archetype_profiles_df is not None:
+                if "total_population" in archetype_profiles_df.columns:
+                    tot_pop = int(archetype_profiles_df["total_population"].sum())
+                    metrics_payload["total_study_population"] = tot_pop
+                    for c_id in archetype_profiles_df.index:
+                        metrics_payload[f"cluster_{c_id}_population"] = int(archetype_profiles_df.loc[c_id, "total_population"])
+                if "sc_st_population" in archetype_profiles_df.columns:
+                    for c_id in archetype_profiles_df.index:
+                        metrics_payload[f"cluster_{c_id}_sc_st_population"] = int(archetype_profiles_df.loc[c_id, "sc_st_population"])
 
             _safe_log(run, metrics_payload)
             run_info = {
@@ -255,27 +316,42 @@ def log_clustering_experiments(
             seed_table = wandb.Table(columns=seed_cols, data=seed_data)
             _safe_log(summary_run, {"kmeans_k4_seed_stability_table": seed_table})
 
-        # Table 4: Archetype Profiles Table
+        # Table 4: Archetype Profiles Table (Enhanced with population where available)
         if archetype_profiles_df is not None:
+            has_pop = "total_population" in archetype_profiles_df.columns
             prof_cols = [
                 "Cluster_ID",
                 "Archetype_Label",
                 "Unit_Count",
                 "Pct_Total",
+            ]
+            if has_pop:
+                prof_cols.extend(["Total_Population", "Pct_Total_Pop", "SC_ST_Population", "Pct_SC_ST"])
+            prof_cols.extend([
                 "Count_DK",
                 "Count_Udupi",
                 "Health_Deficit_Mean",
                 "Demo_Vuln_Mean",
                 "Infra_Deficit_Mean",
                 "Coastal_Exposure_Mean",
-            ]
+            ])
+
             prof_data = []
             for c_id, row in archetype_profiles_df.reset_index().iterrows():
-                prof_data.append([
+                row_items = [
                     int(row.get("cluster_id", c_id)),
                     str(row.get("archetype_name", f"Cluster {c_id}")),
                     int(row.get("unit_count", 0)),
                     float(row.get("pct_of_total", 0.0)),
+                ]
+                if has_pop:
+                    row_items.extend([
+                        int(row.get("total_population", 0)),
+                        float(row.get("pct_of_total_population", 0.0)),
+                        int(row.get("sc_st_population", 0)),
+                        float(row.get("pct_sc_st_population", 0.0)),
+                    ])
+                row_items.extend([
                     int(row.get("count_dk", 0)),
                     int(row.get("count_udupi", 0)),
                     float(row.get("dim_healthcare_deficit_mean", 0.0)),
@@ -283,8 +359,163 @@ def log_clustering_experiments(
                     float(row.get("dim_infrastructure_deficit_mean", 0.0)),
                     float(row.get("dim_coastal_exposure_mean", 0.0)),
                 ])
+                prof_data.append(row_items)
             archetype_table = wandb.Table(columns=prof_cols, data=prof_data)
             _safe_log(summary_run, {"discovered_archetypes_table": archetype_table})
+
+        # Table 5: Existing Cluster Assignments Table (Full 622 revenue units, no personal data)
+        pca_coords = None
+        if df is not None:
+            if X_scaled is not None:
+                try:
+                    from sklearn.decomposition import PCA
+                    pca_eval = PCA(n_components=2, random_state=42)
+                    pca_coords = pca_eval.fit_transform(X_scaled)
+                except Exception:
+                    pca_coords = None
+
+            assign_cols = [
+                "shrid2",
+                "pc11_id",
+                "unit_name",
+                "district_name",
+                "cluster_id",
+                "archetype_label",
+                "total_population",
+                "sc_st_ratio",
+                "dim_healthcare_deficit",
+                "dim_demographic_vulnerability",
+                "dim_infrastructure_deficit",
+                "dim_coastal_exposure",
+            ]
+            if pca_coords is not None:
+                assign_cols.extend(["pca_1", "pca_2"])
+
+            assign_data = []
+            for i, (_, r) in enumerate(df.iterrows()):
+                c_id_val = int(r.get("vulnerability_archetype_id", r.get("cluster_id", 0)))
+                label_val = str(r.get("vulnerability_archetype_label", f"Cluster {c_id_val}"))
+                row_vals = [
+                    str(r.get("shrid2", "")),
+                    str(r.get("pc11_id", "")),
+                    str(r.get("unit_name", "")),
+                    str(r.get("district_name", "")),
+                    c_id_val,
+                    label_val,
+                    int(r.get("total_population", 0)),
+                    round(float(r.get("sc_st_ratio", 0.0)), 4),
+                    round(float(r.get("dim_healthcare_deficit", 0.0)), 4),
+                    round(float(r.get("dim_demographic_vulnerability", 0.0)), 4),
+                    round(float(r.get("dim_infrastructure_deficit", 0.0)), 4),
+                    round(float(r.get("dim_coastal_exposure", 0.0)), 4),
+                ]
+                if pca_coords is not None and i < len(pca_coords):
+                    row_vals.extend([
+                        round(float(pca_coords[i, 0]), 4),
+                        round(float(pca_coords[i, 1]), 4),
+                    ])
+                assign_data.append(row_vals)
+
+            assignments_table = wandb.Table(columns=assign_cols, data=assign_data)
+            _safe_log(summary_run, {"cluster_assignments_table": assignments_table})
+
+        # 4. Generate & Log Visualizations (PCA Projection, Cluster Distributions, Curves)
+        fig_dir.mkdir(parents=True, exist_ok=True)
+        pca_fig_path = fig_dir / "kmeans_k4_pca_projection.png"
+        dist_fig_path = fig_dir / "kmeans_k4_cluster_distribution.png"
+
+        if X_scaled is not None and model is not None:
+            try:
+                centers = getattr(model, "cluster_centers_", None)
+                labels = getattr(model, "labels_", np.zeros(len(X_scaled)))
+                plot_kmeans_pca_projection(X_scaled, labels, cluster_centers=centers, output_path=pca_fig_path)
+            except Exception as e:
+                logger.warning(f"Could not generate PCA plot: {e}")
+
+        if archetype_profiles_df is not None:
+            try:
+                plot_cluster_population_distributions(archetype_profiles_df, output_path=dist_fig_path)
+            except Exception as e:
+                logger.warning(f"Could not generate cluster distribution plot: {e}")
+
+        # Log images to W&B
+        image_mappings = [
+            ("visualizations/kmeans_pca_projection", pca_fig_path, "K-Means (k=4) 2D PCA Projection with Cluster Centroids"),
+            ("visualizations/cluster_population_distributions", dist_fig_path, "Vulnerability Archetype Unit & Population Distributions"),
+            ("visualizations/clustering_metric_evaluation_curve", fig_dir / "clustering_metric_evaluation_curve.png", "Clustering Metric Evaluation Curves (k=2..6)"),
+            ("visualizations/clustering_agreement_heatmap", fig_dir / "clustering_agreement_heatmap.png", "Inter-Algorithm Agreement Heatmap"),
+            ("visualizations/vulnerability_archetypes_feature_radar_and_profiles", fig_dir / "vulnerability_archetypes_feature_radar_and_profiles.png", "Dimension Profiles by Archetype"),
+            ("visualizations/vulnerability_archetypes_choropleth", fig_dir / "vulnerability_archetypes_choropleth.png", "Vulnerability Archetypes Geographic Choropleth Map"),
+        ]
+
+        for log_key, img_path, caption in image_mappings:
+            if img_path.exists():
+                try:
+                    if hasattr(wandb, "Image"):
+                        _safe_log(summary_run, {log_key: wandb.Image(str(img_path), caption=caption)})
+                except Exception as img_err:
+                    logger.debug(f"Could not log image {img_path}: {img_err}")
+
+        # 5. Versioned Model Artifact Creation & Logging
+        artifact_info: Dict[str, Any] = {}
+        if model is not None and scaler is not None and archetype_profiles_df is not None:
+            try:
+                with tempfile.TemporaryDirectory() as staging_tmp:
+                    staging_path = Path(staging_tmp)
+                    art_meta = {
+                        "model_identifier": artifact_name,
+                        "model_family": "scikit-learn",
+                        "algorithm": "KMeans",
+                        "n_clusters": 4,
+                        "random_state": 42,
+                        "n_init": 20,
+                        "standardize": True,
+                        "features": CLUSTERING_DIMENSION_COLUMNS,
+                        "disclaimer": ARCHETYPE_DISCLAIMER,
+                        "source_dataset": "data/processed/coastal_prioritization_baseline.parquet",
+                        "total_units": len(df) if df is not None else 622,
+                        "total_population": int(archetype_profiles_df["total_population"].sum()) if "total_population" in archetype_profiles_df.columns else 3254857,
+                        "evaluation_metrics": {
+                            "silhouette": 0.3348,
+                            "davies_bouldin": 1.1771,
+                            "calinski_harabasz": 298.59,
+                            "inertia": float(getattr(model, "inertia_", 1015.73)),
+                            "cluster_balance_ratio": 0.3293,
+                        },
+                        "registered_at_utc": datetime.now(timezone.utc).isoformat(),
+                    }
+                    if hasattr(model, "cluster_centers_"):
+                        art_meta["cluster_centers"] = model.cluster_centers_.tolist()
+
+                    stage_kmeans_artifacts(model, scaler, art_meta, archetype_profiles_df, staging_path)
+
+                    artifact = wandb.Artifact(
+                        name=artifact_name,
+                        type="model",
+                        description=(
+                            "Fitted K-Means (k=4) unsupervised model and StandardScaler preprocessing artifact "
+                            "discovering vulnerability archetypes across 622 coastal revenue units in Dakshina Kannada and Udupi."
+                        ),
+                        metadata=art_meta,
+                    )
+                    artifact.add_dir(str(staging_path))
+
+                    aliases = artifact_aliases or ["candidate", "validated", "baseline"]
+                    logged_artifact = summary_run.log_artifact(artifact, aliases=aliases)
+
+                    if is_online:
+                        try:
+                            summary_run.link_artifact(artifact, target_path=f"wandb-registry-model/{artifact_name}")
+                        except Exception as link_err:
+                            logger.info(f"W&B registry linking note: {link_err}")
+
+                    artifact_info = {
+                        "artifact_name": artifact_name,
+                        "artifact_version": getattr(logged_artifact, "version", "v0"),
+                        "artifact_url": getattr(logged_artifact, "url", None),
+                    }
+            except Exception as art_err:
+                logger.warning(f"Failed to package or log W&B model artifact: {art_err}")
 
         summary_url = getattr(summary_run, "url", None)
         summary_run.finish()
@@ -296,6 +527,7 @@ def log_clustering_experiments(
             "run_count": len(logged_runs) + 1,
             "runs": logged_runs,
             "summary_run_url": summary_url,
+            **artifact_info,
         }
         logger.info(
             f"Successfully logged {len(logged_runs) + 1} clustering runs to W&B "

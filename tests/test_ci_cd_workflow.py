@@ -246,6 +246,69 @@ def test_cd_workflow_immutable_image_tag_enforcement(cd_workflow_data):
     assert any("sha-" in s for s in step_scripts), "Pre-deployment step must validate sha- tag format"
 
 
+def test_cd_workflow_checkout_ref_no_literal_head(cd_workflow_data):
+    """Regression test: Ensure CD workflow never passes literal 'HEAD' as actions/checkout ref.
+
+    Detects and prevents actions/checkout failures where git attempts to fetch
+    '+refs/heads/HEAD*:refs/remotes/origin/HEAD*'.
+
+    Verifies:
+    - workflow_dispatch default for git_commit_sha is NOT literal 'HEAD'.
+    - image_tag default is independently set to immutable 'sha-1221e7c'.
+    - Production deployment remains protected by the production-release-gate approval gate.
+    - No actions/checkout step in manual-deploy.yml passes literal 'HEAD' or raw unvalidated input.
+    - All checkout steps use a safe resolved ref (target_commit or github.sha).
+    - Pre-deployment verification step safely resolves empty or 'HEAD' input to ${{ github.sha }}.
+    """
+    triggers = cd_workflow_data.get("on") or cd_workflow_data.get(True, {})
+    inputs = triggers.get("workflow_dispatch", {}).get("inputs", {})
+
+    # 1. Verify git_commit_sha default is not 'HEAD'
+    commit_input = inputs.get("git_commit_sha", {})
+    assert commit_input.get("default") != "HEAD", "git_commit_sha default must not be literal 'HEAD'"
+
+    # 2. Verify image_tag default is sha-1221e7c
+    image_tag_input = inputs.get("image_tag", {})
+    assert image_tag_input.get("default") == "sha-1221e7c", (
+        f"image_tag default must be 'sha-1221e7c', found '{image_tag_input.get('default')}'"
+    )
+
+    jobs = cd_workflow_data.get("jobs", {})
+
+    # 3. Verify deploy-to-laptop depends on production-release-gate approval
+    deploy_job = jobs.get("deploy-to-laptop", {})
+    deploy_needs = deploy_job.get("needs", [])
+    if isinstance(deploy_needs, str):
+        deploy_needs = [deploy_needs]
+    assert "production-release-gate" in deploy_needs, (
+        "deploy-to-laptop must depend on production-release-gate approval gate"
+    )
+
+    # 4. Check all checkout steps across all jobs
+    for job_id, job in jobs.items():
+        steps = job.get("steps", [])
+        for step in steps:
+            uses = step.get("uses", "")
+            if "actions/checkout" in uses:
+                with_params = step.get("with", {})
+                ref = with_params.get("ref", "")
+                assert ref != "HEAD", f"Job '{job_id}' passes literal 'HEAD' to actions/checkout"
+                assert ref != "${{ github.event.inputs.git_commit_sha }}", (
+                    f"Job '{job_id}' directly passes unvalidated github.event.inputs.git_commit_sha to actions/checkout"
+                )
+                if ref:
+                    assert "github.sha" in ref or "target_commit" in ref, (
+                        f"Job '{job_id}' checkout ref '{ref}' must reference github.sha or target_commit"
+                    )
+
+    # 5. Verify pre-deployment verification job resolves HEAD/empty commit to github.sha
+    verify_job = jobs.get("pre-deployment-verification", {})
+    step_scripts = [step.get("run", "") for step in verify_job.get("steps", [])]
+    assert any("github.sha" in s and ("HEAD" in s or "head" in s) for s in step_scripts), (
+        "Pre-deployment verification must have step resolving HEAD to ${{ github.sha }}"
+    )
+
+
 def test_docker_compose_config_validation():
     """Verify local docker-compose.yml and docker-compose.test.yml pass validation cleanly."""
     res = subprocess.run(

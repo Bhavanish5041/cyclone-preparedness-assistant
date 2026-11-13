@@ -21,4 +21,5 @@ data/interim/
 data/cyclonelm/
 models/cyclonelm/
 frontend/node_modules/
+frontend/dist/
 .DS_Store

@@ -1,15 +1,35 @@
 # ==============================================================================
-# React + Vite Frontend Production Container
+# React + Vite Frontend Production Container (Multi-Stage Build)
 # Cyclone Preparedness Decision Support System
 # ==============================================================================
 
+# ------------------------------------------------------------------------------
+# Stage 1: Build React SPA
+# ------------------------------------------------------------------------------
+FROM node:22-alpine AS builder
+
+WORKDIR /app/frontend
+
+# Install dependencies using lockfile and .npmrc
+COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
+RUN npm ci
+
+# Copy frontend source code and configuration
+COPY frontend/ ./
+
+# Build production assets (emits to /app/frontend/dist)
+RUN npm run build
+
+# ------------------------------------------------------------------------------
+# Stage 2: Production Nginx Server
+# ------------------------------------------------------------------------------
 FROM nginx:alpine
 
 LABEL maintainer="Cyclone Preparedness Team"
 LABEL description="Nginx web server and reverse proxy for React SPA"
 
-# Copy pre-built production frontend assets
-COPY frontend/dist /usr/share/nginx/html
+# Copy built production frontend assets from builder stage
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
 # Copy container-optimized Nginx reverse proxy configuration
 COPY deployment/nginx/nginx.container.conf /etc/nginx/nginx.conf

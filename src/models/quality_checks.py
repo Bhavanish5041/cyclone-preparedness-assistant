@@ -51,9 +51,20 @@ from sklearn.metrics import (
 
 # Project paths and module search path configuration
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-for path_entry in [str(PROJECT_ROOT), str(PROJECT_ROOT / "src")]:
-    if path_entry not in sys.path:
-        sys.path.insert(0, path_entry)
+root_str = str(PROJECT_ROOT)
+src_str = str(PROJECT_ROOT / "src")
+
+# Guarantee repository root is at index 0 of sys.path
+while root_str in sys.path:
+    sys.path.remove(root_str)
+sys.path.insert(0, root_str)
+
+# Ensure src/ is NOT in sys.path to prevent src/api from shadowing root api package
+while src_str in sys.path:
+    sys.path.remove(src_str)
+
+# Ensure current working directory is repository root for relative data paths
+os.chdir(PROJECT_ROOT)
 
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "configs" / "model_quality_gates.json"
 DEFAULT_REPORT_JSON = PROJECT_ROOT / "reports" / "model_quality_gate_report.json"
@@ -88,6 +99,7 @@ class QualityGateRunner:
     """Orchestrates comprehensive multi-dimensional model quality gate checks."""
 
     def __init__(self, config_path: Optional[Path] = None):
+        os.chdir(PROJECT_ROOT)
         self.config_path = config_path or DEFAULT_CONFIG_PATH
         self.config = self._load_config()
         self.results: Dict[str, Dict[str, Any]] = {

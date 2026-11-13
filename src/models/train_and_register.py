@@ -12,11 +12,17 @@ import logging
 from pathlib import Path
 import sys
 
-# Ensure repository root and src/ are in sys.path
+# Ensure repository root is at index 0 of sys.path and src/ does not shadow
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-for path_entry in [str(PROJECT_ROOT), str(PROJECT_ROOT / "src")]:
-    if path_entry not in sys.path:
-        sys.path.insert(0, path_entry)
+root_str = str(PROJECT_ROOT)
+src_str = str(PROJECT_ROOT / "src")
+
+while root_str in sys.path:
+    sys.path.remove(root_str)
+sys.path.insert(0, root_str)
+
+while src_str in sys.path:
+    sys.path.remove(src_str)
 
 from src.models.clustering import train_kmeans_model
 from src.models.quality_checks import QualityGateRunner

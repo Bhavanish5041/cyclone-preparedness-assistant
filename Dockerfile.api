@@ -12,6 +12,7 @@ LABEL description="FastAPI decision-support and model inference backend"
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH="/app" \
     PORT=8000 \
     WANDB_MODEL_ARTIFACT="village-preparedness-classifier:v0" \
     WANDB_CACHE_DIR="/app/.wandb_artifacts_cache" \
@@ -32,15 +33,24 @@ WORKDIR /app
 COPY docker/requirements-api.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code, processed data, local baseline models, and seed cache
+# Copy application code, processed data, and local baseline models
 COPY api/ /app/api/
 COPY src/ /app/src/
 COPY data/processed/ /app/data/processed/
 COPY models/ /app/models/
-COPY .wandb_artifacts_cache/ /app/.wandb_artifacts_cache/
 
-# Create persistent storage mountpoints with correct non-root ownership
-RUN mkdir -p /app/.wandb_artifacts_cache /app/reports/model_monitoring && \
+# Seed immutable offline W&B artifact cache from tracked render_artifact bundle
+COPY models/render_artifact/ \
+     /app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v0/
+
+# Create persistent storage mountpoints, seed v1.0.0 cache, and configure non-root ownership
+RUN mkdir -p /app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v1.0.0 \
+             /app/reports/model_monitoring && \
+    cp /app/models/logistic_regression_tier.joblib \
+       /app/models/label_encoder.joblib \
+       /app/models/logistic_regression_metadata.json \
+       /app/models/render_artifact/feature_schema.json \
+       /app/.wandb_artifacts_cache/bhavanishreddy69-na_cyclone-preparedness-assistant_village-preparedness-classifier_v1.0.0/ && \
     chown -R appuser:appgroup /app
 
 # Switch to unprivileged user

@@ -13,6 +13,7 @@ htmlcov/
 .env.*
 !.env.example
 wandb/
+.wandb_artifacts_cache/
 export/
 backups/
 data/raw/

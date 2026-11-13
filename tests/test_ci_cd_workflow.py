@@ -177,3 +177,97 @@ def test_docker_compose_config_validation():
         text=True,
     )
     assert res_test.returncode == 0, f"docker-compose.test.yml config failed: {res_test.stderr}"
+
+
+def test_ci_workflow_ghcr_image_publishing_configuration(ci_workflow_data):
+    """Verify Job 6 normalizes image repository to lowercase and validates references before push."""
+    job6 = ci_workflow_data["jobs"]["job-6-docker-validation"]
+    publish_step = None
+    for step in job6.get("steps", []):
+        if "Publish" in step.get("name", "") and "GHCR" in step.get("name", ""):
+            publish_step = step
+            break
+
+    assert publish_step is not None, "Job 6 must contain GHCR publish step"
+    script = publish_step.get("run", "")
+
+    # Requirement: Normalize to lowercase using ${GITHUB_REPOSITORY,,}
+    assert "${GITHUB_REPOSITORY,,}" in script, "Script must use ${GITHUB_REPOSITORY,,} for lowercase normalization"
+    assert "${GITHUB_REPOSITORY_OWNER,,}" in script, "Script must use ${GITHUB_REPOSITORY_OWNER,,} for owner normalization"
+
+    # Requirement: Applied consistently across api, dashboard, frontend
+    for svc in ["api", "dashboard", "frontend"]:
+        assert svc in script, f"Service '{svc}' must be included in publishing targets"
+
+    # Requirement: Validation before push
+    assert "docker push" in script, "Script must execute docker push"
+    assert "docker image inspect" in script, "Script must inspect local image prior to pushing"
+    assert "[A-Z]" in script, "Script must validate repository names contain no uppercase characters"
+
+    # Requirement: Preserve SHA tags and latest tags
+    assert "sha-" in script, "Script must preserve sha-* tags"
+    assert "latest" in script, "Script must preserve latest tags"
+
+    # Requirement: Preserve deployment references
+    assert "cyclone-assistant-" in script, "Script must preserve deployment references (cyclone-assistant-*)"
+
+
+def test_cd_workflow_repo_owner_lowercase_normalization(cd_workflow_data):
+    """Verify CD workflow normalizes repository owner to lowercase."""
+    cd_job = cd_workflow_data["jobs"]["job-7-protected-cd-deployment"]
+    step_scripts = [step.get("run", "") for step in cd_job.get("steps", [])]
+    deploy_script = None
+    for s in step_scripts:
+        if "deploy_production.py" in s:
+            deploy_script = s
+            break
+
+    assert deploy_script is not None, "CD workflow must invoke deploy_production.py"
+    assert "${GITHUB_REPOSITORY_OWNER,,}" in deploy_script, (
+        "deploy_production step must normalize repo owner using ${GITHUB_REPOSITORY_OWNER,,}"
+    )
+
+
+def test_ghcr_image_normalization_bash_simulation():
+    """Simulate bash normalization logic with mixed-case repository and verify lowercase output."""
+    bash_code = """
+    set -e
+    GITHUB_REPOSITORY="Bhavanish5041/Cyclone-Preparedness-Assistant"
+    GITHUB_REPOSITORY_OWNER="Bhavanish5041"
+    SHORT_SHA="abcd123"
+
+    REPO="${GITHUB_REPOSITORY,,}"
+    OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+
+    for SVC in api dashboard frontend; do
+      IMAGE_REPOS=(
+        "ghcr.io/$REPO/$SVC"
+        "ghcr.io/$OWNER/cyclone-assistant-$SVC"
+      )
+      for IMAGE_BASE in "${IMAGE_REPOS[@]}"; do
+        if echo "$IMAGE_BASE" | grep -q '[A-Z]'; then
+          echo "FAIL_UPPERCASE: $IMAGE_BASE"
+          exit 1
+        fi
+        for TAG in "sha-$SHORT_SHA" "latest"; do
+          FULL_IMAGE="$IMAGE_BASE:$TAG"
+          if ! echo "$FULL_IMAGE" | grep -E -q '^ghcr\\.io/[a-z0-9._/-]+:[a-zA-Z0-9._-]+$'; then
+            echo "FAIL_FORMAT: $FULL_IMAGE"
+            exit 1
+          fi
+          echo "VALID: $FULL_IMAGE"
+        done
+      done
+    done
+    """
+    res = subprocess.run(["bash", "-c", bash_code], capture_output=True, text=True)
+    assert res.returncode == 0, f"Bash simulation failed: {res.stderr}"
+    lines = res.stdout.strip().splitlines()
+    # 3 services * 2 repo paths * 2 tags = 12 verified tags
+    assert len(lines) == 12, f"Expected 12 validated tags, got {len(lines)}"
+    for line in lines:
+        assert line.startswith("VALID: ghcr.io/")
+        # Verify the entire repository path before the tag colon is lowercase
+        repo_part = line.split(":")[1].replace("//", "")
+        assert repo_part == repo_part.lower(), f"Repository part {repo_part} is not lowercase"
+

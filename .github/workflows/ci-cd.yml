@@ -260,12 +260,55 @@ jobs:
         if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          OWNER="${{ github.repository_owner }}"
-          REPO="${{ github.repository }}"
+
+          # Normalize repository and owner to lowercase per GHCR / Docker OCI naming specification
+          REPO="${GITHUB_REPOSITORY,,}"
+          REPO="${REPO:-${{ github.repository }}}"
+          REPO="${REPO,,}"
+
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          OWNER="${OWNER:-${{ github.repository_owner }}}"
+          OWNER="${OWNER,,}"
+
+          echo "Publishing container artifacts for repository: $REPO (owner: $OWNER, sha: $SHORT_SHA)"
 
           for SVC in api dashboard frontend; do
-            IMAGE_ID="ghcr.io/$REPO/$SVC"
-            echo "Publishing: $IMAGE_ID:sha-$SHORT_SHA"
-            docker tag "cyclone-$SVC:ci-test" "$IMAGE_ID:sha-$SHORT_SHA"
-            docker push "$IMAGE_ID:sha-$SHORT_SHA"
+            # Target image repositories:
+            # 1. Primary repository-scoped image path: ghcr.io/<owner>/<repo>/<svc>
+            # 2. Deployment reference image path: ghcr.io/<owner>/cyclone-assistant-<svc>
+            IMAGE_REPOS=(
+              "ghcr.io/$REPO/$SVC"
+              "ghcr.io/$OWNER/cyclone-assistant-$SVC"
+            )
+
+            for IMAGE_BASE in "${IMAGE_REPOS[@]}"; do
+              # Pre-push validation: repository name must be strictly lowercase
+              if echo "$IMAGE_BASE" | grep -q '[A-Z]'; then
+                echo "CRITICAL: Image repository '$IMAGE_BASE' contains uppercase letters. GHCR requires strictly lowercase repository names." >&2
+                exit 1
+              fi
+
+              # Validate and publish immutable SHA tag and latest tag
+              for TAG in "sha-$SHORT_SHA" "latest"; do
+                FULL_IMAGE="$IMAGE_BASE:$TAG"
+
+                # Validate image reference format conforms to ghcr.io specification
+                if ! echo "$FULL_IMAGE" | grep -E -q '^ghcr\.io/[a-z0-9._/-]+:[a-zA-Z0-9._-]+$'; then
+                  echo "CRITICAL: Image reference format is invalid for '$FULL_IMAGE'" >&2
+                  exit 1
+                fi
+
+                echo "Tagging image: cyclone-$SVC:ci-test -> $FULL_IMAGE"
+                docker tag "cyclone-$SVC:ci-test" "$FULL_IMAGE"
+
+                # Validate tagged image exists locally and is inspectable prior to push
+                if ! docker image inspect "$FULL_IMAGE" > /dev/null 2>&1; then
+                  echo "CRITICAL: Local image inspection failed for '$FULL_IMAGE' before publishing." >&2
+                  exit 1
+                fi
+
+                echo "Publishing verified image: $FULL_IMAGE"
+                docker push "$FULL_IMAGE"
+              done
+            done
           done

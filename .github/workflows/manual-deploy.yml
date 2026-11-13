@@ -141,10 +141,14 @@ jobs:
             SIM_FLAG="--simulate"
           fi
 
+          REPO_OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          REPO_OWNER="${REPO_OWNER:-${{ github.repository_owner }}}"
+          REPO_OWNER="${REPO_OWNER,,}"
+
           python3 scripts/deploy_production.py \
             --image-tag "${{ github.event.inputs.image_tag }}" \
             --commit-sha "${{ steps.resolve_target.outputs.target_commit || github.sha }}" \
-            --repo-owner "${{ github.repository_owner }}" \
+            --repo-owner "$REPO_OWNER" \
             --services "${{ github.event.inputs.services }}" \
             --health-timeout 60 \
             $SIM_FLAG
